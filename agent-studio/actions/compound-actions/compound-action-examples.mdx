@@ -1,0 +1,267 @@
+---
+title: "Compound Action Examples"
+description: "These examples show how data moves between  and actions."
+---
+
+# Get Salesforce Accounts by Name (Single Action, Return)
+
+This compound action performs a single action called `get_account_info` which calls the Salesforce SOQL API to fetch accounts passing in `account_name`as the slot to be used as the query.
+
+### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        output_key: account_info
+        action_name: get_account_info # the action that fetches accounts by name
+        progress_updates:
+          on_complete: Found info for {{data.account_name}}
+          on_pending: Searching Salesforce for {{data.account_name}}
+        input_args:
+          account_name: data.account_name
+    - return:
+        output_mapper:
+        	# if no results are returned the values will evaluate to ""
+          description: data.account_info.records[0].Description
+          account_id: data.account_info.records[0].Id
+  ```
+</CodeGroup>
+
+# Create Salesforce Case & Sync to JIRA
+
+This compound action implements a cross-platform case management workflow that creates linked tickets in both Salesforce and JIRA:
+
+1. Creates a Salesforce case with:
+
+   1. Description
+   2. subject
+   3. account ID
+   4. Case type from input data
+
+2. Creates a corresponding JIRA issue with:
+
+   1. Same description and subject as the Salesforce case
+   2. Captures the JIRA issue key from the generated case for linking
+
+3. Links the two systems by:
+
+   1. Updating the original Salesforce case with a comment/field containing the JIRA URL
+   2. Constructs the full JIRA URL using the Moveworks DSL $CONCAT function: [https://company.atlassian.net/browse/\[JIRA-KEY\]](https://company.atlassian.net/browse/%5BJIRA-KEY%5D)]\`
+
+### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        output_key: case_info
+        action_name: create_sfdc_case
+        progress_updates:
+          on_complete: Created a new case in Salesforce
+          on_pending: Creating a new case in Salesforce
+        input_args:
+          description: data.description
+          subject: data.subject
+          account_id: data.account_id
+          type: data.type
+    - action:
+        output_key: jira_issue
+        action_name: create_jira_issue
+        progress_updates:
+          on_complete: Added Issue to JIRA
+          on_pending: Adding Issue to JIRA
+        input_args:
+          description: data.description
+          subject: data.subject
+    - action:
+        output_key: case_update
+        action_name: update_sfdc_case
+        progress_updates:
+          on_complete: Updated Case Object
+          on_pending: Adding JIRA Link to Case Comment
+        input_args:
+          case_id: data.case_info.id
+          jira_link: $CONCAT(["https://company.atlassian.net/browse/",
+            data.jira_issue.key])
+  ```
+</CodeGroup>
+
+# Onboard Users (Multi Action, Switch, Return)
+
+**Slots**
+
+* `username`
+* `firstName`
+* `lastName`
+* `companyName`
+* `groupName`
+* `managerName`
+* `managerEmail`
+
+### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        output_key: msgraph_user
+        action_name: add_username_to_azure
+        progress_updates:
+          on_complete: Added {{data.username}} to Azure
+          on_pending: Attempting to add {{data.username}} to Azure
+        input_args:
+          companyName: data.companyName
+          fullName: $CONCAT([data.firstName, data.lastName], " ", TRUE)
+          firstName: data.firstName
+          username: IF data.username THEN $CONCAT([data.username,
+            "@moveworksai.onmicrosoft.com"]) ELSE NULL
+    - switch:
+        cases:
+          - steps:
+              - action:
+                  output_key: group_info
+                  action_name: get_group_info
+                  progress_updates:
+                    on_complete: Found {{data.groupName}} in Azure
+                    on_pending: Looking up group in Azure by name
+                  input_args:
+                    groupName: data.groupName
+              - action:
+                  output_key: add_user_to_group_result
+                  action_name: add_user_to_group
+                  progress_updates:
+                    on_complete: Added {{data.username}} to Azure Group
+                    on_pending: Adding user to group
+                  input_args:
+                    groupId: data.group_info.value[0].id
+                    userId: data.msgraph_user.id
+            condition: data.groupName
+    - action:
+        output_key: jira_customer
+        action_name: add_username_to_jira
+        progress_updates:
+          on_complete: Added {{data.username}} to JIRA
+          on_pending: Attempting to add {{data.username}} to JIRA
+        input_args:
+          email: IF data.username THEN $CONCAT([data.username,
+            "@moveworksai.onmicrosoft.com"]) ELSE NULL
+          displayName: $CONCAT([data.firstName, data.lastName], " ", TRUE)
+    - action:
+        output_key: okta_user
+        action_name: add_username_to_okta
+        progress_updates:
+          on_complete: Added {{data.username}} to Okta
+          on_pending: Attempting to add {{data.username}} to Okta
+        input_args:
+          username: IF data.username THEN $CONCAT([data.username,
+            "@moveworksai.onmicrosoft.com"]) ELSE NULL
+          lastName: data.lastName
+          firstName: data.firstName
+          managerEmail: data.managerEmail
+          managerName: data.managerName
+    - return:
+        output_mapper:
+          lastName: data.lastName
+          firstName: data.firstName
+  ```
+</CodeGroup>
+
+# Lookup Google Calendar Events (Action, Script Action, Return)
+
+This compound action takes in 2 slots `start_date` and `end_date` and performs a Google Calendar REST API call to retrieve events, and data cleaning:
+
+1. Fetches calendar events from Google Calendar API using the specified date range (timeMin to timeMax) from the input slots.
+
+2. Cleans and filters the event data using a Python script that:
+
+   1. Takes the raw calendar events from gcal\_output.items Extracts only 3 specific fields from each event:
+
+      1. **htmlLink** - URL to view the event in Google Calendar
+      2. **description** - Event description text
+      3. **summary** - Event title/summary
+
+3. Removes all other event metadata (attendees, location, timestamps, etc.)
+
+4. Returns the simplified event list as an object called `final_events`
+
+### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: fetch_gcal_events
+        input_args:
+          timeMin: data.start_date
+          timeMax: data.end_date
+        output_key: gcal_output
+    - script:
+        output_key: cleaned_events
+        input_args:
+          events: data.gcal_output.items
+        code: "[{'htmlLink': event.get('htmlLink'), 'description':
+          event.get('description'), 'summary': event.get('summary')} for event in
+          events]"
+    - return:
+        output_mapper:
+          final_events: data.cleaned_events
+  ```
+</CodeGroup>
+
+# Grant Copilot License & Remove after 7 days (Action, Action w/ Delay Config, Action, Return)
+
+This compound action below implements a temporary Microsoft Copilot license assignment workflow with the following sequence:
+
+1. Assigns a Microsoft Copilot license to the user (using their email address from metadata)
+2. Sends an immediate notification to the user confirming the license assignment and warning that it will be automatically removed in 7 days
+3. Waits 7 days by leveraging a `delay_config`, then automatically removes the Copilot license from the user's account
+4. Returns a final message to inform the user that their license has been removed and they can request access again if needed
+
+This workflow is useful for temporary trial access or short-term license provisioning, ensuring licenses don't remain assigned indefinitely and providing clear communication to users about the temporary nature of their access.
+
+### Compound Action
+
+```
+steps:
+  - action:
+      action_name: ms_graph_assign_copilot_license
+      input_args:
+        userPrincipalName: meta_info.user.email_addr
+      output_key: ms_graph_assign_copilot_license_result
+  - action:
+      action_name: mw.send_plaintext_chat_notification
+      input_args:
+        message: '"You have been successfully assigned a Microsoft Copilot License it
+          will be removed in 7 days"'
+        user_record_id: meta_info.user.id
+      output_key: send_plaintext_chat_notification_result
+  - action:
+      output_key: ms_graph_remove_copilot_license_result
+      action_name: ms_graph_remove_copilot_license
+      delay_config:
+        days: "7"
+      input_args:
+        userPrincipalName: meta_info.user.email_addr
+  - return:
+      output_mapper:
+        message_to_user: '"The license for Microsoft Copilot has been removed from your
+          account if you need access again please ask Me, TELL THE USER THE
+          LICENSE WAS REMOVED NOT ASSIGNED"'
+```
+
+***
+
+[Compound Action Data Bank](/docs/compound-action-exposed-data)
+
+[Troubleshooting Compound Actions](/docs/troubleshooting-compound-actions)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Get Salesforce Accounts by Name (Single Action, Return)](#get-salesforce-accounts-by-name-single-action-return)
+  * [Create Salesforce Case & Sync to JIRA](#create-salesforce-case--sync-to-jira)
+  * [Onboard Users (Multi Action, Switch, Return)](#onboard-users-multi-action-switch-return)
+  * [Lookup Google Calendar Events (Action, Script Action, Return)](#lookup-google-calendar-events-action-script-action-return)
+  * [Grant Copilot License & Remove after 7 days (Action, Action w/ Delay Config, Action, Return)](#grant-copilot-license--remove-after-7-days-action-action-w-delay-config-action-return)

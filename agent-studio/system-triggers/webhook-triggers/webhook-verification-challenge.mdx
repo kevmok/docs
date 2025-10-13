@@ -1,0 +1,133 @@
+---
+title: "Webhook Verification Challenge"
+---
+
+# Introduction
+
+To begin sending webhooks to your listener, some external systems require an initial setup validation known as a **verification challenge**. This one-time process confirms that your endpoint is correctly configured to receive webhooks, preventing misrouting or unauthorized registrations.
+
+Verification challenges are not mandatory for all systems. Many, like payment processors or code repositories, rely solely on signature verification. However, platforms such as messaging services often mandate challenges to establish trust. For instance, Slack uses a challenge token, while Adobe employs a header code response. This step **enhances security** by ensuring only legitimate endpoints are registered, protecting against spoofed webhook URLs. Our platform supports this through a declarative UI, allowing you to define rules and responses without custom coding, accommodating a variety of external system requirements.
+
+# How Webhook Verification Challenges Work
+
+Webhook verification challenges involve a one-time setup validation where an external system sends a special request to your endpoint to verify its readiness. This process typically follows a **challenge-response pattern**, ensuring your server, in this case Agent Studio, can correctly respond with expected data or status codes.
+
+#### Core Concept
+
+The external system initiates a verification request, often distinguishable by unique parameters or headers. Your endpoint must detect this request and respond appropriately, signaling that it is the intended recipient. This might involve returning a specific status code, header value, a challenge token, or a computed value based on the request data.
+
+#### Challenge-Response Mechanism
+
+1. **Detection**: The system identifies the verification request using predefined conditions, such as a specific HTTP method, query parameter, or header.
+2. **Response**: Your endpoint sends a response tailored to the system's expectations, which could be a simple HTTP status (e.g., 200 OK) or a computed token signed with a shared secret.
+
+#### Common Variations
+
+* **Token-Based**: Systems like Slack send a challenge token in the request body or query, expecting it to be echoed back in the response.
+* **Status-Based**: External systems require a specific HTTP status code (e.g., 200) to confirm endpoint validity.
+* **Header-Based**: Other systems will be expect a specific value in the response headers.
+* **Computed Response**: Some systems expect a hashed value (e.g., HMAC) of the challenge data, using a signing secret.
+
+#### Security Considerations
+
+Challenges **prevent unauthorized endpoint registration** by requiring active participation. They also mitigate risks of misconfiguration, ensuring your server can handle webhook traffic before full integration. However, improper setup (e.g., incorrect token hashing) can lead to failed verifications, so alignment with the external system's documentation is critical.
+
+# Configuring Verification Challenges in Agent Studio
+
+Our UI simplifies setup for webhook listeners, providing a dedicated **One Time Verification Challenge** panel when configuring your Listener. To begin, create or edit a listener for incoming events:
+
+![](/images/docs/42d204a7011b4525a1f703c5ba94b42e8d19a15b46e67a585b25673b9328a72f-CleanShot_2025-09-12_at_10.11.29.png)
+
+### Field-by-Field Breakdown
+
+* **Set Challenge Detection**: Use Moveworks DSL to define rules for detecting verification requests. This field accesses five elements:
+
+  * **raw\_body**: The unparsed HTTP body as bytes (e.g., `b'{{"event":"update"}}'`).
+
+  * **parsed\_body**: The JSON-parsed raw body.
+
+  * **query\_params**: URL query parameters destructured as JSON.
+
+  * **headers**: The headers of the request.
+
+  * **http\_method**: The method of the request. For example, a rule such as `http_method == "POST"` allows only POST requests
+
+    ![](/images/docs/d33c957c25eda6f4899df50a94a0789d181302a1ffd47d322436aab89a6e9b32-CleanShot_2025-09-12_at_10.23.47.png)
+
+* **HTTP Response Status Code**: Select a status code to return in the response, aligning with the external system's requirement. The default is `200 OK`, but options like `204 No Content` may apply. Choose based on the system's documentation.
+
+* **HTTP Response Headers**: Use Moveworks Data Mappers to define custom headers for the response. This field supports dynamic values based on request data, enhancing flexibility for specific system needs.
+
+* **HTTP Response Body**: Configure the response body using Moveworks Data Mappers. This can include static text or dynamic values, such as a challenge token.
+
+  ![](/images/docs/b114bd75e476308a87efc8c5516667613a50f747d1bd72549f041c39354650a4-CleanShot_2025-09-12_at_10.41.08.png)
+
+* **Add Challenge Token**: Click this button to create a challenge token for systems requiring a signed response. Each token has four fields:
+
+  * **Name:** Set a unique name (e.g., `example_name`) to reference the token later with the syntax `challenge_token["name"]`.
+  * **Signing Algorithm**: Select the HMAC variant (e.g., `HMAC-SHA256`) used by the external system.
+  * **Signing Secret**: Enter the shared secret provided by the system, masked for security.
+  * **Signing Payload**: Point to the field containing the challenge token (e.g., `query_params["challenge"]`) using Moveworks Data Mappers.
+
+The platform hashes the payload with the secret and algorithm, making the result available in the response body via `challenge_token["name"]` syntax.
+
+![](/images/docs/5f1966b5b4c704d36f837e8151048c8363c34aa0f67ddf59cc71e3f6ded7a76a-CleanShot_2025-09-12_at_10.52.37.png)
+
+The following diagram visually represents both `one-time verification` flows. Color coding:
+
+* **Green** represents inputs
+* **Blue** represents processing
+* **Red** represents validation
+
+```
+graph TD
+    subgraph Token-Based Flow
+        direction TB
+        A[Incoming Challenge Request] -->B[Detect via DSL Rule]
+        B -->C[Extract Token]
+        C -->D[Sign Token <br/>]
+        D -->E[Build Response <br/>]
+        E -->F{Valid Echo?}
+        F -->|Yes|G[Webhook Activated]
+        F -->|No|H[Retry or Fail]
+    end
+
+    subgraph No-Token Flow
+        direction TB
+        A2[Incoming Verification Request] -->B2[Detect via DSL Rule]
+        B2 -->C2[Build Response]
+        C2 -->D2{Valid Echo?}
+        D2 -->|Yes|E2[Webhook Activated]
+        D2 -->|No|F2[Retry or Fail]
+    end
+
+    style A fill:#90ee90,stroke:#333,stroke-width:2px
+    style B fill:#add8e6,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,stroke:#333,stroke-width:2px
+    style E fill:#add8e6,stroke:#333,stroke-width:2px
+    style F fill:#ff6347,stroke:#333,stroke-width:2px
+    style G fill:#90ee90,stroke:#333,stroke-width:2px
+    style H fill:#ff6347,stroke:#333,stroke-width:2px
+
+    style A2 fill:#90ee90,stroke:#333,stroke-width:2px
+    style B2 fill:#add8e6,stroke:#333,stroke-width:2px
+    style C2 fill:#add8e6,stroke:#333,stroke-width:2px
+    style D2 fill:#ff6347,stroke:#333,stroke-width:2px
+    style E2 fill:#90ee90,stroke:#333,stroke-width:2px
+    style F2 fill:#ff6347,stroke:#333,stroke-width:2px
+```
+
+***
+
+[Listener Configuration](/docs/webhooks-listener)
+
+[Webhook Signature Verification](/docs/webhook-signature-verification)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Introduction](#introduction)
+  * [How Webhook Verification Challenges Work](#how-webhook-verification-challenges-work)
+  * [Configuring Verification Challenges in Agent Studio](#configuring-verification-challenges-in-agent-studio)

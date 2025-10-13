@@ -1,0 +1,111 @@
+---
+title: "Conversational Agents"
+description: "Conversational agents are the interactive face of Moveworks’ Agent Studio, responding to user queries through the assistant to automate business processes on demand. In short, conversational agents are user-driven in their initiation and collaborative in their execution."
+---
+
+# How Conversational Agents Work
+
+Conversational agents are activated by user interactions within the Moveworks assistant, where they process natural language inputs to understand intent and context. Once initiated, the agent engages in a dynamic dialogue, which may involve clarifying questions, gathering additional information, or executing a sequence of actions across integrated systems. These actions can include API calls, data retrieval, conditional logic, multi-step workflows, and real-time updates, all powered by plugins configured in the Plugin Workspace. The Agentic Automation Engine manages the conversation flow, ensures secure interactions, and adapts to user responses for seamless resolutions.
+
+# Types of Conversational Agents
+
+Agent Studio categorizes conversational agents into 2 distinct types, each designed to address specific automation needs. Below is a detailed breakdown of each type, including their capabilities, use cases, and examples.
+
+| Agent Type     | Description                                                                                             | Example Use Case                                                                               | Availability |
+| -------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------ |
+| Task Agents    | Handle specific, well-defined tasks with a single request-response cycle, ideal for routine operations. | Check the status of a support ticket or retrieve sales data from a CRM system.                 | Available    |
+| Process Agents | Manage multi-step workflows across systems, coordinating complex processes with decision points.        | Automate employee onboarding by creating accounts, assigning training, and setting up payroll. | Available    |
+
+## Task Agents
+
+```
+sequenceDiagram
+    participant U as User
+    participant A as Task Agent
+    participant B as Backend System
+    U->>A: Submit Task Request
+    A->>A: Interpret and Validate Request
+    A->>B: Execute Task (e.g., API Call, Database Query)
+    B->>A: Return Task Result
+    A->>A: Formulate Response
+    A->>U: Deliver Response
+```
+
+Task Agents excel at executing discrete, single-step tasks that require minimal back-and-forth. They are perfect for automating routine operations that previously demanded manual effort, such as retrieving information or submitting requests. By leveraging plugins built in the Plugin Workspace, Task Agents connect seamlessly to enterprise systems to perform actions like querying databases or updating records. Their strength lies in reducing the time and effort spent on mundane tasks, allowing users to focus on higher-value work.
+
+* **How It Works**: Task Agents operate by receiving a user request, processing it through a predefined set of actions, and returning a response. They rely on plugins to define their capabilities and connect to enterprise systems like databases, APIs, or third-party services. The agent’s workflow is straightforward: it takes an input, performs a single action using the plugin, and returns the result. This simplicity makes Task Agents highly efficient for tasks that don’t require complex logic or multi-step processes. Developers can also add basic conditional checks—such as validating input data or handling errors—to ensure the agent behaves reliably in different scenarios.
+
+* **Example**: A Task Agent can check the status of a Jira ticket by connecting to the Jira API, retrieving the ticket details, and presenting them to the user in natural language. Another example is fetching real-time sales figures from Salesforce, saving users from navigating complex dashboards.
+
+* **Use Case**: Ideal for quick, repetitive tasks that employees perform frequently, such as:
+
+  * **Password Resets**: Automating the process of resetting passwords in an identity management system.
+  * **Status Checks**: Retrieving the status of orders, tickets, or shipments from various systems.
+  * **Data Lookups**: Fetching employee details, inventory levels, or financial metrics from databases or APIs.
+
+## Process Agents
+
+```
+sequenceDiagram
+    participant U as User
+    participant A as Process Agent
+    participant B1 as Backend System 1
+    participant B2 as Backend System 2
+    participant B3 as Backend System 3
+    U->>A: Initiate Workflow Request (e.g., Onboard Employee)
+    A->>A: Interpret and Validate Request
+    A->>B1: Execute Step 1 (e.g., Create Account)
+    B1->>A: Return Result
+    A->>A: Apply Conditional Logic
+    A->>B2: Execute Step 2 (e.g., Assign Training)
+    B2->>A: Return Result
+    A->>B3: Execute Step 3 (e.g., Set Up Payroll)
+    B3->>A: Return Result
+    A->>A: Formulate Response
+    A->>U: Deliver Proces Completion     
+```
+
+Process Agents are designed for complex, multi-step workflows that span multiple systems and involve conditional logic or decision points. They orchestrate end-to-end business processes, ensuring seamless coordination between systems like HR platforms, IT tools, and financial software. These agents are built using the Plugin Workspace and powered by the Automation Engine to handle intricate automation scenarios.
+
+* **How It Works**: Process Agents are designed to handle workflows that involve a series of interconnected tasks, often across different systems. They manage the process with conditional logic and cross-system integration, ensuring that each step is completed successfully before moving to the next.
+
+* **Example**: A Process Agent could automate the entire employee onboarding process. Upon receiving a new hire’s details, the agent:
+
+  * Creates a user account in Active Directory.
+  * Assigns mandatory training modules in a learning management system.
+  * Sets up the employee’s payroll information in Workday.
+  * Sends a welcome email with login credentials and training instructions.
+
+* **Use Case**: Process Agents are perfect for automating complex, multi-step workflows that involve coordination across systems, such as:
+
+  * **Change Management**: Managing approvals, updates, and notifications for system changes.
+  * **Procurement Approvals**: Routing purchase requests through approval chains and updating inventory systems.
+  * **IT Incident Resolution**: Automating ticket triaging, diagnostics, and resolution steps.
+
+* **How It Works**: Process Agents use plugins to define each step of the workflow, with the Automation Engine managing the sequence and handling errors or edge cases.
+
+# Best Practices
+
+* **Start Small**: Begin with a simple Task Agent to understand plugin creation and API integration.
+* **Test Thoroughly**: Validate agent behavior with edge cases to ensure reliability.
+* **Leverage the Marketplace**: Explore pre-built agents to accelerate development and learn best practices.
+* **Provide Feedback**: Share suggestions via the Moveworks community to improve Agent Studio.
+
+***
+
+[Action Orchestrator](/docs/action-orchestrator)
+
+[Conversational Triggers](/docs/natural-language-triggers)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [How Conversational Agents Work](#how-conversational-agents-work)
+
+  * [Types of Conversational Agents](#types-of-conversational-agents)
+
+  * * [Task Agents](#task-agents)
+    * [Process Agents](#process-agents)
+
+  * [Best Practices](#best-practices)

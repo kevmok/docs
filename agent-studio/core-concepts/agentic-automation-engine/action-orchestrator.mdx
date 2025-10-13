@@ -1,0 +1,86 @@
+---
+title: "Action Orchestrator"
+---
+
+# What is the Action Orchestrator?
+
+The Action Orchestrator makes it possible for you to build **intention-focused tools**, improving the reliability of your AI agents. There are two main frameworks:
+
+* [Conversation Processes ](/docs/plugin-process#/)can keep track of standard operating procedures across multiple turns of conversation. They are great for guiding the user through a multi-step flow with lots of expert decisions.
+* [Compound Actions](/docs/compound-actions#/) execute workflows with both system actions & human approvals, allowing you to reliably chain actions without going back to the user for more information.
+
+Since both frameworks are connected to the Agentic Reasoning Engine, the are capable of "pausing" so your AI agents can support enterprise features like [OAuth 2.0 Authorization Code](/docs/oauth-20-authorization-code#/), which require user input mid-automation for secure AI agents. This can't be done with traditional iPaaS & workflow tools.
+
+# Why do we need intention-focused tools?
+
+Vercel wrote [a great blog](https://vercel.com/blog/the-second-wave-of-mcp-building-for-llms-not-developers) on designing intention-focused tools. We'll cite a few key sections.
+
+Intention-focused tools vary from API-shaped tools quite dramatically.
+
+| API-shaped tools                                    | Intention-based tools          |
+| --------------------------------------------------- | ------------------------------ |
+| `create_project`, `add_env`, `deploy`, `add_domain` | `deploy_project`               |
+| Multiple calls with state management                | Single atomic operation        |
+| Returns technical status codes                      | Returns conversational updates |
+| LLM assembles the workflow                          | Tool owns the complete process |
+
+Consider the following traditional "deployment API"
+
+<CodeGroup>
+  ```bash bash
+  // Traditional API usage: developer manages the sequence
+  const project = await client.projects.create({
+    name: domain.replace(/\./g, '-'),
+    gitRepository: { repo: repoUrl }
+  });
+
+  await client.projects.createProjectEnv({
+    idOrName: project.id,
+    upsert: 'true',
+    requestBody: Object.entries(env).map(([key, value]) => ({
+      key, value,
+      target: ['production', 'preview', 'development'],
+      type: 'encrypted'
+    }))
+  });
+
+  const deployment = await client.deployments.createDeployment({
+    requestBody: {
+      name: project.name,
+      target: 'production',
+      gitSource: { type: 'github', repo: repo.replace('.git', ''), ref: 'main' }
+    }
+  });
+
+  await client.projects.addProjectDomain({
+    idOrName: project.id,
+    requestBody: { domain: domain }
+  });
+  ```
+</CodeGroup>
+
+When you write code, you keep track of information between API calls.
+
+* You store the project ID from the create call,
+* check deployment status before adding the domain, and
+* wrap error handling around each step so failures don't break the entire process.
+
+An LLM **can** accomplish these, however, each time the LLM has to "solve the puzzle" from scratch
+
+* manage IDs & data-passing across multiple calls
+* figure out the right sequence to call tools
+
+Teams who build intention-focused tools are able to deploy AI agents more frequently & more reliably.
+
+***
+
+[Policy Validators](/docs/policies)
+
+[Conversational Agents](/docs/conversational-agents)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What is the Action Orchestrator?](#what-is-the-action-orchestrator)
+  * [Why do we need intention-focused tools?](#why-do-we-need-intention-focused-tools)

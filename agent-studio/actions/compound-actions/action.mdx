@@ -1,0 +1,171 @@
+---
+title: "Action"
+---
+
+# Overview
+
+Actions are the core executable units in compound actions, think of them as your agent's "doers". Use this expression to invoke predefined actions.
+
+#### Key concepts
+
+* **Action Types**: Supports three types callable via `action_name`: HTTP actions (for API calls), script actions (for custom logic), and Compound Actions (for reusable workflows).
+* **Execution Flow**: The expression runs the specified action, storing results in an output key variable for downstream use. Delays handle asynchronous behaviors pausing the execution of the flow.
+* **Dynamic Elements**: Pass variables from prior steps or user data using Moveworks Data Mapping; outputs capture full API responses or script results.
+
+# Low-Code Editor
+
+Add an action step to the editor, then use the right-hand panel to wire it up. Below, follow the annotated steps to build a simple feature request update (e.g., via an HTTP action). Follow the steps to build a simple action expression.
+
+![](/images/docs/3b23bedae17cda28b393d870673cf0abd072ddd6030ee93db3b6ad147c28b4e3-CleanShot_2025-09-15_at_12.12.57.png)
+
+1. **Select Action**: Choose from your predefined actions. *Tip: If it's a new action, define it first*.
+2. **Set Output Key Variable**: Name a variable to capture the result. This stores the API response or script output for later steps. *Tip: Use descriptive names like `update_output` to avoid debugging headaches.*
+3. **Set Dynamic Inputs** Map inputs via code editor fields such as `feature_request_id: data.feature_id`. *Common Pitfall: Ensure vars exist upstream*.
+4. **Set Execution Updates** Customize user-facing messages for pending ("Updating feature request, please wait...") and complete ("The feature request has been successfully updated!") states.
+5. **Delay Action** Execution Add a wait (e.g., 3 seconds) via units like seconds or minutes.
+
+# Syntax Reference
+
+#### Schema
+
+<CodeGroup>
+  ```bash bash
+  action:
+    action_name: ACTION_NAME*  # str: HTTP/script/compound action ID (e.g., 'fetch_user_details')
+    output_key: OUTPUT_VAR*    # any: Variable to store results (e.g., 'user_details')
+    input_args:                # dict: Dynamic params (uses Data Mapping Syntax)
+      key1: VALUE_EXPR         # e.g., data.user_id or static '''abc123'''
+      key2: VALUE_EXPR
+    progress_updates:          # dict: User messages (optional)
+      on_pending: 'PENDING_MSG'  # e.g., "Fetching details..."
+      on_complete: 'COMPLETE_MSG' # e.g., "Success!"
+    delay_config:              # dict: Wait time (optional; DSL number expr per unit)
+      seconds: 'DSL_EXPR'       # e.g., "10" or "data.delay"
+      # Other units: minutes, hours, days
+  ```
+</CodeGroup>
+
+#### Fields
+
+| Field              | Type                                                   | Mandatory | Description                                                        |
+| ------------------ | ------------------------------------------------------ | --------- | ------------------------------------------------------------------ |
+| `action_name`      | string (action identifier)                             | Yes       | Specifies the HTTP, script, or Compound Action to run.             |
+| `output_key`       | string                                                 | Yes       | Name of variable storing the action's result (e.g., API response). |
+| `input_args`       | dictionary                                             | No        | Key-value pairs for action parameters                              |
+| `progress_updates` | dictionary `{on_pending: string, on_complete: string}` | No        | Messages shown to user during pending and completion states.       |
+| `delay_config`     | dictionary of DSL number expressions                   | No        | Time units (seconds, minutes, hours, days) for pre-execution wait. |
+
+# Practical Examples
+
+### Example 1: Basic HTTP Action
+
+Retrieve user info via API, with progress feedback
+
+<CodeGroup>
+  ```bash bash
+  action:
+    action_name: fetch_user_details  # HTTP action
+    output_key: user_details
+    input_args:
+      user_id: data.user_id     # Dynamic from input args
+    delay_config:
+      seconds: "5"                  # Brief pause before executing
+    progress_updates:
+      on_pending: "Looking up your profile..."
+      on_complete: "Profile loaded!"
+  ```
+</CodeGroup>
+
+#### Expected Output
+
+<CodeGroup>
+  ```bash bash
+  data: {
+    user_details: {
+      "user_id": "abc123",
+      "name": "Jane Smith",
+      "email": "[email protected]"
+    }
+  }
+  ```
+</CodeGroup>
+
+The API response is stored un the `user_details` output key defined above and is now available in the data bank for any downstream steps.
+
+### Example 2: Script Action
+
+Run a script action that add two strings together
+
+#### Python script
+
+<CodeGroup>
+  ```bash bash
+  return str1 + " " + str2
+  ```
+</CodeGroup>
+
+#### Action
+
+<CodeGroup>
+  ```bash bash
+  action:
+    action_name: add_two_strings     # Script action
+    output_key: concatenated_strings
+    input_args:
+      str1: meta_info.user.name
+      str2: '''is an AI Engineer'''
+  ```
+</CodeGroup>
+
+### Example 3: Nested Compound Action
+
+Run a compound action that approves and notifies a ticket
+
+#### Nested Compound Action
+
+<CodeGroup>
+  ```bash bash
+  # approve_and_notify
+  steps:
+    - action:
+        action_name: approve_ticket  
+        output_key: approved_ticket_output
+        input_args:
+          ticket_id: data.ticket_id
+          status: '''approved'''
+    - action:
+        action_name: notify_team
+        output_key: notified_team_output
+        input_args:
+          team_id: data.approved_ticket_output.team_id
+  ```
+</CodeGroup>
+
+#### Action calling nested compound action
+
+<CodeGroup>
+  ```bash bash
+  action:
+    action_name: approve_and_notify  # Compound action
+    output_key: ticket_status
+    input_args:
+      ticket_id: data.ticket_id
+    progress_updates:
+      on_complete: "Ticket approved and team notified!"
+  ```
+</CodeGroup>
+
+***
+
+[Compound Actions](/docs/compound-actions)
+
+[Switch](/docs/switch)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+  * [Low-Code Editor](#low-code-editor)
+  * [Syntax Reference](#syntax-reference)
+  * [Practical Examples](#practical-examples)

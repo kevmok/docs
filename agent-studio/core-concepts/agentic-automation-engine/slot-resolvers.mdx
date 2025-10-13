@@ -1,0 +1,60 @@
+---
+title: "Slot Resolvers"
+description: "Resolving natural language into business objects"
+---
+
+# What are slot resolvers?
+
+Slot resolvers convert natural language into data types. The way that users will reference your business objects will seldom match how they're stored in business systems.
+
+![](/images/docs/24b4e8795e72b5c671a9f536ecd7e4ec1cbe92559915381fdcefd98135e71658-CleanShot_2024-10-24_at_18.18.212x.png)
+
+For example...
+
+* "Tomorrow's Standup" is a `GoogleCalendarEvent` with ID = `4s567d8s908f87654sa678ds`
+* "Jamie" is a `User` with ID = `9e107d9d-372b-4ac9-b4e9-0fbccd3029ab`
+
+We purpose-built Slot Resolvers to solve this problem. **[Plugins](/docs/plugins) built using slot resolvers will perform substantially better when deployed to production.**
+
+# How do they work?
+
+## Candidate Retrieval
+
+Then, the AI agent retrieves possible values that might satisfy the constraints of your slot. These are retrieved using the [resolver strategy](/docs/resolver-strategies).
+
+<Frame caption="In this case, the AI agent search for">
+  <img src="/images/docs/3d741695b6e7dbf01a267e14f57d29e9d3d0c0303ece9a23d9c4ba7e6fe2cd3a-CleanShot_2025-02-05_at_12.17.08.png" />
+</Frame>
+
+## Disambiguation
+
+Then, when the AI agent finds multiple possible matches, it presents them (with [citations](/docs/citations)) so the user can pick the right one.
+
+![](/images/docs/b760cb0254cda14f5fadf33ea042da84213e6e7dad75264af606eff348d1d096-CleanShot_2024-10-24_at_18.29.322x.png)
+
+## Stable Memory & State Management
+
+Slot Resolvers use a **symbolic working memory architecture** to keep track of both
+
+1. the list of possible values possible values &
+2. the selected value
+
+As a result you can be confident the AI agent won't accidentally change IDs or make up new ones when providing them to your actions.
+
+***
+
+[Manifest Generator](/docs/manifest-generator)
+
+[Policy Validators](/docs/policies)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What are slot resolvers?](#what-are-slot-resolvers)
+
+  * [How do they work?](#how-do-they-work)
+
+  * * [Candidate Retrieval](#candidate-retrieval)
+    * [Disambiguation](#disambiguation)
+    * [Stable Memory & State Management](#stable-memory--state-management)

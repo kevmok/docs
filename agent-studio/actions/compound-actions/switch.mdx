@@ -1,0 +1,164 @@
+---
+title: "Switch"
+---
+
+# Overview
+
+The switch expression is a control flow expression that evaluates a list of boolean conditions in order. The first true condition executes its steps; if none match, it runs the optional default. Each case pairs a condition with a list of expressions; empty steps allow silent passes.
+
+# Low-Code Editor
+
+Add a switch step, define DSL conditions per case and add expressions inside each case.
+
+![](/images/docs/922db6836498a8de0f78032011f7914042c7fb5c5bebfe909537232bcbc844ff-CleanShot_2025-09-15_at_13.57.18.png)
+
+1. **Define the Number of Cases**: Click on the "+" or "-" symbol to add or remove cases.
+2. **Define Condition in a Case**: Select a case block; enter a boolean DSL expression in the editor (e.g., `data.operation == "sum"`)'
+3. **Add Steps in the Case**: Click "+" inside the case to add expressions.
+4. **Configure the Default**: Add fallback steps. Omit for silent skips on no-match.
+
+# Syntax Reference
+
+#### Schema
+
+<CodeGroup>
+  ```bash bash
+  switch:
+    cases:                          # list: Sequence of condition-step pairs (required)
+      - condition: DSL_BOOLEAN_EXPR  # boolean: DSL expr (e.g., "data.user_id == meta_info.user.id")
+        steps:                      # list: Nested expressions (e.g., actions)
+          - EXPRESSION_1
+          - EXPRESSION_2
+      - condition: ANOTHER_EXPR
+        steps:
+          - EXPRESSION_3
+    default:                        # dict: Fallback if no cases match (optional)
+      steps:                        # list: Default expressions
+        - EXPRESSION_4
+  ```
+</CodeGroup>
+
+#### Fields
+
+| Field           | Type        | Mandatory | Description                                       |
+| --------------- | ----------- | --------- | ------------------------------------------------- |
+| `cases`         | list\[dict] | Yes       | Sequential checks: First true runs its steps      |
+| `condition`     | boolean     | Per case  | DSL expressions                                   |
+| `steps`         | list\[expr] | No        | List of expressions to execute. Can be empty `[]` |
+| `default.steps` | list\[expr] | No        | Catch-all list of expressions.                    |
+
+# Practical Examples
+
+### Example 1: Simple ID Match
+
+Notify only if the user is not the requestor
+
+<CodeGroup>
+  ```bash bash
+  switch:
+    cases:
+      - condition: meta_info.user.id == data.requestor.record_id
+        steps: []  # Skip if self-add
+    default:
+      steps:
+        - action:
+            action_name: mw.send_plaintext_chat_notification
+            output_key: notification_sent
+            input_args:
+              user_record_id: data.user.record_id
+              message: 
+              	RENDER():
+                template:"Hey {{user_name}}, {{requestor_name}} added you to a special group"
+                args:
+                	user_name: meta_info.user.full_name
+  								requestor_name: data.requestor.full_name
+  ```
+</CodeGroup>
+
+**Expectation**: If there's a match, stay silent; If not, send a message to the user
+
+### Example 2: Role-Based Welcomes
+
+Tailor onboarding by access level.
+
+<CodeGroup>
+  ```bash bash
+  switch:
+    cases:
+      - condition: data.user.access_level == "admin"
+        steps:
+          - action:
+              action_name: send_admin_welcome
+              output_key: admin_msg
+              input_args:
+                user_id: data.user.id
+                message: '''Welcome, Admin! Full dashboard access unlocked.'''
+      - condition: data.user.access_level == "member"
+        steps:
+          - action:
+              action_name: send_member_welcome
+              output_key: member_msg
+              input_args:
+                user_id: data.user.id
+                message: '''Welcome, Member! Dive into your profile perks.'''
+    default:
+      steps:
+        - action:
+            action_name: send_generic_access_notification
+            output_key: generic_msg
+            input_args:
+              user_id: data.user.id
+              message: '''Account ready—start exploring!'''
+  ```
+</CodeGroup>
+
+**Expectation**: Routes to specific action and welcome message based on user's access level.
+
+### Example 3: Temperature Thresholds
+
+Alert or log based on sensor data
+
+<CodeGroup>
+  ```bash bash
+  switch:
+    cases:
+      - condition: data.temperature <= 5
+        steps:
+          - action:
+              action_name: alert_cold_temperature
+              output_key: cold_alert
+              input_args:
+                message: '''Alert: Very cold—check heating!'''
+      - condition: data.temperature > 5 AND data.temperature <= 25
+        steps:
+          - action:
+              action_name: log_moderate_temperature
+              output_key: mod_log
+              input_args:
+                message: '''Moderate temp: All good.'''
+    default:  # >25 implied
+      steps:
+        - action:
+            action_name: alert_high_temperature
+            output_key: high_alert
+            input_args:
+                message: '''Alert: High temp—activate cooling!'''
+  ```
+</CodeGroup>
+
+**Expectation**: Based on the temperature send an alert or log.
+
+***
+
+[Action](/docs/action)
+
+[For Loop](/docs/for)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+  * [Low-Code Editor](#low-code-editor)
+  * [Syntax Reference](#syntax-reference)
+  * [Practical Examples](#practical-examples)

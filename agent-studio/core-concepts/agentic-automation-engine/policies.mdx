@@ -1,0 +1,44 @@
+---
+title: "Policy Validators"
+---
+
+# What are Policy Validators?
+
+While it's appropriate to steer some behavior through natural language, enforcing **business rules** through natural language can be unreliable.
+
+* Natural language policies are useful when there is a lot of nuance, but they are too imprecise for strict rules.
+
+  | Example                                                                 | Optimal Steering Behavior                                          |
+  | ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
+  | "If the escalation seems important, surface it to the on-call engineer" | **Natural Language**Let the LLM decide if it's important.          |
+  | "If the employee is not an FTE, don't show them our FTE benefits"       | **Rules** \``` employee.status IN ["Contractor", "Contingent"]` `` |
+
+* Natural language policies can be misunderstood by LLMs, or users might jail break them.
+
+* The more policies you add, the less likely your AI agent will reliably enforce policies ([Lost in the Middle](https://arxiv.org/abs/2307.03172) problem).
+
+Policy Validators enforce & guarantee that rules are **always** respected accurately — no matter how many you add.
+
+Learn more about [our approach to policy validators here](https://www.moveworks.com/us/en/resources/blog/how-policy-validators-help-ai-compliance).
+
+# How do you configure Policy Validators?
+
+We have policies embedded in different parts of our product to provide you control where you need it
+
+* **[Activity Confirmation Policies](/docs/activities#/activity-confirmation-policies)** - enforces user approval before an action in taken.
+* **[Slot Validation Policies](/docs/slots#/slot-validation-policy)** - validates input values satisfy constraints
+* **[Slot Inference Policies](/docs/slots#/slot-inference-policy)** - decides if the LLM must ask the user for an input.
+* **[Conversational Process Decision Policies](/docs/control-flow#/conversation-process-decision-policy)** - controls agentic decision-making with rules
+
+***
+
+[Slot Resolvers](/docs/slot-resolvers)
+
+[Action Orchestrator](/docs/action-orchestrator)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What are Policy Validators?](#what-are-policy-validators)
+  * [How do you configure Policy Validators?](#how-do-you-configure-policy-validators)

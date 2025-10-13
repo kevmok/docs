@@ -1,0 +1,100 @@
+---
+title: "Activities"
+---
+
+<Warning>
+  ### This is only applicable to the new Agent Studio > Plugin Workspace
+</Warning>
+
+# What is an activity?
+
+A type of process block that represents an "activity" in a business process. This is typically either taking action in a system or surfacing information.
+
+Activities & [Control Flow](/docs/control-flow) blocks work hand-in-hand to create conversation plugins that conform to your business processes.
+
+# Types of activities
+
+## Action Activities
+
+![](/images/docs/bf7762b89c73c6379c52616a9cc15da3be99f002f74cf2c69248a487b8d25526-CleanShot_2025-04-13_at_20.54.422x.png)
+
+Action Activities can call HTTP, Script, Built-in, or Compound Actions to fetch or update data in your business systems.
+
+![](/images/docs/531b99067f1b7ecfef8ded153e2f7307b4b0163a96df47570204187e77764b21-CleanShot_2025-09-26_at_11.39.28.png)
+
+An **Action Activity** includes the following configuration:
+
+* **Select an action** - This is the action you will be running in this Activity block. It will be a dropdown of all available actions (HTTP, Script, Built-in, Compound) you have configured in your Agent Studio instance.
+  * **Note**: ***Compound Actions should not be used in the middle of a Plugin process.*** This is because they are asynchronous in nature so they will not return data back to the Plugin. Instead, they return "progress updates" back to the user during execution.
+
+* **Required slots** - This defines which slots are required to run this Activity. You can select existing or create a new slot here. This important because it tells the AI Assistant when it should ask the user for values.
+
+* **Input Mapper** - This is a [JSON Bender](/docs/moveworks-bender-language-reference#overview) that allows you to map data (slots or outputs from previous Activities) to the inputs for your action.
+
+* **Output Mapper** - This represents the output object of your Activity. By default, it will capture all of the data that the action you selected returns. However, you can "dot walk" into the object if you want to limit the data returned.
+  * Clicking "Switch to advanced bender" will take you to a [JSON Bender](/docs/moveworks-bender-language-reference#overview) editor where you have more controls to fully define a custom output object.
+
+* **Output Mapper Response Syntax** - When creating a custom output mapper to change the data returned from the action with advanced [Moveworks Data Mapper](/docs/moveworks-bender-language-reference) you always refer to the payload with `response` which you can dot walk with [DSL syntax](/docs/moveworks-dsl-reference).
+  * Note this will change the entire shape of the output of the action, if you do not include data from `response` it will not be included in the output.
+
+* **Execution Behavior** - This is only applicable for *Compound Action Activities*.
+
+  * **When checked**, the Conversational Process will "wait" for the Compound Action Activity to finish executing, allowing it return data back to its output key to be used downstream. We recommend using this option by default.
+  * **When unchecked**, the Compound Action Activity will be kicked off in a "fire & forget" manner. The Conversation Process will continue, not waiting for the Compound Action to finish & return data back. You may want to use this if you are firing a notification & don't expect a response from the Compound Action.
+
+### Activity Confirmation Policies
+
+This Policy Validator requires the AI agent to (1) present all of the collect slots for that activity (2) ask for user consent to continue (3) allow users to edit slot values before continuing execution.
+
+When enabled, this policy guarantees that no matter what the user says, they always get a chance to confirm the exact action that's being taken.
+
+![](/images/docs/646a17a9af5ab6e52a1a62017f21d5bf8536b257c44bbd14288d145c6f9b1b9e-CleanShot_2024-12-11_at_17.41.432x.png)
+
+## Content Activities
+
+![](/images/docs/81a2e54cb34e921e5464ec3efb4bc47304137e8ed66c78525ba0adffbee60b54-CleanShot_2025-04-13_at_20.54.422x.png)
+
+Content activities share articles, forms, or markdown text with users.
+
+Content activities do not require inputs to run. They do not produce data.
+
+## Dynamically Referencing Data In Text Content Activity
+
+![](/images/docs/fcb05eb5b44dda4d24ed64b14ac15d0e2dca3e750d52e2d22aeb3729a348209d-Screenshot_2025-05-29_at_7.22.14_PM.png)
+
+To reference data from the data bank in a content activity you can reference the key directly inside of a double bracket or "Mustache syntax" example-> **\{\{ticket\_number}}**. You do not need to use the "data." key as we are pointing directly to the entire data bank when inside of a text activity. You can reference anything that has been output by a previous action or previously collected slot.
+
+To reference a specific index in an array, use a dot (.) as an accessor. This allows you to directly access the element at the specified index. For example, to access the first element of an array associated with the key "ticket\_list", you should use: ticket\_list.0
+
+Example: Suppose you have the following JSON structure:
+
+<CodeGroup>
+  ```bash bash
+  {  
+    "ticket_list": ["ticket1", "ticket2", "ticket3"]  
+  }
+  ```
+</CodeGroup>
+
+To access "ticket1", you would use the notation: ticket\_list.0
+
+* DSL syntax does not work inside this mustache syntax only simple references to keys
+* You can only reference strings with the mustache syntax you can not reference arrays or objects
+
+***
+
+[Resolver Strategies](/docs/resolver-strategies)
+
+[Control Flow](/docs/control-flow)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What is an activity?](#what-is-an-activity)
+
+  * [Types of activities](#types-of-activities)
+
+  * * [Action Activities](#action-activities)
+    * [Content Activities](#content-activities)
+    * [Dynamically Referencing Data In Text Content Activity](#dynamically-referencing-data-in-text-content-activity)

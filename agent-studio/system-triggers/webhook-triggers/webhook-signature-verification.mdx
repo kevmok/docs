@@ -1,0 +1,129 @@
+---
+title: "Webhook Signature Verification"
+---
+
+# Introduction
+
+Webhooks are a powerful mechanism for real-time event-driven integrations, allowing external systems to push updates directly to your endpoints via **HTTP POST** requests. However, this openness introduces risks: malicious actors could forge requests to **inject false data**, **trigger unauthorized actions**, or **disrupt your AI workflows**.
+
+Signature verification addresses these risks by cryptographically signing each webhook payload with a **shared secret**, ensuring that incoming requests are authentic, unmodified, and from the trusted source. External systems commonly implement this for high-stakes integrations where data integrity is critical, such as financial transactions (e.g., Stripe), code deployments (e.g., GitHub), or issue tracking (e.g., Jira). By verifying signatures, you prevent **spoofing**, **tampering**, and **replay attacks**, building a secure foundation for any webhook-based integration.
+
+In our platform, signature verification is configured declaratively through a user-friendly UI, abstracting away the underlying cryptography. This allows you to set up robust checks **without writing custom code**, while supporting a wide range of external systems through flexible data access and configuration options.
+
+# How Webhook Signatures Work
+
+At its core, webhook signature verification relies on symmetric cryptography using a **shared secret**,a private string exchanged between the external system and Agent Studio during webhook registration. This secret acts as a key, ensuring only authorized parties can generate or validate signatures.
+
+#### Key Components
+
+* **Payload**: The data being signed, typically the raw HTTP request body (as bytes) to preserve exact formatting and prevent discrepancies from parsing. Some systems sign subsets (e.g., JSON fields or query parameters), but raw payloads are most common for simplicity and security.
+* **Hashing Algorithm**: A one-way function (e.g., SHA-256) that transforms the payload into a fixed-size digest, sensitive to even minor changes.
+* **Signature**: A compact, verifiable code appended to the request, usually in an HTTP header (e.g., `X-Signature`) or body field.
+
+#### The HMAC Process
+
+Signatures are generated using **[HMAC (Hash-based Message Authentication Code)](https://www.geeksforgeeks.org/computer-networks/what-is-hmachash-based-message-authentication-code/)**, a standard that combines a hash function with the shared secret for keyed authentication. Here's the theoretical flow:
+
+**Sender Side (External System)**
+
+1. **Preparation**: The external system takes the payload (e.g., raw body bytes) and the secret.
+2. **Keyed Hashing**: HMAC applies the hash algorithm twice, first on the secret to create an inner/outer key pad, then on the payload concatenated with these pads. This produces a digest (e.g., a 256-bit value for SHA-256).
+3. **Encoding**: The digest is typically hex-encoded into a string (e.g., 64 characters for SHA-256) for transmission.
+4. **Transmission**: The signature is sent alongside the payload in the request.
+
+**Receiver Side (Agent Studio Listener)**
+
+1. **Recompute**: Agent Studio uses the same secret and payload to generate an expected signature via HMAC.
+2. **Comparison**: If the recomputed signature matches the received one (case-insensitively), the request is valid. Mismatches indicate tampering or an invalid secret.
+
+HMAC provides **integrity** (detects alterations) and authenticity (proves the sender knows the secret), but not confidentiality (the payload remains readable). It's not `encryption`, it's a one-way tag that can't be reversed.
+
+# Configuring Signature Verification in Agent Studio
+
+Our UI simplifies setup for webhook listeners, providing a dedicated **Verification** panel when configuring your **Listener**. To begin, create or edit a listener for incoming events:
+
+1. Click on the **Verification** collapsible and click on **ADD NEW** to add a verification rule.
+
+2. Choose `Signature Verification` in the **Validation Type** dropdown.
+
+   ![](/images/docs/476ba7bba65276a385dce36e28c7fe4e2f7cab37256a98e1d79ab193e4c78a6e-CleanShot_2025-09-11_at_16.58.13.png)
+
+### Field-by-Field Breakdown
+
+* **Secret Shared by External System When Registering the Webhook**: Enter the shared secret provided by the external system (e.g., during webhook creation in their dashboard). This is masked for security (displayed as asterisks).
+
+  ![](/images/docs/4d7e2fbfb3dd86972e07025ca3b3f022d26b638008d589ee173ea7d972e90c28-CleanShot_2025-09-11_at_17.08.02.png)
+
+* **Signature Verification Hash Mode**: Choose the HMAC variant matching the external system's documentation. Options include:
+
+  * **Inferred (from header)**: Automatically detects the algorithm from the signature header.
+
+  * **HMAC-SHA1**: For legacy systems (discouraged due to vulnerabilities).
+
+  * **HMAC-SHA256**: Recommended default for most modern services, balances security and performance.
+
+  * **HMAC-SHA384** or **HMAC-SHA512**: For high-security needs, producing longer digests.
+
+    ![](/images/docs/6e37097323871f57e582904cff7175591c8a7c1cb5d52361b18f1842a7b2e731-CleanShot_2025-09-11_at_17.16.19.png)
+
+* **Verification Payloads**: Specify the data to sign using **Moveworks Data Mappers**. This field has access to request elements such as:
+
+  * **raw\_body**: The unparsed HTTP body as bytes (e.g., `b'{{"event":"update"{}'`). Use this for most cases, as it matches external systems' raw signing.
+  * **parsed\_body**: The JSON-parsed raw body. Avoid for signing unless documented.
+  * **query\_params**: URL query parameters destructured as JSON.
+  * **headers**: The headers of the request.
+
+* **Verification Received Signature**: Point to the field where signature is stored, again via Moveworks Data Mappers. This field also has access to the same request elements Verification Payloads does, some examples on how access the signature verification field:
+
+  * `parsed_body.signature_field` | `parsed_body["Signature-field"]`: For body-embedded signatures.
+
+  * `headers["X-Signature"]`
+
+    <Frame caption="In this case, we are point to a  field that's in the webhook payload. This field will differ by external system">
+      <img src="/images/docs/28fd2640605fd638b8346eb3933d183a4bab1a2e1067b80283e1cac92c096a4f-CleanShot_2025-09-11_at_17.24.22.png" />
+
+      `linear-signature`
+    </Frame>
+
+The following diagram visually represents the request verification flow. Color coding:
+
+* **Green** represents inputs
+* **Blue** represents processing
+* **Red** represents validation
+
+```
+graph TD
+    A[Incoming POST] -->B[Raw Body]
+    B -->C[HMAC]
+    C -->D[Compare to Signature]
+    D -->E{Valid?}
+    E -->|Yes|F[Process Event]
+    E -->|No|G[Reject Request]
+    
+    style A fill:#90ee90,stroke:#333,stroke-width:2px
+    style B fill:#90ee90,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,stroke:#333,stroke-width:2px
+    style E fill:#ff6347,stroke:#333,stroke-width:2px
+    style F fill:#90ee90,stroke:#333,stroke-width:2px
+    style G fill:#ff6347,stroke:#333,stroke-width:2px
+```
+
+#### Best Practices for Setup
+
+* Always cross-reference the external system's docs for secret, mode, and payload details.
+* Start with `raw_body` and the inferred mode to minimize config.
+
+***
+
+[Webhook Verification Challenge](/docs/webhook-verification-challenge)
+
+[Scheduled Triggers](/docs/scheduled-triggers-limited-preview)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Introduction](#introduction)
+  * [How Webhook Signatures Work](#how-webhook-signatures-work)
+  * [Configuring Signature Verification in Agent Studio](#configuring-signature-verification-in-agent-studio)

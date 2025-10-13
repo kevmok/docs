@@ -1,0 +1,179 @@
+---
+title: "Compound Action Data Bank"
+description: "When you're building your Compound Action, you can reference additional variables which will be provided by Moveworks when the Compound action executes. This is the Compound Action Data Bank."
+---
+
+# `meta_info`
+
+You can access the `meta_info` key from any part of the Compound Action. It's structure takes the following form.
+
+<CodeGroup>
+  ```bash bash
+  {			
+  	"meta_info": {
+  		"user": { ... }
+    }
+  }
+  ```
+</CodeGroup>
+
+## `meta_info.user`
+
+We can access the user attributes of the current user (the one who invoked the plugin) with the following notation **`meta_info.user.{{attribute}}`**. [View all of the available user attributes here.](/docs/user-attribute-reference)
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: some_action
+        output_key: some_action_resp
+        input_args:
+          name: meta_info.user.first_name
+    - return:
+        output_mapper:
+          name: meta_info.user.first_name
+          role: meta_info.user.role
+          department: meta_info.user.department
+          some_attr: meta_info.user.custom_data.some_attr
+  ```
+</CodeGroup>
+
+# `data`
+
+You can access the `data` key from any part of the Compound Action. It's structure takes the following form.
+
+<CodeGroup>
+  ```bash bash
+  {			
+  	"data": {
+      ...input_variable_names,
+      ...output_keys
+    }
+  }
+  ```
+</CodeGroup>
+
+## `data.{{input_variable_name}}`
+
+Your Compound Action's [Input Variables](/docs/input-variables-and-slots) are inserted at the top level of the `data` key. So for example, if you defined 2 input variables (name & age)...
+
+![](/images/docs/e3cfe731bce3c8a45b2afa561a0fe825ec37260ccdf2ffd0cf6c07ef96e683fd-image.png)
+
+You could reference it in your Compound Action as `data.name` and `data.age`
+
+<CodeGroup>
+  ```bash bash
+  - return:
+      output_mapper:
+        name: data.name
+        age: data.age
+  ```
+</CodeGroup>
+
+## `data.{{output_key}}`
+
+Expressions "save" their data to an output key so you can reference them later. Some expressions that utilize output keys include
+
+1. [Actions](/docs/actions) (Built-in, HTTP, etc.)
+2. For expressions
+3. Raise expressions
+
+These keys can be accessed using the notation **`data.{{output_key}}`**, facilitating data flow and handling within the compound action.
+
+### `action` Example
+
+In this example, we pass data through the output key from one action to the next.
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: get_user_device
+        output_key: device
+        input_args:
+          user_email: meta_info.user.email_addr
+    - action:
+        action_name: clean_recycle_bin_on_device
+        output_key: remote_action_result
+        input_args:
+          device_id: data.device.asset_uuid # data.device is the output key of the first action
+  ```
+</CodeGroup>
+
+### `for` Example
+
+When you use a `for` expression, the output keys of all steps within that `for` expression are inserted into the `for` expression's `output_key` as a list of dictionaries.
+
+For example, if you had the following compound action...
+
+<CodeGroup>
+  ```bash bash
+  steps:
+  	- action:
+    		action_name: get_open_outages
+        output_key: outage_tickets
+        # Assume response structure is [ {"ticket_id": "OUT-123", ...}, {"ticket_id": "OUT-456", ...}, ... ]
+    - for:
+    		each: ticket
+        index: index
+        in: data.outage_tickets
+        output_key: outage_ticket_process_results
+        steps:
+          - action:
+              action_name: get_incident_manager_for_outage
+              input_args:
+              	outage_id: ticket.system_id
+              output_key: incident_manager_profile
+              # Assume response structure is { "id": "7bd99d76-d5a6-4ed9-bea5-7f513bf35c6a", "status": "INACTIVE" }
+          - action:
+          		action_name: update_incident_manager_profile
+              input_args:
+              	manager_id: data.outage_ticket_process_results[index].incident_manager_profile.id
+                status: "ON_CALL"
+              output_key: updated_manager_profile            
+  ```
+</CodeGroup>
+
+The resulting data bank under `data` will look like this:
+
+<CodeGroup>
+  ```bash bash
+  {
+    "data": {
+      "outage_tickets": [ {"ticket_id": "OUT-123", ...}, {"ticket_id": "OUT-456", ...}, ... ]
+      "outage_ticket_process_results": [
+        {
+          // Process results for "OUT-123"
+          "incident_manager_profile": { "id": "7bd99d76-d5a6-4ed9-bea5-7f513bf35c6a", "status": "INACTIVE" },
+          "updated_manager_profile":  { "id": "7bd99d76-d5a6-4ed9-bea5-7f513bf35c6a", "status": "ON_CALL" }
+        },
+        {
+          // Process results for "OUT-456"
+          "incident_manager_profile": { "id": "839b82da-38f2-41f4-91ec-db70de7c3c56", "status": "INACTIVE" },
+          "updated_manager_profile":  { "id": "839b82da-38f2-41f4-91ec-db70de7c3c56", "status": "ON_CALL" }
+        }
+    	]
+    },
+    ...
+  } 
+  ```
+</CodeGroup>
+
+***
+
+[Compound Action Patterns](/docs/compound-action-patterns)
+
+[Compound Action Examples](/docs/compound-action-examples)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [meta\_info](#meta_info)
+
+  * * [meta\_info.user](#meta_infouser)
+
+  * [data](#data)
+
+  * * [data.\{\{input\_variable\_name}}](#datainput_variable_name)
+    * [data.\{\{output\_key}}](#dataoutput_key)

@@ -1,0 +1,76 @@
+---
+title: "System Triggers"
+description: "System triggers power proactive automation in , enabling workflows to launch automatically in response to real-time events, data changes, or scheduled intervals. This shifts your agents from reactive tools to intelligent, always-on systems that anticipate and resolve issues before they escalate."
+---
+
+## Trigger types
+
+| Trigger                                                                                   | Summary                                                                         | Responsiveness | Typical objective                | Example                                                             |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------- | -------------------------------- | ------------------------------------------------------------------- |
+| **[Webhooks](https://help.moveworks.com/update/docs/webhook-triggers-limited-preview#/)** | Event-driven; fire in real time when a specific event occurs in a source system | Instantaneous  | Respond to key business events   | “Gong call completed” → extract key details and propose CRM updates |
+| **[Scheduled](/docs/scheduled-triggers-limited-preview#/)**                               | Run at predefined times or intervals                                            | Periodic       | Keep time-based workflows moving | Every Monday 9am → review feature requests and route to PM          |
+
+<Info>
+  **Availability**
+
+  [Webhooks are in **Limited Preview**](https://community.moveworks.com/p/webhook-triggers-limited-preview); **Scheduled** and **Pollers** are coming soon.
+</Info>
+
+## How triggers connect to your processes
+
+In Agent Studio, **Plugins** are modular workflows built around two essential elements:
+
+* **Trigger**: Defines the activation condition (when to run)
+* **Process**: Outlines the sequence of actions (what it does)
+
+System Triggers feed events directly into the Process, enabling end-to-end automation without manual intervention, allowing the agent to reason and act.
+
+### Webhooks at a glance (Limited Preview)
+
+To configure webhooks:
+
+* Create a **Listener** for event providers like Salesforce or Asana.
+* Moveworks validates incoming events, supporting signed secrets and one-time challenge verification.
+* Events are parsed and dispatched to matching plugins, with observability provided through dedicated logs.
+
+> For hands-on steps, see [Webhook Triggers (Limited Preview)](/docs/webhook-triggers-limited-preview) and the [Quickstart Guide](/docs/webhook-triggers-quickstart-guide#/).
+
+## Choosing the right trigger
+
+* Use **Webhooks** for real-time responses to system events.
+* Use **Pollers** (upcoming) for systems without native webhooks.
+* Use **Scheduled** for recurring tasks like weekly audits.
+
+## High Level Execution flow
+
+```
+flowchart TD
+    A[Event/Schedule Occurs] --> B[Trigger Activates]
+    B --> C[Moveworks Validates & Parses]
+    C --> D[Route to Matching Plugin]
+    D --> E[Process Executes<br/>LLM + APIs + Approvals]
+    E --> F[Log Results for Traceability]
+    style A fill:#e1f5fe
+    style F fill:#f3e5f5
+```
+
+1. **Trigger Activates**: An event, change, or schedule initiates the process.
+2. **Moveworks Processes the Trigger**: Validates and parses the trigger (e.g., a webhook).
+3. **Matching Plugin(s) Execute**: The configured **Process** runs, using LLM reasoning, API calls, and optional approvals.
+4. **Logs Provide Traceability**: Monitor each stage end-to-end during development and operations.
+
+***
+
+[Network Allowlisting](/docs/ip-address-allowlisting)
+
+[Webhooks Triggers](/docs/webhook-triggers-limited-preview)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Trigger types](#trigger-types)
+  * [How triggers connect to your processes](#how-triggers-connect-to-your-processes)
+  * * [Webhooks at a glance (Limited Preview)](#webhooks-at-a-glance-limited-preview)
+  * [Choosing the right trigger](#choosing-the-right-trigger)
+  * [High Level Execution flow](#high-level-execution-flow)

@@ -1,0 +1,218 @@
+---
+title: "Citations"
+---
+
+# What are citations?
+
+[Citations](/docs/lifecycle-of-an-utterance#citations) present users with verifiable information when an AI agent responds. These greatly improve user trust in your AI agents and **we highly recommend using citations whenever your plugins return data.** Citations are composed of (1) in-line verification links to (2) the business object (i.e. in the below screenshot: the `User` card).
+
+![](/images/docs/8e1ee535519e460682f3e6a2cb3a30d375756072e2dc4a2480f954f2b1eb8be6-CleanShot_2024-12-11_at_17.58.142x.png) ![](/images/docs/ed2c851ba71e90cb4c3b7bf56b3b0b8e39178f3c71340cc069a1a56229692535-CleanShot_2024-12-11_at_18.04.172x.png)
+
+# How do I configure citations?
+
+Citations are automatically created from the `return` statement in your [Compound Action](/docs/compound-actions). You have two options:
+
+1. **Return a list of objects** - Here you should return a list of objects under the `results` key
+   <CodeGroup>
+     ```bash bash
+     {
+       "results": [
+         {
+           "id": "TASK-17431",
+           "friendly_id": "Write Product Requirements",
+         },
+         {
+           "id": "TASK-102131",
+           "friendly_id": "Write Design Document",
+         },
+       ]
+     }
+     ```
+   </CodeGroup>
+2. **Return a single object** - Here you should return a single object under the `result` key.
+   <CodeGroup>
+     ```bash bash
+     {
+       "result": {
+           "id": data.task_info.id,
+           "friendly_id": dta.task_info.title
+       }
+     }
+     ```
+   </CodeGroup>
+
+## Citation Object Schema
+
+Your citation objects must also conform to a specific schema:
+
+* Each object MUST have a string-based `id`
+* Each object MAY have a string-based`friendly_id` (optional)
+
+Best practices:
+
+1. Citations "anchor" to a human-friendly "id" or an "id" that references an object returned by your plugin. Because of this, please choose an **id that is unique** such that it does not show up organically in the bot's response.
+   1. For example, if you specify an id as "1" and the bot returns: "Duration: 1 hour and 10 minutes," then you may have citations incorrectly anchoring after the 1 or 10 instead of your intended id.
+2. Each citation should relate to a single business object, do not create multiple citations for a single business object.
+
+## Examples
+
+### Returning a single object
+
+<CodeGroup>
+  ```bash bash
+  steps:
+  - action:
+      output_key: action_result
+      ...
+      
+  - return:
+      output_mapper:
+        result:
+          MERGE():
+            - data.action_result
+
+            - id: data.action_result.system_id
+              friendly_id: data.action_result.name
+  ```
+</CodeGroup>
+
+In this example, we got back some data in `action_result`, but say that it looked like this:
+
+<CodeGroup>
+  ```bash bash
+  {
+    "system_id": "86b7657c-10b1-4a2e-b85c-be1f590dd89d",
+    "name": "Pied Piper Inc.",
+    "state": "California",
+    "num_employees": 4000,
+    ...
+  }
+  ```
+</CodeGroup>
+
+We need to make sure that an `id` and `friendly_id` exist, so we tell the `MERGE` operation to combine the raw `action_result` (line 10) with a new dictionary that matches the citation schema (lines 12 & 13). The resulting return statement produces the following payload that meets the requirements for a citation.
+
+<CodeGroup>
+  ```bash bash
+  {
+    "id": "86b7657c-10b1-4a2e-b85c-be1f590dd89d",
+    "friendly_id": "Pied Piper Inc.",
+    
+    "system_id": "86b7657c-10b1-4a2e-b85c-be1f590dd89d",
+    "name": "Pied Piper Inc.",
+    "state": "California",
+    "num_employees": 4000,
+    ...
+  }
+  ```
+</CodeGroup>
+
+You can learn more about [our data mapper language here](/docs/moveworks-bender-language-reference).
+
+### Returning a list of objects
+
+This excerpt behaves very similarly to the previous example. The only different is that it has a `MAP()` function that applies the `MERGE()` builder to a `list_of_records`
+
+<CodeGroup>
+  ```bash bash
+  return:
+  	output_mapper:
+  		results:
+  			MAP():
+  				converter:
+  					MERGE():
+  						- item
+  						- id: item.system_id
+  							friendly_id: item.name
+  				items: data.action_result.list_of_records
+  ```
+</CodeGroup>
+
+So in this case, the following payload
+
+<CodeGroup>
+  ```bash bash
+  {
+    "list_of_records": [
+      {
+        "system_id": "86b7657c-10b1-4a2e-b85c-be1f590dd89d",
+        "name": "Pied Piper Inc.",
+        "state": "California",
+        "num_employees": 4000,
+        ...
+      },
+      {
+        "system_id": "df2cdf0f-0dff-4c82-a142-787661ef67b1",
+        "name": "Dunder Mifflin",
+        "state": "New York",
+        "num_employees": 8500,
+        ...
+      }
+  	]
+  }
+  ```
+</CodeGroup>
+
+Turns into this
+
+<CodeGroup>
+  ```bash bash
+  {
+    "results": [
+      {
+  		  "id": "86b7657c-10b1-4a2e-b85c-be1f590dd89d",
+        "friendly_id": "Pied Piper Inc.",
+        
+        "system_id": "86b7657c-10b1-4a2e-b85c-be1f590dd89d",
+        "name": "Pied Piper Inc.",
+        "state": "California",
+        "num_employees": 4000,
+        ...
+      },
+      {
+        "id": "df2cdf0f-0dff-4c82-a142-787661ef67b1",
+        "friendly_id": "Dunder Mifflin",
+        
+        "system_id": "df2cdf0f-0dff-4c82-a142-787661ef67b1",
+        "name": "Dunder Mifflin",
+        "state": "New York",
+        "num_employees": 8500,
+        ...
+      }
+  	]
+  }
+  ```
+</CodeGroup>
+
+# Troubleshooting
+
+## My citation isn't appearing
+
+1. This may be due to an incorrect citation object schema. If you do not satisfy the citation object schema above, all data under the `result` or `results` key will be deleted from the plugin response.
+2. ID not present in bot response. The bot anchors to instances of the id/friendly\_id appearing in the bot response verbatim to populate the citation. I.e. if your id is "TOP\_10\_COMPANY\_PALO\_ALTO" and the bot's response was "View the top 10 companies in the city of Palo Alto" then the citation will not link. If you are facing this issue, please include in [the display instructions](/docs/plugin-responses#plugin-result-instructions) or plugin description for the bot to return the field verbatim.
+
+## My citation is anchoring to the wrong item
+
+This is usually caused by selecting an id/friendly\_id that is not unique. If this the bot generates a response that includes multiple instances of the same id (i.e. id: "1") then this problem is likely to occur. Please update the id/friendly\_id to be unique to the business object and not one that may appear organically through the bot's response.
+
+***
+
+[Data Types](/docs/data-types)
+
+[Conversation Process](/docs/plugin-process)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What are citations?](#what-are-citations)
+
+  * [How do I configure citations?](#how-do-i-configure-citations)
+
+  * * [Citation Object Schema](#citation-object-schema)
+    * [Examples](#examples)
+
+  * [Troubleshooting](#troubleshooting)
+
+  * * [My citation isn't appearing](#my-citation-isnt-appearing)
+    * [My citation is anchoring to the wrong item](#my-citation-is-anchoring-to-the-wrong-item)

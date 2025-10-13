@@ -1,0 +1,120 @@
+---
+title: "Troubleshooting Compound Actions"
+description: "When saving your compound action, you might get a compilation error. This guide covers common mistakes"
+---
+
+# Known Issues
+
+<Warning>
+  **Known Issues: Compound Action Tester (in Limited Preview)**
+
+  *The **Compound Action Tester** is currently in **Limited Preview for Ambient Agents**. The items below are known issues we’re actively addressing.*
+
+  1. Initial response shows raw proto
+
+     1. Symptom: The first response in the Response tab briefly renders in a raw proto-like format.
+     2. Impact: Cosmetic only; final results are correct. Primarily noticeable for actions that return immediately (rare).
+     3. Workaround: Ignore the initial render; view the final response or the Console tab.
+
+  2. Blank optional args sent as empty strings
+
+     1. Symptom: If you leave an optional argument empty in the tester, it is sent as "" (empty string) instead of being omitted.
+     2. Impact: Your compound action may see "" where it expects a missing/omitted value.
+     3. Workaround: Provide an explicit test value, make the arg Required, or handle empty strings defensively in your expression (e.g., treat "" as “no value”).
+
+  3. Log banner says “not redacted,” but values are redacted
+
+     1. Symptom: The log header may state that data is not redacted, while sensitive values are actually masked.
+     2. Impact: Confusing copy; does not expose sensitive data.
+     3. Workaround: Proceed normally—PII/secrets are redacted—but still avoid pasting secrets into tests.
+
+  4. Log viewer toggles between tabs while streaming
+
+     1. Symptom: The viewer can bounce between Response and Console as progress updates stream in (most visible with many updates).
+     2. Impact: Disruptive reading experience during long-running tests.
+     3. Workaround: Wait until the run completes before switching tabs, or reduce progress updates during testing.
+
+  5. User argument type is hard to test
+
+     1. Symptom: Selecting User as an input type offers no easy way to supply a full user object.
+     2. Impact: Difficult to run realistic tests for actions expecting a user object.
+     3. Workaround: Pass a user identifier (e.g., email) as a string and resolve the user inside the action (e.g., mw\.get\_user\_by\_email)—as shown in this quickstart.
+</Warning>
+
+# Multi-line inputs
+
+When writing [script actions](/docs/script-actions), you may want to use multiple lines. The full compound action gets parsed as YAML, so make sure you add a vertical bar and then write your code normally.
+
+```
+script:
+  code: |
+    a = 1
+    b = 2
+    a + b
+```
+
+# DSL Escaping
+
+In our [Data Mapper language](/docs/moveworks-bender-language-reference), every input gets parsed as a [DSL string](/docs/moveworks-dsl-reference). So numeric and boolean constants need to be quoted as follows
+
+```
+integer_value: '2'
+decimal_value: '12.34'
+boolean_value: 'true'
+```
+
+Additionally, because we use YAML as the authoring language we have to write constants to circumvent built-in yaml syntax. This means you need an extra set of quotes surrounding string/list/object constants
+
+```
+string_value: '"abc"'
+list_value: '[1, 2, 3, "abc"}'
+object_value: '{"a": "b", "c": 123}'
+```
+
+If you don't like managing those quotes yaml also makes it pretty easy to do this outer wrapping using the block quote syntax
+
+```
+string_value: >
+  "abc"
+list_value: >
+  [1, 2, 3, "abc"]
+object_value: >
+  {"a": "b", "c": 123}
+```
+
+# Missing fields from an HTTP Action
+
+If you have fields from an HTTP Action response that are missing in when the action is referenced in the compound action or from the bot's response.
+
+This may occur due to the action filtering values based on it's action schema. To resolve this, ensure that all of the fields from the actions response are referenced in the output schema. To do this:
+
+1. Go to Agent Studio, select Plugins in the top bar, and then select actions.
+
+   ![](/images/docs/40ebadc12b2bde79045396d2055390d2ecb0884a6480b72298d546337edfe5e3-CleanShot_2024-12-11_at_14.30.56.png)
+
+2. Select the action that is causing the missing fields.
+
+   ![](/images/docs/bc3dd4223c739e6f51822581487c3873598627d08da91072a5c77656294ca28a-CleanShot_2024-12-11_at_14.34.46.png)
+
+3. Select the "Response" tab
+
+   ![](/images/docs/b75e9bf54d79354d72e06560cec820ae39b76600aabea6adccebe3406a2b6903-CleanShot_2024-12-11_at_14.32.39.png)
+
+4. Ensure that each response field from the API Response (left-hand side) is mentioned in the Output Schema (right-hand side). If you are unsure if all the fields are covered, you can select "Generate From Response" and we will generate a schema that includes every field from the API response.
+
+5. FYI: If you see the following text at the bottom of the response page, it means that Moveworks has detected a difference between fields in the API Response and in the Output Schema.
+
+***
+
+[Compound Action Examples](/docs/compound-action-examples)
+
+[Connectors](/docs/connectors)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Known Issues](#known-issues)
+  * [Multi-line inputs](#multi-line-inputs)
+  * [DSL Escaping](#dsl-escaping)
+  * [Missing fields from an HTTP Action](#missing-fields-from-an-http-action)

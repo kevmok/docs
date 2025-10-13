@@ -1,0 +1,182 @@
+---
+title: "HTTP Actions"
+description: "HTTP Actions make API calls to your business systems so you can build automations. They can be chained together in ."
+---
+
+HTTP Actions can be used to call both SOAP and REST APIs. Moveworks recommends using REST APIs with JSON payloads whenever possible for ease of configuration, and debugging purposes.
+
+# Set up an HTTP Action
+
+You are able to setup an HTTP Action two ways:
+
+1. \[Recommended] Import the entire HTTP Request via cURL.
+2. Manually select/create a connector + setup the API Request
+
+## Import from cURL
+
+<Warning>
+  ### Warning
+
+  1. Importing cURL will overwrite all of the current work you have in the HTTP Editor.
+
+  2. If the Request you are trying to import uses a 2-step Auth method like OAuth 2.0, then you will have to set up the connector manually AFTER importing cURL.
+</Warning>
+
+### Steps
+
+1. Get your `cURL` command:
+
+   1. You can typically find cURL commands in the API documentation for the source system you are trying to integrate with
+
+      ![](/images/docs/ae94eb5e050026cd356e3ea29058c5312d5a8fde02d78239bce6a88eb63d0c58-CleanShot_2024-12-11_at_22.31.342x.png)
+
+   2. You can export your Postman requests to curl by clicking the `</>` icon on the right toolbar in Postman
+
+      ![](/images/docs/368af1e54fc709ed9107317c4633d56594def561f599fc78a11f7ccaa160d811-CleanShot_2024-12-11_at_22.33.112x.png)
+
+2. Click `IMPORT CURL`
+
+   ![](/images/docs/6d5cd02f4c10feb77aa93ed23eeb06e8591530c9d7682b60a030a4e1f34b758d-image.png)
+
+3. Paste your cURL command into the text box.
+
+   ![](/images/docs/702436afe65207f3d96c36a1b7242a757238847b7d58b07d376ffff10ea74cbe-image.png)
+
+4. Double check everything is imported the way you expected.
+
+## Set up HTTP Action Manually
+
+### Prerequisite
+
+Please make sure to setup the connector for this action. For more information, see [Connectors Help Documentation](/docs/connector-configuration)
+
+### Steps
+
+![](/images/docs/5d854d6123d19d25d78fcba3a8d0261977ffe1763497df020a4d80c35feecde2-image.png)
+
+If you're manually configuring your API, you can do so by editing:
+
+1. `Method` - We support GET, POST, PUT, DELETE, PATCH methods.
+2. `Endpoint URL` - This is the rest of the URL Path starting from the end of the Base URL. It must start with a `/`.
+   * **Note:** The Connector's **Base URL** and the inputted **Endpoint URL** are combined to create the full Request URL.
+3. `Headers` - ALL Request Headers must be added to this table.
+4. `Query parameters` - ALL Query Params must be added to this table. They cannot be saved in the `Endpoint URL`.
+5. `Body` - ALL Body content must be added to this text box.
+   * **Note:** If you want to use `Content-Type: x-www-form-urlencoded` , you have to convert the data to the following format: `key=value&key2=value2`
+
+# Use Variables
+
+## Inserting Variables
+
+You can use variables anywhere in the Headers, Params, Body, or Endpoint URL. They can also be used in JWT Connector Claims.
+
+* You insert variables by using `{{{VARIABLE_NAME}}}`.
+* You can also reference variables from the [HTTP Action Data Bank](/docs/http-action-data-bank) (like the current user)
+  ```
+  "{{{meta_info.user.email_addr}}}"
+  ```
+
+You can check variable names by looking at the `Input Variables` tab and our [User Attributes Reference](/creator-studio/reference/user-attributes)
+
+![](/images/docs/aafa002b38938ef5e6d9c79025a0484e75f3d3afc7a30035b717ddfec2827f51-image.png)
+
+## Variable Escaping
+
+By default all variables will be HTML escaped. This follows the [Mustache templating language](https://mustache.github.io/).
+
+<Info>
+  ### Pro Tip!
+
+  You can use `{{{VARIABLE_NAME}}}` if you need avoid HTML escaping the content of the variable.
+</Info>
+
+![](/images/docs/d5a1fb43e9cb8e5a05dd8ab52f25989625685cf67539dac09a4320bc4ae7c9ab-image.png)
+
+# Test your API
+
+If you use a variable in the request and want to test your API, then you must add an example value to the variable in the `Input Variables` tab.
+
+<Warning>
+  This does not apply to User Attributes. User Attributes will pull from the information of the current user who is logged in and configuring the request.
+</Warning>
+
+![](/images/docs/abd8b721cbf3b1a0d718d0c1722f7ef6064c63195170333be1a84ad82c10cdf7-image.png)
+
+Once all your variables are configured, click `TEST` in order to kick off a Request with the example data you inputted in the `Input Variables` tab.
+
+![](/images/docs/7b85f98d13a99c4c47f74043a663052cfb4f8d7fd7141caeed311dc10b247122-image.png)
+
+# Prune Response Schema
+
+You can filter out attributes from your HTTP action by deleting parts of the **Output Schema** on the right of the **Response** tab. Otherwise all data will be exported to the caller of this action (e.g. the compound action).
+
+![](/images/docs/88f07143899abc16a88ece5af29c5ab9d3a37cd0636c657b3ec11d742f2a2a36-CleanShot_2024-12-11_at_22.49.292x.png)
+
+# Save Action
+
+When you choose to save the action, you will specify an **Action Name**. In Pre-April 2025 versions of the Plugin Workspace, you will reference this Action Name in subsequent[Compound Actions](/docs/compound-actions) as the `action.action_name`.
+
+In Post-April 2025 versions of the Plugin Workspace, you will be able to either reference the action inside of a compound action, or you can reference the action directly in a plugin as an action activity.
+
+If you created a new connector in the HTTP editor, you'll also be prompted to provide a connector name.
+
+![](/images/docs/f6945261949b7dd0d67cdef6b46b396589e170c98645009f033317fc72eaf672-CleanShot_2024-12-11_at_22.53.022x.png)
+
+# Troubleshooting
+
+## My HTTP Action is failing
+
+1. Check our [logs](/docs/logs) to understand why.
+2. Requests will timeout after 60 seconds with no response from the requested server.
+3. Requests accept a max of 200kb responses.
+
+## How to pass an array through the POST Body
+
+If you wish to pass an array through the POST body of an action, refer to the following steps:
+
+1. In the action body itself, refer to the array in triple braces without any quotes. For example:
+
+> \{\{\{meeting\_attendee\_list}}}
+
+no quotes.
+
+![](/images/docs/ae53b8cf8ef56e55f0504b9b27bd525ec5689e7afc2d5823dc542d88fc11a05e-CleanShot_2024-12-12_at_13.03.492x.png)
+
+2. When you create inputs in the compound action, you need to stringy the array. For example your input arg would be:
+
+```
+1. data.input.$STRINGIFY_JSON()
+```
+
+![](/images/docs/7f0c6f94c918245ae1e2cc138002b0085049650e73d46b2c34ce5dd294ab5d51-CleanShot_2024-12-12_at_13.07.302x.png)
+
+***
+
+[Built-in Actions](/docs/built-in-actions)
+
+[HTTP Action Data Bank](/docs/http-action-data-bank)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Set up an HTTP Action](#set-up-an-http-action)
+
+  * * [Import from cURL](#import-from-curl)
+    * [Set up HTTP Action Manually](#set-up-http-action-manually)
+
+  * [Use Variables](#use-variables)
+
+  * * [Inserting Variables](#inserting-variables)
+    * [Variable Escaping](#variable-escaping)
+
+  * [Test your API](#test-your-api)
+
+  * [Prune Response Schema](#prune-response-schema)
+
+  * [Save Action](#save-action)
+
+  * [Troubleshooting](#troubleshooting)
+
+  * * [My HTTP Action is failing](#my-http-action-is-failing)
+    * [How to pass an array through the POST Body](#how-to-pass-an-array-through-the-post-body)

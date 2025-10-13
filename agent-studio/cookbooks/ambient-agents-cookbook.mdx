@@ -1,0 +1,67 @@
+---
+title: "Ambient Agents Cookbook"
+description: "Ambient agents can leverage different trigger types, each with its own architecture for handling events, changes, or scheduled tasks. Below are sequence diagrams illustrating the flow for each trigger type."
+---
+
+## Webhook Trigger Architecture
+
+This diagram shows an ambient agent responding to a real-time webhook event, such as monitoring CPU usage and scaling resources if needed.
+
+```
+sequenceDiagram
+    participant A as Admin
+    participant P as Ambient Agent
+    participant B1 as Backend System 1
+    P->>B1: Monitor Webhook Trigger
+    B1->>P: Send Webhook Event (CPU Usage)
+    P->>P: Interpret and Validate Event
+    P->>P: Check: Is CPU Usage > 80%?
+    alt CPU Usage > 80%
+        P->>B1: Execute Action (Scale Resources)
+        B1->>P: Return Result
+    else CPU Usage ≤ 80%
+        P->>P: Log Event
+    end
+    P->>A: Deliver Notification
+```
+
+## Scheduled Trigger Architecture
+
+This diagram depicts an ambient agent executing a workflow at a predefined time, such as generating a report on new feature requests every Monday morning.
+
+<Warning>
+  Do not use scheduled triggers to run a task for **every employee**. Instead, you should aim to run a task for **every record** in a business process.
+</Warning>
+
+```
+sequenceDiagram
+    participant A as Admin
+    participant P as Ambient Agent
+    participant B1 as Backend System 1
+    participant B2 as Backend System 2
+    P->>P: Scheduled Trigger (Every Monday @ 9am)
+    P->>B1: Get All New Feature Requests
+    B1->>P: Return Feature Request Data
+    P->>P: Compare to WIP Memos
+    P->>P: Identify Relevant PM
+    P->>B2: Assign Task to PM
+    B2->>P: Return Assignment Result
+    P->>P: Generate Summary Report
+    P->>A: Deliver Report
+    A->>A: Receive Report
+```
+
+.
+
+***
+
+[Data Retrieval Cookbook](/docs/data-retrieval-cookbook)
+
+[Connect to other AI Agents](/docs/connect-to-other-ai-agents-applications)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Webhook Trigger Architecture](#webhook-trigger-architecture)
+  * [Scheduled Trigger Architecture](#scheduled-trigger-architecture)

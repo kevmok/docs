@@ -1,0 +1,167 @@
+---
+title: "Try Catch and Raise Error"
+---
+
+# Overview
+
+The **Raise** expression gives you a sharp tool to flag errors explicitly and stop execution of compound actions. The **Try Catch** expression complements it by attempting risky code and rerouting on failure.
+
+#### Raise
+
+This expression triggers an immediate exit, much like throwing an exception in code, but with a stored output for traceability. Always set an `output_key` to capture the error object (status, details), and add a message for clarity in logs or chats.
+
+#### Try Catch
+
+The **`try_catch`** expression allows for the execution of a compound action expression with an error handling mechanism. If the **`try`** block encounters an error, the **`catch`** block is executed, allowing for graceful error handling and recovery. This is particularly useful for managing errors in compound actions where certain actions might fail under known or unknown conditions.
+
+| Feature              | Raise Error                                  | Try Catch                     |
+| -------------------- | -------------------------------------------- | ----------------------------- |
+| **Primary Role**     | Intentional failure trigger                  | Failure containment and route |
+| **Best Paired With** | Conditionals like `switch` or `catch` blocks | Unreliable actions            |
+
+# Low-Code Editor
+
+Combine the Try Catch and Raise steps for graceful error handling
+
+![](/images/docs/e7916295995d737a69a0eb5e832cd48858fd53769ea992c06e394bdd3c6fd052-CleanShot_2025-09-17_at_09.49.46.png)
+
+1. **Set Up Your Steps**: Accordingly set up steps within your Try and Catch blocks
+
+![](/images/docs/c47c97a6d87bb7e5fdfab4a4b5fbfaef79ed994c7e1a2bfd61c550ce866ff4e0-CleanShot_2025-09-17_at_09.50.06.png)
+
+2. **Filter by Status Code**: For common errors and expected issues, set the catch block to trigger on specific status codes.
+
+![](/images/docs/c07ef04d1e856a4cb06c67aba36def3322bb209fd7d892ae3d93672b7bb3ec50-CleanShot_2025-09-17_at_09.51.11.png)
+
+3. **Add Graceful Exit**: Add a Raise step to provide an error message and gracefully end the execution of the flow.
+
+# Syntax Reference
+
+#### Raise Schema
+
+<CodeGroup>
+  ```bash bash
+  raise:
+    output_key: ERROR_VAR*  # any: Holds error details (e.g., {status: E403, message: ...})
+    message: 'ERROR_MSG'    # str: Optional log/chat note
+  ```
+</CodeGroup>
+
+| Field        | Type   | Mandatory | Description                                                           |
+| ------------ | ------ | --------- | --------------------------------------------------------------------- |
+| `output_key` | string | Yes       | Error storage for data bank                                           |
+| `message`    | string | No        | Mustache expression string, e.g., `"There was an error {{ error }} "` |
+
+#### Try Catch Schema
+
+<CodeGroup>
+  ```bash bash
+  try_catch:
+    try:
+      steps:  # Expressions to attempt
+        - EXPRESSION_1  # e.g., flaky action
+    catch:
+      on_status_code: [404, 500]  # Optional
+      steps:  # Recovery (no error details available)
+        - EXPRESSION_2  # e.g., notify with static msg
+  ```
+</CodeGroup>
+
+| Field                  | Type        | Mandatory | Description                 |
+| ---------------------- | ----------- | --------- | --------------------------- |
+| `try.steps`            | list\[expr] | Yes       | Attempted expressions       |
+| `catch.on_status_code` | list\[str]  | No        | Error filters; omit for all |
+| `catch.steps`          | list\[expr] | Yes       | Recovery expressions        |
+
+# Practical Examples
+
+## Raise
+
+### Example 1: Permission Gate
+
+Halt non-admins
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - switch:
+        cases:
+          - condition: meta_info.user.role != 'admin'
+            steps:
+              - raise:
+                  output_key: auth_error
+                  message: "Access denied: Admin required"
+    - action:
+        name: perform_admin_task
+        output_key: admin_task_result
+  ```
+</CodeGroup>
+
+## Try Catch
+
+### Example 1: Action Recovery
+
+Catch a 404, notify the admin and raise the error
+
+<CodeGroup>
+  ```bash bash
+  try_catch:
+    try:
+      steps:
+        - action:
+            action_name: may_fail_action
+            output_key: action_result
+    catch:
+      on_status_code: [404]
+      steps:
+        - action:
+            action_name: notify_admin
+            output_key: admin_alert
+            input_args:
+              message: "API returned 404—standard flake"
+        - raise:
+            output_key: user_error
+            message: "Item not found—try a different query"
+  ```
+</CodeGroup>
+
+### Example 2: General Fallback
+
+Log any error and exit
+
+<CodeGroup>
+  ```bash bash
+  try_catch:
+    try:
+      steps:
+        - action:
+            action_name: external_call
+            output_key: api_data
+    catch:  # Catches all
+      steps:
+        - raise:
+            output_key: service_down
+            message: "Service temporarily down—retry later"
+  ```
+</CodeGroup>
+
+***
+
+[Return](/docs/return)
+
+[Notify](/docs/notify)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+
+  * [Low-Code Editor](#low-code-editor)
+
+  * [Syntax Reference](#syntax-reference)
+
+  * [Practical Examples](#practical-examples)
+
+  * * [Raise](#raise-1)
+    * [Try Catch](#try-catch-1)

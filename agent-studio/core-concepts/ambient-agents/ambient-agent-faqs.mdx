@@ -1,0 +1,191 @@
+---
+title: "Ambient Agent FAQs"
+description: "Short, practical answers to the most common questions about  and  on Moveworks."
+---
+
+## What is an ambient agent?
+
+Ambient agents are **always-on, event-driven** automations. They listen for signals from your systems, reason with LLMs, and can execute workflows end-to-end with optional human approvals—no user prompt required.
+
+## What is a webhook, anyway?
+
+A **webhook** is a way for one system (like GitHub or Workday) to **automatically send real-time updates** to another (like Moveworks) when something happens—e.g., a new ticket is filed or a document is signed.
+
+Moveworks uses a **Listener** to receive these webhook events and trigger automation, notifications, or approvals.
+
+## Common terms
+
+| Term                    | What it means in plain English                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Listener**            | A webhook receiver you configure in Moveworks to accept events from a system like GitHub, Salesforce, etc.            |
+| **Webhook URL**         | A unique Moveworks-generated URL that external systems post events to.                                                |
+| **Payload**             | The JSON body of the webhook—the event data (e.g., ticket title, user name).                                          |
+| **Headers**             | Metadata sent with the request—includes event type, signature, or secret token.                                       |
+| **System Trigger**      | A non-conversational trigger that starts a plugin (webhook, poller, or scheduled).                                    |
+| **Event Filtering**     | Rules to discard unwanted events (e.g., “ignore closed tickets”). Can run at the listener level or inside the plugin. |
+| **Signature / HMAC**    | Security feature that confirms the sender is trusted and the payload wasn’t tampered with.                            |
+| **Validation / Schema** | Ensures the payload has the fields you expect (e.g., `title` must be a string).                                       |
+| **Replay Protection**   | Prevents duplicate requests from triggering the same plugin twice.                                                    |
+
+## How is “ambient” different from other agent types?
+
+Moveworks supports three blueprints:
+
+* **Aggregation** — prompt → information
+* **Action** — prompt → transaction
+* **Ambient** — system trigger → orchestration (no prompt)
+
+## What is a System Trigger? What types exist?
+
+System triggers start workflows based on events, checks, or schedules.
+
+| Trigger Type  | Example                          | Best For                                      |
+| ------------- | -------------------------------- | --------------------------------------------- |
+| **Webhook**   | “New GitHub issue opened”        | Real-time automation                          |
+| **Poller**    | “Check device logs every 5 min”  | Systems that don’t support webhooks           |
+| **Scheduled** | “Run script every Monday at 9am” | Time-based workflows (e.g., license cleanups) |
+
+> Availability: Webhooks are in Limited Preview. Pollers and Scheduled triggers are coming soon.
+
+## Why should I secure my webhook listener?
+
+Webhook traffic often includes sensitive data. Without authentication or signature verification, **anyone who knows your Listener URL could trigger your workflow**, causing unauthorized requests, data exposure, or unexpected automation runs.
+
+### What security options are available?
+
+1. **Signature verification (HMAC)** — **recommended**. Configure a signing secret so Moveworks can verify the request comes from your provider and hasn’t been altered.
+2. **Auth settings** — require a bearer/API token in a header on every request.
+
+### What happens if I don’t secure my listener?
+
+Unsecured listeners are **heavily rate-limited** to reduce risk.
+
+* **Unsecured:** 1 request every 10 seconds (max 6/min)
+* **Secured:** 20 requests per second (max 1200/min)
+
+> Limits are subject to change, but unsecured listeners will always have significantly lower limits.
+
+### Can I still publish an unsecured listener?
+
+Yes—but it’s strongly discouraged, especially for production.
+
+## Can a single plugin be triggered by both a webhook **and** a conversational prompt?
+
+No. A plugin must use **one trigger paradigm**: system triggers (one or many) **or** conversational triggers (one or many). If you need both, create two plugins.
+
+## Can multiple system triggers target the same plugin?
+
+Yes. A plugin can subscribe to **multiple system triggers** (e.g., several Listeners), and **one event can fan-out to multiple plugins** if their conditions match.
+
+## Do you validate webhook payloads? Which formats are supported?
+
+Yes. Use **Payload Schema** to validate structure and types (LP focus: **JSON**). Without a schema, the request is treated as unstructured downstream.
+
+Other formats may come later.
+
+## Can I filter events before they become Moveworks events?
+
+Yes. **Event Filtering** runs at the **listener** (global) and **plugin** (per-workflow) layers.
+
+**Copy-paste examples (Listener DSL):**
+
+**A) GitHub — only`issues.opened` in one repo and titles containing “bug”:**
+
+```
+(action == "opened")
+AND (repository.full_name == "acme/widgets")
+AND (issue.title.$LOWERCASE() CONTAINS "bug")
+```
+
+**B) DocuSign — only fully executed envelopes; Sales contracts ≥ $10k:**
+
+```
+(event == "EnvelopeSigned")
+AND (contract.type == "Sales")
+AND ($DECIMAL(contract.value) >= 10000)
+```
+
+**C) Headers/params guard — only accept from prod and ignore`dry_run=true`:**
+
+```
+(headers["X-Env"].$LOWERCASE() == "prod")
+AND NOT (query_params["dry_run"].$LOWERCASE() == "true")
+```
+
+## How do you handle duplicate deliveries or retries?
+
+Enable **Deduplication** with a reliable key (e.g., `X-GitHub-Delivery`, `event.id`) and a **deduplication window** to drop duplicates and provider retries. This complements signature verification for replay protection.
+
+## What logs are available to debug a webhook end-to-end?
+
+Three dedicated logs trace the lifecycle:
+
+1. `listener.webhook.trigger` — request received (headers, method, parsed body, timestamps)
+2. `listener.webhook.processor.update` — processing outcome (published, failure reason, debounced)
+3. `listener.webhook.plugin.trigger` — which plugins were evaluated/triggered/skipped/expired
+
+See **Webhook Logs & Troubleshooting** for playbooks like “plugin never ran”.
+
+## What if an app doesn’t have a UI to set up webhooks?
+
+You have two paths:
+
+**Option 1 — API-based registration (if supported):**
+
+Some platforms expose APIs to register webhooks (e.g., Slack, Zoom, Okta). Use curl/Postman/SDKs to POST your Moveworks Listener URL and secret to the provider’s registration endpoint.
+
+**Option 2 — No UI and no API:**
+
+You can’t use webhooks with that app. Use a **poller** or **scheduled trigger** once available in Moveworks.
+
+## Where do approvals fit with ambient agents?
+
+Approvals are part of the **Process** that runs after a trigger fires. Agents can run fully autonomously or pause for **notify / question / review** moments.
+
+## Why ambient on Moveworks vs. an iPaaS?
+
+Listeners give our agents **“ears”** to hear events, reason over context, and act using Moveworks processes often eliminating the need for a separate iPaaS for these flows.
+
+***
+
+[Ambient Agents](/docs/ambient-agents)
+
+[Connecting Ambient Agents to Conversational Agents](/docs/connecting-ambient-agents-to-conversational-agents)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What is an ambient agent?](#what-is-an-ambient-agent)
+
+  * [What is a webhook, anyway?](#what-is-a-webhook-anyway)
+
+  * [Common terms](#common-terms)
+
+  * [How is “ambient” different from other agent types?](#how-is-ambient-different-from-other-agent-types)
+
+  * [What is a System Trigger? What types exist?](#what-is-a-system-trigger-what-types-exist)
+
+  * [Why should I secure my webhook listener?](#why-should-i-secure-my-webhook-listener)
+
+  * * [What security options are available?](#what-security-options-are-available)
+    * [What happens if I don’t secure my listener?](#what-happens-if-i-dont-secure-my-listener)
+    * [Can I still publish an unsecured listener?](#can-i-still-publish-an-unsecured-listener)
+
+  * [Can a single plugin be triggered by both a webhook and a conversational prompt?](#can-a-single-plugin-be-triggered-by-both-a-webhook-and-a-conversational-prompt)
+
+  * [Can multiple system triggers target the same plugin?](#can-multiple-system-triggers-target-the-same-plugin)
+
+  * [Do you validate webhook payloads? Which formats are supported?](#do-you-validate-webhook-payloads-which-formats-are-supported)
+
+  * [Can I filter events before they become Moveworks events?](#can-i-filter-events-before-they-become-moveworks-events)
+
+  * [How do you handle duplicate deliveries or retries?](#how-do-you-handle-duplicate-deliveries-or-retries)
+
+  * [What logs are available to debug a webhook end-to-end?](#what-logs-are-available-to-debug-a-webhook-end-to-end)
+
+  * [What if an app doesn’t have a UI to set up webhooks?](#what-if-an-app-doesnt-have-a-ui-to-set-up-webhooks)
+
+  * [Where do approvals fit with ambient agents?](#where-do-approvals-fit-with-ambient-agents)
+
+  * [Why ambient on Moveworks vs. an iPaaS?](#why-ambient-on-moveworks-vs-an-ipaas)

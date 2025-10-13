@@ -1,0 +1,127 @@
+---
+title: "Connecting Ambient Agents to Conversational Agents"
+---
+
+# Overview
+
+Ambient agents and conversational agents operate in distinct contexts within Agent Studio, each designed to handle specific types of interactions and triggers. Ambient agents are proactive, triggered by external circumstances such as events or scheduled triggers, and they lack direct user context. In contrast, conversational agents are reactive, initiated by user interactions, and maintain rich user-specific context for personalized dialogues.
+
+This separation into different context layers ensures efficiency: ambient agents handle background automation without user involvement, while conversational agents focus on interactive, context-aware experiences. However, bridging these layers becomes essential in scenarios where an ambient agent needs user input, consent, or to initiate a conversation—such as gathering details for an API update or responding to an event that requires approval.
+
+To visualize this separation and the need for connection, consider the following diagram, which illustrates the distinct context layers and the flow of integration.
+
+```
+flowchart TD
+    subgraph Ambient_Context["Ambient Agent Context (No User Context)"]
+        A[Ambient Agent]
+        B[Triggered by Events/Schedules]
+        C[Background Actions]
+    end
+
+    subgraph Conversational_Context["Conversational Agent Context (With User Context)"]
+        D[Conversational Agent]
+        E[Triggered by User Interactions]
+        F[User Input/Consent/Dialogues]
+    end
+
+    A -->|Needs User Involvement| G[Bridge via Notify]
+    G -->|Send Notification with button| H[User Clicks to Initiate]
+    H --> D
+
+    style Ambient_Context fill:#f9f,stroke:#333,stroke-width:2px
+    style Conversational_Context fill:#bbf,stroke:#333,stroke-width:2px
+```
+
+This guide explains the key differences, integration scenarios, and the recommended method for connecting them using the `notify` expression. By following these steps, developers can enable seamless, user-initiated transitions that respect context boundaries while enhancing functionality.
+
+## Key Concepts
+
+Ambient agents and conversational agents exist in different context layers: conversational agents have access to user-specific context, while ambient agents do not. This separation ensures efficiency but can limit scenarios where an ambient agent needs to involve a user—for example:
+
+* Triggering a conversational agent from an ambient one to gather user input.
+* Starting a conversation with a user based on an ambient event.
+* Performing an API update that requires user consent or authentication.
+
+Direct actions like these are not natively possible in ambient agents due to their lack of user context. However, there is a structured way to connect them, ensuring secure and user-initiated transitions.
+
+# Implementation Guide
+
+The primary mechanism for bridging ambient and conversational agents is through the **`notify`** expression. This allows an ambient agent to send a notification to the user, prompting them to engage via a button. Upon clicking the button, the system initiates a conversation process, seamlessly passing any necessary input arguments (context) from the ambient agent.
+
+### Prerequisites
+
+* Familiarize yourself with the **[notify](/docs/notify)** expression and [**conversation process**](/docs/plugin-process) documentation for detailed syntax and options.
+* Conversational process published as a plugin, with defined slots for input args.
+
+## Core Implementation with Code Example
+
+In the ambient agent's configuration, define the `notify` block to craft the notification, embed a `conversation_action` button, and pass context. Below is an annotated compound action example, adaptable to your use case (e.g., handling a ticket assignment event).
+
+<CodeGroup>
+  ```bash bash
+  # Example: Notify in Ambient Agent for Budget Approval
+  notify:
+    output_key: approval_result 
+    recipient_id: data.manager_user.id 
+    message: 
+      RENDER():  
+        template: "Budget threshold exceeded for [{{ category }}]({{ details_url }}) - approve adjustment?"
+        args: 
+          category: data.expense.category
+          details_url: $CONCAT(["https://finance.dashboard.com/", data.expense.id], "") 
+    actions:
+      - key: approve_adjustment 
+        label: '''Approve Adjustment'''  # Button text displayed to user
+        conversation_action:  # Type for initiating conversational process
+          conversation_process_name: collect_approval_reason_and_update_budget  # Published process name
+          input_args: 
+            budget_request: data.expense  # Map to process slot, passing context
+  ```
+</CodeGroup>
+
+#### Explanation
+
+* **Notify Structure**: The top-level notify key initiates the expression, specifying output, recipient, and message.
+* **Button (Actions)**: Define buttons under actions. For conversations, use conversation\_action with the process name and input\_args to pass data (must match slots in the target process).
+* **Context Passing**: input\_args bridges ambient data to conversational slots, enabling the process to start informed (e.g., pre-populating ticket details).
+
+For a visual breakdown of the flow, refer to this sequence diagram tracing the end-to-end interaction.
+
+```
+sequenceDiagram
+    participant Ambient as Ambient Agent
+    participant Notify as Notify System
+    participant User as User
+    participant Conv as Conversational Agent
+
+    Ambient->>Ambient: Event/Schedule Trigger
+    Ambient->>Notify: Execute Notify Expression
+    Note over Ambient,Notify: Build Message & CTA with Input Args
+    Notify->>User: Deliver Notification
+    User->>User: Review & Click Button
+    User->>Conv: Start Conversation Process
+    Note over User,Conv: Transfer Context via Input Args
+    Conv->>Conv: Execute with User Input/Consent
+    Conv-->>Ambient: Optional Callback (Not yet released)
+```
+
+# Best Practices
+
+* **User-Centric Design**: Craft concise, actionable notifications to maximize engagement; include clear context in messages.
+* **Security Considerations**: Ensure input args handle sensitive data appropriately; always require explicit user consent for actions like API updates.
+
+***
+
+[Ambient Agent FAQs](/docs/ambient-agent-faqs)
+
+[Data Types](/docs/data-types)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+  * * [Key Concepts](#key-concepts)
+  * [Implementation Guide](#implementation-guide)
+  * * [Core Implementation with Code Example](#core-implementation-with-code-example)
+  * [Best Practices](#best-practices)

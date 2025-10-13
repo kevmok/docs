@@ -1,0 +1,111 @@
+---
+title: "When to Use Compound Actions vs. Conversational Processes"
+---
+
+# Overview
+
+Compound actions and conversational processes are foundational building blocks for creating agents that automate tasks and interact with users. Understanding when to use each helps developers design solutions tailored to trigger types and interaction needs.
+
+* **Compound Actions**: These are designed for system-level triggers, enabling proactive automation in response to backend events or schedules. They excel in non-interactive, background workflows within ambient agents.
+* **Conversational Processes**: These are built for user-level triggers, facilitating reactive, interactive dialogues. They shine in conversational agents where user input, context, and consent are central.
+
+The choice between them depends on the agent's context: ambient agents typically rely on compound actions for event-driven logic, while conversational agents use processes for user-initiated flows. However, they aren't mutually exclusive, integrations allow hybrid scenarios, such as triggering compound actions from conversational processes for asynchronous tasks or loops.
+
+```
+flowchart TD
+    subgraph Plugin_Ecosystem["Context Guide"]
+        subgraph Ambient_World["Ambient Agents"]
+            A[Ambient Agent]
+            B[System Triggers<br>]
+            C[Compound Actions<br>]
+            A --> B --> C
+        end
+
+        subgraph Conversational_World["Conversational Agents"]
+            D[Conversational Agent]
+            E[User Triggers<br>]
+            F[Conversational Processes<br>]
+            D --> E --> F
+        end
+
+        Start[Developer Decision: Build Agent]
+        Start -->|Proactive? System Events?| Ambient_World
+        Start -->|Reactive? User Input?| Conversational_World
+
+        %% Ambient_World <-->|Interconnect: Async Workflows, Loops| Conversational_World
+        Conversational_World -->|Interconnect: Async Workflows, Loops| Ambient_World
+        Ambient_World -->|Need User Input?| Link[Connecting Ambient and Conversational Agents]
+        %% Conversational_World -->|Need Background Tasks? Trigger Compound Actions| Link
+    end
+
+    style Ambient_World fill:#f9f,stroke:#333,stroke-width:2px
+    style Conversational_World fill:#bbf,stroke:#333,stroke-width:2px
+```
+
+# When to Use Compound Actions
+
+Use compound actions when your workflow is triggered at the system level, without requiring immediate user interaction. They are the go-to for ambient agents, which monitor external signals proactively.
+
+### Scenarios
+
+* **Event-Driven Automation**: Respond to backend events, like a database update or webhook.
+* **Scheduled Tasks**: Run periodic jobs, such as daily reports or cleanups.
+* **Background Processing**: Perform computations or integrations that don't need user input, like syncing data across systems.
+
+### Example
+
+In an ambient agent monitoring inventory levels:
+
+* Trigger: System event (stock below threshold).
+* Action: Compound action fetches data, calculates reorder quantities, and updates an ERP system.
+
+**Advantages**: Fast execution, no user dependency, scalable for high-volume tasks.
+
+**Limitations**: Lacks user context; cannot directly solicit input.
+
+# When to Use Conversational Processes
+
+Opt for conversational processes when triggers are user-initiated, involving interactive elements like queries or decisions. These are core to conversational agents, which react to user engagement.
+
+### Scenarios
+
+* **User Input Collection**: Gather details via dialogues (e.g., troubleshooting a device issue step-by-step).
+* **Consent-Driven Actions**: Require approvals, like authorizing a purchase or access request.
+* **Multi-Turn Interactions**: Handle complex queries needing clarification (e.g., booking travel with preferences).
+
+### Example
+
+In a conversational agent for HR support:
+
+* Trigger: User query ("Request time off").
+* Process: Slots collect dates, reason, and manager approval, then submit to the system.
+
+**Advantages**: Maintains context for natural conversations, validates inputs in real-time, enhances user experience.
+
+**Limitations**: Reactive only; not suited for unattended automation.
+
+# Blending Compound Actions and Conversational Processes
+
+While compound actions and conversational processes operate in distinct worlds, they can integrate for powerful hybrid agents. For instance:
+
+* From a conversational process, trigger a compound action to run asynchronous workflows (e.g., after user input, kick off a long-running sync).
+* Use loops in compound actions for iterative tasks, or notify from ambient to conversational for user involvement.
+
+For detailed guidance on bridging these, including using notify for transitions, refer to our guide on **[Connecting Ambient Agents and Conversational Agents](/docs/connecting-ambient-agents-to-conversational-agents)**.
+
+This blend enables flexible architectures, such as ambient agents prompting user actions or conversational flows delegating to background processing.
+
+***
+
+What’s Next
+
+* [Connecting Ambient Agents to Conversational Agents](/docs/connecting-ambient-agents-to-conversational-agents)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+  * [When to Use Compound Actions](#when-to-use-compound-actions)
+  * [When to Use Conversational Processes](#when-to-use-conversational-processes)
+  * [Blending Compound Actions and Conversational Processes](#blending-compound-actions-and-conversational-processes)

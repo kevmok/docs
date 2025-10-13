@@ -1,11 +1,14 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "palm",
+  "name": "Moveworks",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
     "dark": "#15803D"
+  },
+  "interaction": {
+    "drilldown": true
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -15,18 +18,21 @@
         "groups": [
           {
             "group": "Getting started",
+            "icon": "play",
+            "expanded": false,
             "pages": [
               "index",
               "quickstart",
-              "development"
+              "development",
+              {
+                "group": "Test",
+                "pages": ["docs/action"]
+              }
             ]
           },
           {
             "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
+            "pages": ["essentials/settings", "essentials/navigation"]
           },
           {
             "group": "Writing content",
@@ -52,9 +58,7 @@
         "groups": [
           {
             "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           },
           {
             "group": "Endpoint examples",
@@ -63,6 +67,180 @@
               "api-reference/endpoint/create",
               "api-reference/endpoint/delete",
               "api-reference/endpoint/webhook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Agent Studio",
+        "icon": "robot",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": ["agent-studio/agent-studio-overview"]
+          },
+          {
+            "group": "Quickstarts",
+            "pages": [
+              "agent-studio/quickstarts/quickstart-guide",
+              {
+                "group": "All Quickstarts",
+                "pages": [
+                  "agent-studio/quickstarts/quickstart-basic-task-agent",
+                  "agent-studio/quickstarts/quickstart-basic-process-agent",
+                  "agent-studio/quickstarts/quickstart-2-slots-resolvers-copy",
+                  "agent-studio/quickstarts/quickstart-4-structured-data-analysis-sda",
+                  "agent-studio/quickstarts/quickstart-6-expense-approval-ambient-agent",
+                  "agent-studio/quickstarts/quickstart-7-scheduled-trigger-ambient-agent",
+                  "agent-studio/quickstarts/webhook-triggers-quickstart-guide",
+                  "agent-studio/quickstarts/hackathon-access-guide",
+                  "agent-studio/quickstarts/purple-api-tool"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              {
+                "group": "Assistants, Agents & Plugins",
+                "pages": [
+                  "agent-studio/core-concepts/assistants-agents-plugins/assistants-agents-plugins",
+                  "agent-studio/core-concepts/assistants-agents-plugins/plugin-responses",
+                  "agent-studio/core-concepts/assistants-agents-plugins/reasoning-instructions",
+                  "agent-studio/core-concepts/assistants-agents-plugins/response-sizes"
+                ]
+              },
+              {
+                "group": "Agentic Automation Engine",
+                "pages": [
+                  "agent-studio/core-concepts/agentic-automation-engine/agentic-automation-engine",
+                  "agent-studio/core-concepts/agentic-automation-engine/action-orchestrator",
+                  "agent-studio/core-concepts/agentic-automation-engine/manifest-generator",
+                  "agent-studio/core-concepts/agentic-automation-engine/policies",
+                  "agent-studio/core-concepts/agentic-automation-engine/slot-resolvers"
+                ]
+              },
+              {
+                "group": "Conversational Agents",
+                "pages": [
+                  "agent-studio/core-concepts/conversational-agents/conversational-agents",
+                  "agent-studio/core-concepts/conversational-agents/natural-language-triggers",
+                  "agent-studio/core-concepts/conversational-agents/how-to-configure-generative-intents",
+                  "agent-studio/core-concepts/conversational-agents/when-to-use-compound-actions-vs-conversational-processes"
+                ]
+              },
+              {
+                "group": "Ambient Agents",
+                "pages": [
+                  "agent-studio/core-concepts/ambient-agents/ambient-agents",
+                  "agent-studio/core-concepts/ambient-agents/ambient-agent-faqs"
+                ]
+              },
+              "agent-studio/core-concepts/connecting-ambient-agents-to-conversational-agents",
+              "agent-studio/core-concepts/data-types",
+              "agent-studio/core-concepts/citations-1"
+            ]
+          },
+          {
+            "group": "Actions",
+            "pages": [
+              "agent-studio/actions/actions",
+              "agent-studio/actions/built-in-actions",
+              "agent-studio/actions/llm-actions",
+              {
+                "group": "Compound Actions",
+                "pages": [
+                  "agent-studio/actions/compound-actions/compound-actions",
+                  "agent-studio/actions/compound-actions/action",
+                  "agent-studio/actions/compound-actions/compound-action-input-arguments",
+                  "agent-studio/actions/compound-actions/compound-action-exposed-data",
+                  "agent-studio/actions/compound-actions/compound-action-patterns",
+                  "agent-studio/actions/compound-actions/compound-action-examples",
+                  "agent-studio/actions/compound-actions/for",
+                  "agent-studio/actions/compound-actions/parallel",
+                  "agent-studio/actions/compound-actions/switch",
+                  "agent-studio/actions/compound-actions/return",
+                  "agent-studio/actions/compound-actions/notify",
+                  "agent-studio/actions/compound-actions/try-catch-and-raise-error",
+                  "agent-studio/actions/compound-actions/troubleshooting-compound-actions"
+                ]
+              },
+              {
+                "group": "HTTP Actions",
+                "pages": [
+                  "agent-studio/actions/http-actions/http-actions",
+                  "agent-studio/actions/http-actions/http-action-data-bank",
+                  "agent-studio/actions/http-actions/http-action-troubleshooting"
+                ]
+              },
+              {
+                "group": "Script Actions",
+                "pages": [
+                  "agent-studio/actions/script-actions/script-actions",
+                  "agent-studio/actions/script-actions/apithon-a-special-kind-of-python"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Conversation Process",
+            "pages": [
+              "agent-studio/conversation-process/plugin-process",
+              "agent-studio/conversation-process/activities",
+              "agent-studio/conversation-process/slots",
+              "agent-studio/conversation-process/resolver-strategies",
+              "agent-studio/conversation-process/control-flow",
+              "agent-studio/conversation-process/plugin-process-data-bank"
+            ]
+          },
+          {
+            "group": "Connectors",
+            "pages": [
+              "agent-studio/connectors/connectors",
+              "agent-studio/connectors/system-connectors",
+              "agent-studio/connectors/ip-address-allowlisting",
+              {
+                "group": "HTTP Connectors",
+                "pages": [
+                  "agent-studio/connectors/http-connectors/http-connectors"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "System Triggers",
+            "pages": [
+              "agent-studio/system-triggers/system-triggers-overview",
+              "agent-studio/system-triggers/scheduled-triggers-limited-preview",
+              "agent-studio/system-triggers/webhook-logs-troubleshooting-guide",
+              {
+                "group": "Webhook Triggers",
+                "pages": [
+                  "agent-studio/system-triggers/webhook-triggers/webhook-triggers-limited-preview",
+                  "agent-studio/system-triggers/webhook-triggers/webhooks-listener",
+                  "agent-studio/system-triggers/webhook-triggers/webhook-signature-verification",
+                  "agent-studio/system-triggers/webhook-triggers/webhook-verification-challenge"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Configuration Languages",
+            "pages": [
+              "agent-studio/configuration-languages/dsl-and-mapper-playground"
+            ]
+          },
+          {
+            "group": "Cookbooks",
+            "pages": [
+              "agent-studio/cookbooks/cookbooks",
+              "agent-studio/cookbooks/agent-studio-design-philosophy",
+              "agent-studio/cookbooks/plugin-architecture-guide",
+              "agent-studio/cookbooks/data-retrieval-cookbook",
+              "agent-studio/cookbooks/ambient-agents-cookbook",
+              "agent-studio/cookbooks/connect-to-other-ai-agents-applications",
+              "agent-studio/cookbooks/mirroring-approvals"
             ]
           }
         ]
@@ -102,15 +280,15 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {

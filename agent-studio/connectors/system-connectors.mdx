@@ -1,0 +1,111 @@
+---
+title: "System Connectors"
+---
+
+# How to Create a System Connector?
+
+### Prerequisites
+
+* Ensure you have the appropriate permission to use Moveworks Setup. You must have have either an Admin or user roles assigned to you in order to create and view connectors.
+* Ensure that you have provided correct access to the service account you are using for creating a connector. You can view [this](/docs/access-requirements) guide in order to find all the access requirement guides for the systems that Moveworks supports.
+* Go to the guide for the system you’re trying to set up a connector for and follow the steps in the guide to make sure you’ve provided the necessary access to Moveworks before beginning to setup the connector.
+
+### Configuration
+
+Here is an example of creating a **ServiceNow connector** under **System Connectors.**
+
+* Go to the *Connectors* module in Moveworks Setup, by clicking on **Manage Connectors** under *Core Platform,* and then click on **System Connectors**.
+* Click on **Create New** in the top right corner.
+* You will then see a list of all the systems supported by Moveworks. Select the system you are trying to create a connector for. In this example it would be ServiceNow. If you can’t find the system you’re looking for, use the search bar on top right to search for the system. Then click on **Add Creds**.
+
+![](/images/docs/50dc916-Screenshot_2024-04-29_at_11.04.19_AM.png)
+
+* Provide a Name to the connector, please keep in mind this name is also going to be considered as the unique Integration ID for this system. It will be defined in configurations like Identity ingestion and Permissioning.
+
+![](/images/docs/76c4a17-Screenshot_2024-04-29_at_11.06.25_AM.png)
+
+* Depending on the instance, provide the base URL. Choosing **Common Base URL** renders the section for the URL where only your **instance name** would need to be provided and the **domain** would be pre-filled.
+
+![](/images/docs/b15b1667a8541e7b8b3f2e4738ce50244c1676b59fd49380802938eb6d44ea86-image.png)
+
+* Choosing **Custom Base URL** renders the section for the URL where you need to define the complete URL including the domain as this method is chosen when the domain name is not the default.
+
+![](/images/docs/3065c76090e1eac01deb5fc61e0378fe209f981a9a32790f8e39ce931cbf7322-image.png)
+
+* Next, select an authentication type. Please note that this depends on the configurations that you have made on the ServiceNow instance. We provide Auth methods in this drop down which specific to the integration.
+
+  * In this case we are using **Basic Auth** which requires Username and Password. **Note:** Once the password has been saved, it will no longer show up in the UI as it is encrypted.
+
+    ![](/images/docs/44b6362ae8a26f78e1f417292a0be6468e629eff6726967516fe59f8c3533024-image.png)
+
+    To learn more about creating service accounts, generating credentials and using them to create connectors, view the guides [here](/docs/access-requirements).
+
+<Info>
+  ### If there is an Auth method you would like Moveworks to Support. Please reach out to the Support Team.
+</Info>
+
+* Once you have provided the credentials for your authentication type, go ahead and click **Save**.
+
+Please make sure you provide the correct credentials and inputs. **Once a connector is created, it cannot be deleted.** Although you can have multiple connectors per system and can also edit existing connectors.
+
+### Validation
+
+In order to validate if the connector which has been setup is working as expected, We need to navigate to the **User Identity > Import Users** where we need to select the connector for the source we have set up.
+
+You will see a table with all the identity sources that you have previously selected. Here you will come across a **"View Sample"** button for each source. This is a quick way to check if the connector being used for the source system is configured correctly.
+
+![](/images/docs/b69e819ecaf8a4c7fcae5babe6b00df6fa700e2ae6905605f7a725b5d2c3641a-image.png)
+
+Clicking on **"View Sample"** makes a live API call to the source system and fetches the identity data using the default attributes if the connector has been setup correctly.
+
+![](/images/docs/6ccf5ca6f1b631a525a350bbef8332a69e7454998faca68f32735fd75376d0e9-image.png)
+
+<Info>
+  ### Native Connector Validation is coming soon !
+
+  The current validation method serves as a workaround until we support native connector validation.
+</Info>
+
+***
+
+# How to leverage System Connectors for Agent Studio
+
+<Warning>
+  ### This functionality is currently in Limited Preview. To enable it, please refer to [this community post.](https://community.moveworks.com/agent-studio-6/new-opt-in-to-use-built-in-connectors-in-agent-studio-2472)
+
+  This functionality only works with the latest version of Agent Studio (April 2025 Release), which is currently in [Limited Preview.](https://community.moveworks.com/p/agent-studio-limited-preview)
+</Warning>
+
+Once this functionality is enabled, please refer to the following steps to use a system connector inside of Agent Studio.
+
+1. Go to `HTTP Actions` within Agent Studio
+
+   ![](/images/docs/33e2711d76e6a69fbedb244a8973e543e1bfbe10c38d72d08a2261570f5b7fea-CleanShot_2025-06-18_at_11.52.392x.png)
+
+2. Under the `Connector` Tab, select `Inherit from existing connector`
+
+   ![](/images/docs/666ca4d89384a2c881bb5ebc6ced6d14f2f29057aebc24bb1fbe5ded2ffff35b-CleanShot_2025-06-18_at_12.31.112x.png)
+
+3. Search for a built-in connector in the Select an existing connector dropdown. The names in the dropdown should match those of the built-in connectors name.
+
+4. Select the connector and use it as you would any other connector. You will be able to test, create plugins, etc. just as you would an HTTP Connector.
+
+Because this is a Limited Preview there are the following limitations:
+
+1. **Developers may access connectors they should not have access to.** If this feature is enabled, then all developers will be able to use Built-In Connectors inside of Agent Studio. They will not be able to edit these connectors unless they have access to Moveworks Setup. This may result in developers seeing and using connectors that they would not have access to. Please only opt-in to this Limited Preview if this limitation is not a concern for you.
+2. **Developers cannot create built-in connectors inside of Agent Studio.** Configuring or editing built-in connectors must be done inside of Moveworks Setup. For developers with the Setup RBAC, they will have to go to MW Setup to make changes. For developers who do not have the role, they will not be able to create or edit these connectors, but rather only use previously configured ones.
+3. **System Limitations**. The following systems are not supported:
+   1. Active Directory, Amazon Connect, Cisco Webex Teams, Duo, Facebook Workplace, Google Hangouts Chat, Google Spreadsheet, Microsoft Exchange Online, Microsoft Teams, NetIQ eDirectory, PingID, RingCentral Glip, Twilio, Vayusphere
+
+***
+
+[Connectors](/docs/connectors)
+
+[HTTP Connectors](/docs/http-connectors)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [How to Create a System Connector?](#how-to-create-a-system-connector)
+  * [How to leverage System Connectors for Agent Studio](#how-to-leverage-system-connectors-for-agent-studio)

@@ -1,0 +1,143 @@
+---
+title: "HTTP Connectors"
+---
+
+# Prerequisites
+
+* Ensure you have the appropriate permission to use Moveworks Setup. You must have have either an Admin or user roles assigned to you in order to create and view connectors.
+* Ensure that you have provided correct access to the service account you are using for creating a connector. Since these permissions are associated with systems which are not natively integrated with Moveworks you will need to look up the appropriate documentation for the same.
+* **Network Allowlisting** - Please make sure that our production services can access your applications. [See documentation](/docs/ip-address-allowlisting).
+
+# Configuration
+
+We start by setting the Basic connector Info where we start by providing :
+
+* Name
+* Description
+* Base URL
+* Auth Config
+
+![](/images/docs/5a69644d03ad63320e45c9b2714f3071ded5c1f1f23df4058c88f86150c2874a-connector_details.png)
+
+Securely store credentials based on your auth type:
+
+# HTTP Connector Auth Types
+
+HTTP connectors support the follow auth types:
+
+* No Auth
+
+* [Basic Auth](/docs/basic-auth)
+
+* [API Key Auth](/docs/api-key-auth)
+
+* [Bearer Token Auth](/docs/bearer-token-auth)
+
+* OAuth 2.0
+
+  * [Client Credentials](/docs/oauth-20-client-credentials)
+  * [JWT Bearer](/docs/jwt-auth)
+  * [Refresh Token](/docs/oauth-20-refresh-token)
+  * [Password Credentials](/docs/oauth-20-password-credentials)
+
+# On Premise Auth
+
+On Premise Auth is used when you want to leverage the Moveworks On Premise Agent for your authentication. If you choose to do this, please follow these steps. Please be sure to be on agent version 2.10.\*
+
+* Configure the Moveworks On Premise Agent following [this installation guide](/docs/moveworks-agent-installation-guide). Please make a note of the Service Name you have entered during the agent configuration as you’ll need it later.
+* Create the connector with “On Premise Auth” as the authentication type. Enter the service name from step 1.
+
+![](/images/docs/e55a5806224e7e195ac86c9b32275decf428e9990b599d9ea3ba0d62da79c57d-image.png)
+
+## Unsupported Auth Types:
+
+If you need to use any of the below connectors for your use case, please make an idea post in Moveworks Community.
+
+* OAuth 2.0 - Grant Type: Authorization Code
+* OAuth 1.0
+* Cookie Auth
+* Client Credentials Header Auth
+* PKI Auth
+* NTLM Auth
+
+***
+
+# Editing HTTP Connector Credentials
+
+<Info>
+  ### Limited Preview Capability
+
+  See [this post](https://community.moveworks.com/ideas/credential-rotation-aka-connector-editing-642) in our community for more details.
+</Info>
+
+* Navigate to **HTTP Connectors**
+
+  ![](/images/docs/a7eb0636489735f7d98b09df569d9a12033dd4d01c448a953591bbb2397008f5-CleanShot_2025-05-15_at_08.07.212x.png)
+
+* Select the edit button for the connector you wish to change.
+
+![](/images/docs/5f2cf0b8dbf104cbe0b0faf6be94e10116a5a0f2d998838fd926db894d1cde87-Screenshot_2024-11-04_at_11.33.12_AM.png)
+
+* You're taken to a page that resembles the authentication tab when creating a new connector. You are able to edit any fields that need to be changed here.
+
+<Warning>
+  ### Secret Values will NOT be revealed.
+
+  Please note that your secret key will show up as empty in the UI if it has been previously saved. If you change a non-secret value, but the secret stays blank, the secret will not be changed. However, if you put in a new secret, it will be overwritten.
+
+  <Frame caption="Client Secret appears blank, however the secret is still stored and not be modified unless overwritten.">
+    <img src="/images/docs/c8cb5f23d72237639b9bb3c95bc853ce313949f9acc4a4762a892a3f01334a19-Screenshot_2024-11-04_at_12.08.47_PM.png" />
+  </Frame>
+</Warning>
+
+* After you are done making your edits, press the save button and the connector will be updated with the new values. Changes may take \~3-5 minutes to process.
+
+* After changes are saved, go test your connector. To do this:
+
+  * Go to an action, event, path, or query that is using the edited connector.
+  * Test that the connector is working as intended through the HTTP editor.
+  * Go back to Creator Studio Connectors -> Edit to make any changes after testing.
+  * Repeat if necessary.
+
+This feature is still in Limited Preview. Please request access for it through [this community post](https://community.moveworks.com/creator-studio-6/new-opt-in-to-edit-creator-studio-connectors-1661).
+
+If you request access, you must also acknowledge the following limitations:
+
+* Moveworks does not currently support role based access control for connectors. This means that with this features, developers will be edit connectors that they have not created. Please be cautious when editing connectors and ensure that you are editing the correct one.
+* There is currently no visibility into which plugins will be affected as part of this change. When making connector edits, make sure that you are aware of the plugins you will be affected and do rigorous testing.
+
+# Deleting HTTP Connectors
+
+1. Navigate to HTTP Connectors within my apps
+
+   ![](/images/docs/da5785a91b3c64161856ac30893448b66e8508e82bf2fb51fdec79cbf0c4a277-CleanShot_2025-05-15_at_08.07.212x.png)
+
+2. Select the delete icon for the connector you wish to delete.
+
+   ![](/images/docs/6288c817e93bdc26c53a748bb4f49ae5313556166b6f2cc3b003ea723e14c51e-CleanShot_2024-12-11_at_14.13.57.png)
+
+3. Confirm that you wish to delete the connector. Please be cautious, it is not possible to undo this change.
+
+   ![](/images/docs/0af8655fecfbdd8ea36eef5204e81536c86cec51eaf6f376bb283771ee0c6490-CleanShot_2024-12-11_at_14.15.22.png)
+
+If you get an error such as the one picture below, it means that you're connector is still in use in Creator Studio. Please be sure to delete all references of that connector and try again
+
+![](/images/docs/dbbead6dd442bcab8c4c1cf79b97d83e6c0e265bb5783cc73e12791f2a6e7ff7-CleanShot_2024-12-11_at_14.16.35.png)
+
+***
+
+[System Connectors](/docs/system-connectors)
+
+[Basic Auth](/docs/basic-auth)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Prerequisites](#prerequisites)
+  * [Configuration](#configuration)
+  * [HTTP Connector Auth Types](#http-connector-auth-types)
+  * [On Premise Auth](#on-premise-auth)
+  * * [Unsupported Auth Types:](#unsupported-auth-types)
+  * [Editing HTTP Connector Credentials](#editing-http-connector-credentials)
+  * [Deleting HTTP Connectors](#deleting-http-connectors)

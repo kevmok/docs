@@ -1,0 +1,100 @@
+---
+title: "Compound Actions"
+description: "Compound Actions empower developers to build sophisticated, multi-step automations within Agent Studio, chaining actions, data transformations, and logic into reusable AI workflows."
+---
+
+Think of Compound Actions as an orchestration layer that can:
+
+* [Collect input arguments](/docs/compound-action-input-arguments/) from data sources
+* [Execute actions](/docs/action/) to complete tasks
+* [Conditionally run](/docs/switch/) different branches of logic
+* [Loop over items](/docs/for/) and run steps for each item
+* [Run steps at the same time](/docs/parallel/)
+* [Return information](/docs/return/) to the user or processes
+* [Handle error gracefully](/docs/try-catch-and-raise-error/)
+* [Notify users](/docs/notify/) with interactive messages and buttons
+
+## Why Use Compound Actions
+
+* **Modularity**: Break down monolithic agents into testable, composable steps.
+* **Efficiency**: Parallelize tasks or loop over lists to cut execution time.
+* **Resilience**: Built-in error handling and early exits keep workflows robust.
+* **Interactivity**: Notify users mid-flow with buttons for seamless handoffs.
+
+```
+flowchart TD
+    A[Start: User Query or Trigger] --> B[Inputs<br/>e.g., Data Mapping from User/Context]
+    B --> C[Core Actions<br/>e.g., HTTP Calls, Scripts]
+    C --> D{Control Flow?}
+    D -->|Switch: Condition Check| E[Branch 1<br/>e.g., Admin Path]
+    D -->|Switch: Condition Check| F[Branch 2<br/>e.g., User Path]
+    E --> G[Actions/Next Steps]
+    F --> G
+    G --> H[Parallel: Split Independent Tasks]
+    H --> I[Task 1<br/>e.g., Fetch Data]
+    H --> J[Task 2<br/>e.g., Notify User]
+    I --> K[Merge Outputs]
+    J --> K
+    K --> L[Outputs<br/>e.g., Return Mapped Data]
+    L --> M[End: Chat Response or Handoff]
+    style A fill:#e1f5fe
+    style M fill:#e8f5e8
+    style D shape: diamond
+    style H shape: diamond
+```
+
+## The `steps` Key
+
+The `steps` key defines a sequence of expressions executed in order, forming the backbone of multi-step Compound Actions. It groups logic cleanly, ensuring predictable flow while enabling nesting for controls like `switch` or `parallel`. Use it whenever chaining more than one expression, it's required for compound structures to maintain order and scope.
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: fetch_user_data
+        output_key: user_info
+        input_args:
+          user_id: data.requestor_id
+    - switch:  # Nested control
+        cases:
+          - condition: user_info.role == "admin"
+            steps:
+              - return:
+                  output_mapper:
+                    access: '''granted'''
+  ```
+</CodeGroup>
+
+## Getting Started
+
+1. **Prerequisites**: Familiarity with Moveworks [Data Mappers](/docs/moveworks-bender-language-reference) and [DSL](/docs/moveworks-dsl-reference)
+
+2. **Use the Low Code Editor**: Get started fast with the low code editor. Switching back to code mode will generate the compound action script for you and viceversa.
+
+   ![](/images/docs/628774ff2d8ff2ac4e2661f13aa0be592d6541b622436a30658a62ae82095243-CleanShot_2025-09-17_at_11.33.49.png)
+
+<Warning>
+  ### Low Code Editor LP
+
+  *The Low Code Editor is still in development. Expect its release in October 2025*
+</Warning>
+
+<Info>
+  ### Comments
+
+  *YAML comments (`#`) are supported and preserved during edits, but switching between low-code and code views will strip them.*
+</Info>
+
+***
+
+[APIthon Reference](/docs/apithon-a-special-kind-of-python)
+
+[Action](/docs/action)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Why Use Compound Actions](#why-use-compound-actions)
+  * [The steps Key](#the-steps-key)
+  * [Getting Started](#getting-started)

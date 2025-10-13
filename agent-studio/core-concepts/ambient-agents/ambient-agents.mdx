@@ -1,0 +1,69 @@
+---
+title: "Ambient Agents"
+description: "Ambient agents monitor enterprise systems continuously, detecting events or changes to initiate workflows automatically."
+---
+
+# The Ambient Agent Blueprint
+
+Ambient agents follow the **Listen → Understand → Act** cycle.
+
+```
+flowchart LR
+    A[Listen<br/>Detect signals via triggers] --> B[Understand<br/>Interpret with LLMs & context]
+    B --> C[Act<br/>Execute via APIs, scripts, & approvals]
+
+    style A fill:#e1f5fe
+    style B fill:#f0f4c3
+    style C fill:#ffebee
+```
+
+### Listen
+
+Monitor systems for events, data changes, or schedules using [System Triggers](/docs/system-triggers-overview). Examples include new tickets, inactive licenses, or supply chain alerts.
+
+### Understand and Act
+
+Events are fed into a [Compound Action](/docs/compound-actions#/) in both phases:
+
+* **Understand**: Analyze the event with an LLM to interpret context and assess impact.
+* **Act**: Execute [Actions](/docs/actions), including API calls, scripts, or approvals.
+
+## How Ambient Agents Work
+
+System triggers handle the **Listen** phase and feed events into a Compound Action to **Understand** and **Act**. They use LLMs for reasoning, APIs for integration, and logs for observability.
+
+![](/images/docs/8951c39868f93265d7a62e2ae877ee98be7b3407ed74f5fc38fecdf4070b9432-CleanShot_2025-09-28_at_21.09.142x.png)
+
+## Example Use Cases
+
+Ambient agents enable powerful automations across various business functions.
+
+Here are some real-world examples:
+
+* **SaaS License Reclamation**: An ambient IT agent that scans weekly for inactive SaaS licenses, confirms inactivity with the user, reclaims the unused licenses, and saves real dollars every week.
+* **Support Ticket Auto-Triage**: An ambient customer support agent that triages new high-priority Jira tickets, attempts to reproduce issues using internal tools, looks for related open tickets, and summarizes its findings, all before a human support agent even opens the ticket.
+* **Supply-Chain Disruption Response**: An ambient supply chain agent that detects potential disruptions, diagnoses the root cause, and then recommends and executes adjustments once approved.
+
+You can brush up on best practices for [Ambient AI agents in our cookbooks](/docs/ambient-agents-architecture-best-practices#/).
+
+## Get started (If You're in the [Webhooks Limited Preview](https://community.moveworks.com/p/webhook-triggers-limited-preview))
+
+1. Review the **[System Triggers Overview](https://help.moveworks.com/update/docs/system-triggers-overview#/)**
+2. Build with **Webhook Triggers** via the [Quickstart](https://help.moveworks.com/update/docs/webhook-triggers-quickstart-guide#/)
+3. Debug and iterate using [Logs & Troubleshooting](https://help.moveworks.com/update/docs/webhook-logs-troubleshooting-guide#/).
+
+***
+
+What’s Next
+
+* [Connecting Ambient Agents to Conversational Agents](/docs/connecting-ambient-agents-to-conversational-agents)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [The Ambient Agent Blueprint](#the-ambient-agent-blueprint)
+
+  * * [How Ambient Agents Work](#how-ambient-agents-work)
+    * [Example Use Cases](#example-use-cases)
+    * [Get started (If You're in the Webhooks Limited Preview )](#get-started-if-youre-in-the-webhooks-limited-preview)

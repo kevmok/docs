@@ -1,0 +1,239 @@
+---
+title: "Parallel"
+---
+
+# Overview
+
+The **Parallel** expression allows you to run sets of expressions at the same time concurrently. It is able to spawn `branches` or use a `for` expression within in.
+
+There are two types of parallel expressions:
+
+* Parallel with Branches
+* Parallel with For Loop
+
+### Parallel with Branches
+
+A parallel with branches is useful when you need to run a specific number of expressions simultaneously, each with their own set of actions. The number of branches for this type of parallel does not change dynamically, it's fixed.
+
+### Parallel with For Loop
+
+A parallel with for loop will run every expression, similar to a regular For Loop expression. However, it will run all iterations *at the same time* for every item in the list.
+
+# Low-Code Editor
+
+Add a Parallel Step, select the type of parallel you need. If you select branches, you will add as many branches as you need for parallel executions of expressions. If you select for loop, bind the iterable, define loops variables, and execute iterations in parallel.
+
+![](/images/docs/aa95c3a5417a8b1ab434f8566b193286058033c2a9e654de9c3a9141e25907b7-CleanShot_2025-09-16_at_12.55.34.png)
+
+1. **Select Branches**: For static execution of paths
+2. **Set the amount of branches**: Define how many tasks to run in parallel
+3. **Define expressions**: Add expressions under each branch
+
+![](/images/docs/27ee5f2e0396a11c67b2ba85039992b1bcfecd22a56cec1eabcf236bd93cf92a-CleanShot_2025-09-16_at_13.18.17.png)
+
+1. **Select For Loop**: To iterate over a list of items in parallel
+2. **Set up For variables**: Set up all bindings as shown in [For Loop](/docs/for#/low-code-editor)
+3. **Define expressions**: Add expressions under the For Loop.
+
+# Syntax Reference
+
+#### Schema
+
+##### Parallel with Branches
+
+<CodeGroup>
+  ```bash bash
+  parallel:
+    branches:  # List of parallel paths (at least 2)
+      - steps:  # Branch 1 expressions
+          - EXPRESSION_1  # e.g., action with output_key
+      - steps:  # Branch 2
+          - EXPRESSION_2
+      # Optional: More branches...
+  ```
+</CodeGroup>
+
+##### Parallel with For Loop
+
+<CodeGroup>
+  ```bash bash
+  parallel:
+    for:
+      each: ITEM_VAR*      # str: Per-iteration binder (e.g., 'user_id')
+      index: INDEX_VAR*    # str: Optional position (e.g., 'idx')
+      in: DATA_BANK_ITERABLE*  # str: Array ref (e.g., 'data.user_ids')
+      output_key: RESULTS_VAR* 
+      steps:               # Per-iteration expressions (parallel across iterations)
+        - EXPRESSION_1
+  ```
+</CodeGroup>
+
+#### Fields
+
+| Field        | Type         | Mandatory         | Description                                                                                  | Mode     |
+| ------------ | ------------ | ----------------- | -------------------------------------------------------------------------------------------- | -------- |
+| `branches`   | list\[steps] | Yes (if Branches) | Step groups                                                                                  | Branches |
+| `each`       | string       | Yes (if For)      | item binder - accessed as `var.prop` within steps                                            | For Loop |
+| `index`      | string       | Yes (if For)      | Index binder (even if unused, set to dummy such as `idx`)                                    | For Loop |
+| `in`         | string       | Yes (if For)      | Data bank reference only (upstream outputs)                                                  | For Loop |
+| `output_key` | list\[dict]  | Yes (if For)      | List of per-iteration dicts: `[ {step_key: val}, ... ]`. Access: `data.results[i].step_key`. | For Loop |
+| `steps`      | list\[expr]  | No                | Parallelized per item                                                                        | For Loop |
+
+# Practical Examples
+
+## Parallel with Branches
+
+### Example 1: Independent Notifications (Basic Fan-Out)
+
+Log an event and send an email concurrently
+
+<CodeGroup>
+  ```bash bash
+  parallel:
+    branches:
+      - steps:
+          - action:
+              action_name: log_event
+              input_args: 
+  							event_name: '''user_login'''
+              output_key: log_result
+      - steps:
+          - action:
+              action_name: send_email
+              input_args:
+                email: meta_info.user.email_addr
+                subject: "Login Success"
+                body: "Welcome back!"
+              output_key: email_result
+  ```
+</CodeGroup>
+
+### Example 2: Multi-Service Sync
+
+Update a CRM and Slack concurrently
+
+<CodeGroup>
+  ```bash bash
+  parallel:
+    branches:
+      - steps:
+          - action:
+              action_name: update_crm
+              input_args: 
+  							user_id: data.user_id 
+              output_key: crm_update
+      - steps:
+          - action:
+              action_name: post_slack
+              input_args: 
+  							channel: '''#updates'''
+              output_key: slack_post
+  ```
+</CodeGroup>
+
+## Parallel with For Loop
+
+### Send Messages in Parallel
+
+Run actions for each in a list in parallel
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: mw.batch_get_users_by_email
+        output_key: user_results
+        input_args:
+          user_emails:
+            - '"[email protected]"'
+            - '"[email protected]"'
+            - '"[email protected]"'
+   
+   - parallel:
+   		for:
+        each: user
+        index: user_index
+        in: data.user_results.user_records  # From upstream fetch
+        output_key: requested_for_notifications
+        steps:
+          - action:
+              action_name: mw.send_plaintext_chat_notification
+              output_key: notification_output
+              input_args:
+                user_record_id: user.lookup_id
+                message: '''Hi, this is a batch message!'''
+  ```
+</CodeGroup>
+
+### Parallel Ticket Updates
+
+#### Sample input argument
+
+<CodeGroup>
+  ```bash bash
+  outage_tickets: [ {"id": "T1"}, {"id": "T2"} ]
+  ```
+</CodeGroup>
+
+#### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  parallel:
+    for:
+      each: ticket
+      index: ticket_index
+      in: data.outage_tickets
+      output_key: updated_tickets
+      steps:
+        - action:
+            action_name: update_ticket_status
+            input_args: 
+            	ticket_id: ticket.id
+  						status: '''ON_CALL'''
+            output_key: update_result
+        - action:  # Nested parallel-friendly
+            action_name: notify_owner
+            input_args: 
+  						ticket_id: ticket.id
+            output_key: notify_result
+  ```
+</CodeGroup>
+
+#### Expected Output
+
+<CodeGroup>
+  ```bash bash
+  updated_tickets: [
+    {
+      "update_result": { "id": "T1", "status": "ON_CALL" },
+      "notify_result": { "sent": true }
+    },
+    {
+      "update_result": { "id": "T2", "status": "ON_CALL" },
+      "notify_result": { "sent": true }
+    }
+  ]
+  ```
+</CodeGroup>
+
+***
+
+[For Loop](/docs/for)
+
+[Return](/docs/return)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+
+  * [Low-Code Editor](#low-code-editor)
+
+  * [Syntax Reference](#syntax-reference)
+
+  * [Practical Examples](#practical-examples)
+
+  * * [Parallel with Branches](#parallel-with-branches-2)
+    * [Parallel with For Loop](#parallel-with-for-loop-2)

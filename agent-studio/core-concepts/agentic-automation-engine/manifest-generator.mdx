@@ -1,0 +1,34 @@
+---
+title: "Manifest Generator"
+---
+
+# What is the Manifest Generator?
+
+When an AI agent needs to choose a tool to call, multiple similarly named tools can confuse the AI agent.
+
+![](/images/docs/30e2f31b14325fa67a8794f1e009290dd56d95f5ed4dd86d5f5fdc1b02f136ee-Agentic_Automation_-_Education.png)
+
+The **Manifest Generator** inspects the code in your plugins to optimize them for tool selection. You can learn more about how this is done in [our Conversation Triggers docs](/docs/natural-language-triggers) .
+
+# How does it work?
+
+When your users chat with your AI Assistant , the **Manifest Generator** takes the following steps:
+
+1. Uses the conversational trigger to filter to the best plugins
+2. Uses the plugin title, description, details, & trigger examples to rewrite model-facing plugin descriptions
+3. Handles any end-user experience decisions (disambiguation or [parallel tool calling](/docs/multi-plugin-response-assistant#/)).
+
+![](https://files.readme.io/730676b43739bfc1aa45b10d3f18a18d59fe574ffd505a2fb69adc364ea99f82-CleanShot_2024-12-11_at_21.06.11.gif)
+
+***
+
+[Agentic Automation Engine](/docs/agentic-automation-engine)
+
+[Slot Resolvers](/docs/slot-resolvers)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What is the Manifest Generator?](#what-is-the-manifest-generator)
+  * [How does it work?](#how-does-it-work)

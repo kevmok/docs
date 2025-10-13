@@ -1,0 +1,75 @@
+---
+title: "Agent Studio Design Philosophy"
+description: "Agent Studio is built on a core belief:"
+---
+
+**AI development should feel like modern software development.**
+
+When you build a web app today, you don’t worry about how memory is allocated, which CPU architecture it runs on, or whether it’ll render in Chrome vs. Firefox. The abstractions are solid. You build to the spec—and lower level infrastructure takes care of the rest.
+
+![](/images/docs/2524448c987c6d00c2596c0973f571fbca1d6669925d24f5c7872e02d1b7d104-CleanShot_2025-08-06_at_22.50.042x.png)
+
+Agent Studio applies the same philosophy to building AI agents: **You define what the agent needs to do. We handle how it gets done.**
+
+This has a few implications for what is NOT in the product.
+
+# No Dialog Building
+
+Agent Studio doesn’t include tools for manually building dialogs, reordering fields, or hardcoding translation variants. That’s not an oversight—it’s an intentional architectural choice.
+
+Why? **Dialog micromanagement creates more problems than it solves.**
+
+* **AI Assistants lose consistency.** As you bring on more Agentic AI developers to your assistant, they will all follow different practices. They may speak different languages, have different stylistic preferences, and all of this just results in a very inconsistent experience for your users.
+
+  ![](/images/docs/6c182f4f045d60e16e0e82636b0ec6a19c6a7cdccc906e6e8f9ae3d55ef51aff-CleanShot_2025-04-16_at_12.24.302x.png)
+
+* **Managing dialogs for every error message slows down development.** Defining fallback responses for every edge case adds complexity and increases maintenance cost. That time is better spent extending your agent’s core capabilities.
+
+* **Developers are pulled into low-leverage work.** Instead of focusing on integrations and business logic, developers end up tweaking phrasing or alignment across channels.
+
+* **Structured, brittle dialog logic doesn't scale to new modalities.** Adaptive Cards or Block Kit components might work in one UI, but what happens when you move to a web interface, or a mobile app? But what happens when you move to voice? Or robotics? A rigid chat form doesn’t make sense in a world where the output may be spoken, displayed visually, or interacted with in entirely new ways.
+
+Agent Studio agents dynamically decide what to say and how to say it—based on context, language, and modality. Today that’s usually text. Tomorrow it could be a canvas, a chart, a spoken command, or something else entirely.
+
+# No Prompt Tuning Tools
+
+We don’t expose knobs for crafting prompts or manually tweaking model behavior. That’s by design.
+
+80% of AI projects fail due to performance tuning and reliability issues. **We believe that should be our problem—not yours.** It doesn't make sense for thousands of developers to solve this problem for every AI agent – Moveworks' army of ML experts & data scientists will solve it.
+
+Agent Studio abstracts prompt engineering behind a high-level specification. You define requirements (like required help text or disclaimers), and our Manifest Generator, and optimizes it for the best large language models available.
+
+We upgrade the “compiler” regularly. You don’t need to chase the latest LLM or read hundred-page prompt engineering guides. Just describe what you want—and we’ll make sure it works.
+
+# Future-Proof by Default
+
+Think of LLMs as today’s AI “chips.” The architecture is evolving fast—and Agent Studio is designed to let you swap in the latest hardware (LLM) or software (prompt compiler) without rewriting your app.
+
+Just like how modern desktop apps run on Mac, Windows, and Linux without change, your AI agents should run across model providers, modalities, and interfaces without change.
+
+We’re already working to abstract away even more complexity like solving for memory & token limits.
+
+# Still have questions?
+
+By eliminating the need for low-level dialog or prompt control, Agent Studio lets you focus on what matters: building powerful, adaptable, forward-compatible AI agents.
+
+If you have more questions about our design philosophy, or you're seeing our Manifest Generator fall short, please don't hesitate to ask in [our community](https://community.moveworks.com/agent-studio-6).
+
+**Happy hacking!**
+
+*Agent Studio Product Team*
+
+***
+
+[Plugin Architecture Guide](/docs/plugin-architecture-guide)
+
+[Development and Testing](/docs/help)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [No Dialog Building](#no-dialog-building)
+  * [No Prompt Tuning Tools](#no-prompt-tuning-tools)
+  * [Future-Proof by Default](#future-proof-by-default)
+  * [Still have questions?](#still-have-questions)

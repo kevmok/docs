@@ -1,0 +1,239 @@
+---
+title: "Mirroring Approvals"
+---
+
+# Objective
+
+This cookbook describes how to mirror approvals from other business systems into your AI assistant. You can use this cookbook to recreate the experience that your users have with our [built-in approval mirroring experience](/docs/approval-mirroring#/).
+
+This specifically ensures that your users get the full experience of [our Approval Queue](/docs/enterprise-approvals#/) (i.e. ability to ask "which approvals do I still need to complete").
+
+# Architecture
+
+At a high-level, there are going to be two plugins needed in order to build this experience.
+
+1. **Polling Plugin.** Periodically checks for new records that need approval from the user
+2. **Notification Plugin.** Sends the target user a notification, validates the status of the record on response, and pushes the update to the system of record.
+
+```
+sequenceDiagram
+    autonumber
+    actor User
+    
+
+    
+    participant Poller as Polling Plugin
+    
+
+    
+    participant Notifier as Notification Plugin
+    participant SOR as System of Record
+
+    %% 1) Time-based cursor polling
+    rect rgb(250,245,255)
+    note over User,Notifier: Approval Detection
+    Poller->>SOR: GET /approvals?status=pending&cursor=last_cursor
+    SOR-->>Poller: 200 OK [approvals[]]
+    %% 2) Call Notification via HTTP action
+    loop for approval in approvals[]
+        Poller->>Notifier: POST /webhooks/{id} { approval }    
+    end
+    end
+    
+    
+    rect rgb(255,250,240)
+    note over Notifier,SOR: Notify & Act
+    %% 3) Notification sends message and waits for user completion
+    Notifier->>User: Send approval card (Approve / Deny)
+    User-->>Notifier: Approve / Deny (optional reason)
+    Notifier->>SOR: GET /approvals/{id}
+
+    %% 4) Resolve
+    alt Already acted or canceled
+        Notifier-->>User: "This request is already resolved/canceled."
+    else Still pending
+        Notifier->>SOR: POST /approvals/{id}/decision { approve|deny }
+        SOR-->>Notifier: 200 OK • final status
+        Notifier-->>User: Confirmation + link to record
+    end
+    end
+```
+
+## Polling Plugin
+
+* **Trigger:** Scheduled job. Runs on an interval.
+* **Body:** Compound action. Fetches notifications that are eligible for notification.
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: get_pending_approvals_from_system
+        output_key: pending_approvals
+        input_args:
+  				# Everything created in the last 10 minutes, assuming the job runs every 10 min.
+          created_after_timestamp: '$TIME() - 600'
+    - for:
+        each: approval
+        index: idx
+        in: data.pending_approvals.records
+        output_key: webhook_results
+        steps:
+          - action:
+              action_name: send_webhook
+              input_args:
+                payload: approval
+  ```
+</CodeGroup>
+
+## Notification Plugin
+
+* **Trigger** Webhook. Triggered by the polling plugin.
+
+  For this cookbook, assume the payload looks something like this:
+
+  <CodeGroup>
+    ```bash bash
+    {
+      "report_id": "EXP-2025-09-15-001",
+      "total_amount": 750.50,
+      "currency": "USD",
+      "description": "Client dinner and travel for Q3 sales meeting.",
+      "submitter": {
+        "email_addr": "[email protected]",
+        "full_name": "Jane Doe",
+        "record_id": "user_12345"
+      },
+      "approver": {
+        "email_addr": "[email protected]",
+        "full_name": "John Smith",
+        "record_id": "user_67890"
+      },
+      "line_items": [
+        {
+          "item": "Client Dinner at The Grand Restaurant",
+          "category": "Meals & Entertainment",
+          "amount": 250.00
+        },
+        {
+          "item": "Round-trip flight to NYC",
+          "category": "Travel",
+          "amount": 450.50
+        },
+        {
+          "item": "Taxi from JFK to Hotel",
+          "category": "Travel",
+          "amount": 50.00
+        }
+      ]
+    }
+    ```
+  </CodeGroup>
+
+* **Body:** Compound action. Notifies the user and processes their response.
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    # Step 1: Fetch full User objects for both submitter and approver in a single call.
+    - action:
+        action_name: mw.batch_get_users_by_email
+        output_key: user_data
+        input_args:
+          user_emails:
+            - data.payload.submitter_email
+            - data.payload.approver_email
+
+    # Step 2: Create the generic approval request with formatted details.
+    - action:
+        action_name: mw.create_generic_approval_request
+        output_key: approval_request_result
+        input_args:
+          approvers: 'data.user_data.user_records.$FILTER(u => u.user.email_addr == data.payload.approver_email)'
+          users_requested_for: 'data.user_data.user_records.$FILTER(u => u.user.email_addr == data.payload.submitter_email)'
+          approval_details:
+            RENDER():
+              template: |
+                <p><b>Expense Report from {{submitter_name}}</b></p>
+                <p><b>Total:</b> ${{total_amount}} {{currency}}</p>
+                <p><b>Description:</b> {{description}}</p>
+                <p><b>Line Items:</b></p>
+                {{{line_items_html}}}
+              args:
+                submitter_name: 'data.user_data.user_records.$FILTER(u => u.user.email_addr == data.payload.submitter_email)[0].user.full_name'
+                total_amount: data.payload.total_amount
+                currency: data.payload.currency
+                description: data.payload.description
+                line_items_html:
+                  CONCAT():
+                    items:
+                      - '"<ul>"'
+                      - MAP():
+                          items: data.payload.line_items
+                          converter:
+                            RENDER():
+                              template: '<li><b>{{item}}</b> ({{category}}): ${{amount}}</li>'
+                              args:
+                                item: item.item
+                                category: item.category
+                                amount: item.amount
+                      - '"</ul>"'
+                    separator: ''
+    # Step 3: Switch on the approval status to update the system of record.
+    - switch:
+        cases:
+          - condition: 'data.approval_request_result.status == "APPROVED"'
+            steps:
+              - action:
+                  action_name: update_expense_report_in_sor
+                  output_key: sor_update_result
+                  input_args:
+                    report_id: data.payload.report_id
+                    status: '"approved"'
+          - condition: 'data.approval_request_result.status == "DENIED"'
+            steps:
+              - action:
+                  action_name: update_expense_report_in_sor
+                  output_key: sor_update_result
+                  input_args:
+                    report_id: data.payload.report_id
+                    status: '"denied"'
+  ```
+</CodeGroup>
+
+# Risks
+
+* **Rate Limits.** Approvals tend to be bursty, so we recommend building rate limit checks into your plugin.
+
+  * **Make sure you secure your webhooks!** Unauthenticated webhooks have low rate limits, so they won't be able to process all of the events you are generating.
+  * **Throttle your polling plugin.** You can use a [delay config](/docs/action#/syntax-reference) to space your webhook events out.
+
+* **Stale Approvals.** After you send your approval request, it can go "stale." For example, the user might log into the application and approve it there, but the approval request will still be in the assistant. Or another approver might handle the request, making the user's response irrelevant.
+
+  We recommend validating the approval is still "fresh" before taking action. However, there is currently no way to remove it from their "queue" of approvals.
+
+* **Duplicate notifications.** To avoid notifying the same user twice about the same approval, you should implement some sort of deduplication logic in your compound action. We recommend that you...
+
+  1. **Use time-based cursors.** That way you'll only fetch the approval once (e.g. by the `created_on` date)
+  2. **Use worknotes & audit trails.** You can leave a comment on the approval object (a purchase requisition, expense report, etc.) to log whether or not you've already reached out to the user. Then, in your notification plugin, check for that marker before creating the approval request.
+
+* **Approval requests will expire after 30 days.** Generally users don't act on requests that are over 30 days old. So if your approval request expires, we recommend escalating to a different owner rather than just notifying the same user again.
+
+***
+
+[Connect to other AI Agents](/docs/connect-to-other-ai-agents-applications)
+
+[Plugin Architecture Guide](/docs/plugin-architecture-guide)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Objective](#objective)
+
+  * [Architecture](#architecture)
+
+  * * [Polling Plugin](#polling-plugin)
+    * [Notification Plugin](#notification-plugin)
+
+  * [Risks](#risks)

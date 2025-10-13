@@ -1,0 +1,128 @@
+---
+title: "Webhooks Triggers"
+---
+
+<Warning>
+  **Limited Preview: Webhook Triggers & Listener**
+
+  Webhook Triggers and the Webhook Listener are currently in Limited Preview and may change without notice. Access is invite-only. Self-nomination form is [here](https://community.moveworks.com/p/webhook-triggers-limited-preview). Production use is approved but may be subject to interruptions or breaking changes.
+</Warning>
+
+Webhook triggers enable ambient agents to respond to events from applications in real time. External systems (the **provider**) send an HTTP request to the Listener (the **receiver**). The Listener validates and parses the request into an event, which activates one or more **plugins** to execute processes.
+
+<Info>
+  *"**Who is this for?***
+
+  *Builders creating always-active automations triggered by system events, such as "New GitHub issue opened," "Offer letter signed," or "Gong call ended." For the full landscape, see [System Triggers Overview.](/docs/system-triggers-overview)"*
+</Info>
+
+## How it works
+
+1. **Provider → Listener.** An external application sends a webhook to the **Webhook URL**, generated when creating a Listener. The Listener captures incoming requests.
+2. **Listener → Event.** Moveworks authenticates and validates the request, optionally verifies a signature, parses the body and query parameters, and generates an **event**.
+3. **Event → Plugin(s).** Matching plugins are evaluated and activated, executing configured processes (actions, approvals, etc.).
+
+### Event Flow Diagram
+
+```
+flowchart LR
+    A[Provider sends HTTP request] --> B[Listener receives request]
+    B --> C[Authenticate & Validate<br/>Signature, Headers]
+    C --> D[Parse Payload<br/>JSON Schema, Fields]
+    D --> E[Apply Filters<br/>Event Type, Dedupe]
+    E --> F[Generate Event]
+    F --> G[Evaluate Plugins<br/>Conditions Match]
+    G --> H[Activate Plugins<br/>Execute Actions]
+    H --> I[Log Outcomes]
+```
+
+### How events become plugin runs
+
+1. **Raw request received** at your Listener → `listener.webhook.trigger`.
+2. **Processed & published** (or rejected/debounced) → `listener.webhook.processor.update`.
+3. **Plugins evaluated & triggered** → `listener.webhook.plugin.trigger`.
+4. **Process executes** → `compound_action.*` and action logs.
+
+## Key concepts
+
+* **Listener.** Moveworks' receiver for webhook requests. Create one per source or reuse across sources.
+* **Webhook URL.** Unique HTTP endpoint for providers to send requests, enabling event creation in Moveworks.
+* **Provider vs. Receiver.** The provider (e.g., GitHub, Workday, DocuSign) **sends** webhooks, while Moveworks (your Listener) **receives** them.
+
+## Listener Capabilities
+
+**Authentication & security**
+
+* **Signature (HMAC) verification** - configure a shared secret to allow Moveworks to confirm the request originates from your provider.
+* **Auth header** - require bearer token or API key.
+* **Currently unsupported** - mTLS, asymmetric keys, JWKs, or JWTs.
+
+> Why secure? Without auth/signature, anyone who knows your URL can attempt to trigger your workflow. Unsecured listeners are heavily rate-limited (e.g., 1 req / 10s) vs. significantly higher limits for secured listeners.
+
+**Event filtering**
+
+* **Listener-Level Filters**: Drop irrelevant events at the entry point (e.g., accept only `issues.opened`, ignore `issues.edited`).
+* Supported at listener and plugin levels for reuse.
+
+**Deduplication & replay protection**
+
+* Prevent duplicate requests from triggering the same plugin twice; logs will show debounced/skipped events.
+
+**One-time verification challenges**
+
+* Handle challenge/CRC requests during provider registration.
+
+## Platform rules and limitations
+
+* **One trigger paradigm per plugin.** A plugin can be triggered by *system triggers* (one or many), **or** by *conversational triggers* (one or many)—but not both. Duplicate the plugin if you need both paradigms.
+* **Multiple plugins per event.** A single event can fan-out to multiple plugins if their conditions match.
+
+## Logs & observability
+
+Trace any event end-to-end with three new log types:
+
+* `listener.webhook.trigger`: Confirms the raw request reached your Listener, including headers, method, parsed body, and timestamps.
+* `listener.webhook.processor.update`: Displays the processing outcome (published, failed with reason, or debounced) and the normalized payload.
+* `listener.webhook.plugin.trigger`: Indicates which plugins were evaluated, activated, skipped, failed, or expired (TTL).
+
+See the **[Webhook Logs & Troubleshooting](https://help.moveworks.com/update/docs/webhook-logs-troubleshooting-guide#/)** guide for playbooks on diagnosing issues such as "Why didn't my plugin run?"
+
+## Next Steps
+
+* [Create a Listener.](/docs/webhooks-listener)
+* [Learn to Debug](/docs/webhook-logs-troubleshooting-guide)
+* [Webhook Quickstart Guide](/docs/webhook-triggers-quickstart-guide)
+
+### Appendix (glossary)
+
+* **Webhook:** Automated notification sent by a provider on an event.
+* **Webhook Event (Payload):** Data package in the request, typically JSON.
+* **Headers:** Metadata such as event type, request IDs, or signatures.
+* **System Trigger:** Non-conversational trigger (e.g., webhook) initiating a plugin.
+
+***
+
+[System Triggers](/docs/system-triggers-overview)
+
+[Listener Configuration](/docs/webhooks-listener)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [How it works](#how-it-works)
+
+  * * [Event Flow Diagram](#event-flow-diagram)
+    * [How events become plugin runs](#how-events-become-plugin-runs)
+
+  * [Key concepts](#key-concepts)
+
+  * [Listener Capabilities](#listener-capabilities)
+
+  * [Platform rules and limitations](#platform-rules-and-limitations)
+
+  * [Logs & observability](#logs--observability)
+
+  * [Next Steps](#next-steps)
+
+  * * [Appendix (glossary)](#appendix-glossary)

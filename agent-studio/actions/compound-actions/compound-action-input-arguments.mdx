@@ -1,0 +1,62 @@
+---
+title: "Input Arguments"
+description: "Input arguments define the external data a  requires to run, sourced from plugin triggers (e.g., webhooks) or upstream callers like a conversation process. They act as entry points, ensuring workflows receive validated, typed inputs, think user email for personalization or ticket IDs for routing, before diving into steps. By declaring them upfront, you enable dynamic execution while enforcing structure, reducing runtime errors and easing integration."
+---
+
+In the Editor, you set up **Input Arguments** by pressing on the **Input Args** button.
+
+<Frame caption="The input arguments panel, showing the list of arguments with &#x22;user_email&#x22; and controls for search.">
+  <img src="/images/docs/6961db83d4f07565cf06837a15de12f4d80e4b38269d053e7a8a478beb838b50-CleanShot_2025-09-17_at_11.51.11.png" />
+</Frame>
+
+# Setting Up Input Arguments
+
+Access the Input Arguments tab in the Compound Action Editor to add, edit, or remove them. Each argument needs a name, data type, optional description, and required flag. Saving updates the config instantly.
+
+![](/images/docs/40b7d50eb4444cfe5333dbd8a4c83be7aeb8a86f7601fa660dc132e6eadd4bc7-CleanShot_2025-09-17_at_11.46.59.png)
+
+1. **Create New**: Click "Create New" to open a new form to create an argument.
+
+2. **Define Details**: Enter name (e.g., `user_email`), select the type, add a description, and toggle required.
+
+   ![](/images/docs/4061c5a4260f40333a535560e6d3ea702ccd853a9c450ed90e7194c35a035030-CleanShot_2025-09-17_at_11.47.08.png)
+
+# Available Data Types
+
+See [Data Types](/docs/data-types#/) to check the available types in compound actions.
+
+# Usage in Compound Actions
+
+Inputs get stored in the data bank and flow into steps via data mapping (e.g., `data.user_email` in action args).
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: validate_email
+        input_args:
+          email: data.user_email  # From declared string arg
+        output_key: validation_result
+    - switch:
+        cases:
+          - condition: validation_result.valid == true
+            steps:
+              - notify:
+                  recipient_id: data.user_id  # Another input
+                  message: '''Email confirmed!'''
+  ```
+</CodeGroup>
+
+***
+
+[Notify](/docs/notify)
+
+[Compound Action Patterns](/docs/compound-action-patterns)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Setting Up Input Arguments](#setting-up-input-arguments)
+  * [Available Data Types](#available-data-types)
+  * [Usage in Compound Actions](#usage-in-compound-actions)

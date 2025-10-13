@@ -1,0 +1,288 @@
+---
+title: "Built-in Actions"
+---
+
+# Using Built-in Actions
+
+Moveworks provides a wide range of built-in actions to help you built AI agents quickly.
+
+When you want to use a built-in action in your [Compound Action](/docs/compound-actions), you can use `mw.{{action_name}}` as your `action.action_name`. For example, if you want to use the `create_generic_approval_request` native action, you would use `mw.create_generic_approval_request`.
+
+# Action Reference
+
+## `create_generic_approval_request`
+
+Create a Moveworks in-bot approval request. Plugin will continue if the approval is answered within 30 days before the approval is dropped from the database.
+
+**Action Name:** `mw.create_generic_approval_request`
+
+**Input Parameters:**
+
+* **approval\_key (string)**: The approval key which describes the approval workflow. If omitted, MUST provide the `approvers` argument. [Currently Supported Keys](/docs/moveworks-setup-native-approval-settings) (Optional)
+* **approvers (List\[User])**: List of user objects from whom to get approval. Will reach out to all users, but only one approval will be needed. If provided, this will override the approval key. (Optional)
+* **approval\_details (string)**: The details that need approval. (Required)
+* **users\_requested\_for (List\[User])**: Users who we are requesting approval for. (Required)
+
+<Warning>
+  ### Make sure you pass User objects, not emails.
+
+  You can retrieve user objects via an email address using our [**user built-in actions**](/docs/built-in-actions#batch_get_users_by_email)
+</Warning>
+
+**Request Schema:**
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      output_key: create_generic_approval_request_result
+      action_name: mw.create_generic_approval_request
+      progress_updates:
+        on_complete: ON_COMPLETE_MESSAGE
+        on_pending: ON_PENDING_MESSAGE
+      input_args:
+        approval_key: '"MANAGER"'
+        approval_details: '"Need access to coupa"'
+        users_requested_for: 
+        	- data.users[0]
+  				- data.users[1]
+  ```
+
+  ```bash bash
+  {
+    "approval_key": "string",
+    "ticket": "Ticket",
+    "approvers": "List[User]",
+    "approval_details": "string",
+    "users_requested_for": "List[User]"
+  }
+  ```
+</CodeGroup>
+
+**Action Response Schema:**
+
+<CodeGroup>
+  ```bash bash
+  {
+      "state": {
+        "initial_status": "PROCESSING",
+        "status": {
+          "[email protected]": "APPROVED"
+        },
+        "notifiers": {
+          "action_callback": {
+            "action_id": "ZagCDJRsdeD"
+          }
+        }
+      },
+      "status": "APPROVED",
+      "approved_by": [
+        {
+          "full_name": "John",
+          "record_id": "10769610738892443",
+          "email_addr": "[email protected]"
+        }
+      ]
+  }
+  ```
+
+  ```bash bash
+  {
+      "state": {
+        "initial_status": "PROCESSING",
+        "status": {
+          "[email protected]": "APPROVED"
+        },
+        "notifiers": {
+          "action_callback": {
+            "action_id": "ZagCDJRsdeD"
+          }
+        }
+      },
+      "status": "DENIED",
+      "denied_by": [
+        {
+          "full_name": "John",
+          "record_id": "10769610738892443",
+          "email_addr": "[email protected]"
+        }
+      ]
+  }
+  ```
+
+  ```bash bash
+  data.create_generic_approval_request_response.status == "approved"
+  ```
+</CodeGroup>
+
+## `generate_structured_value_action`
+
+[Check LLM Actions for full reference](/docs/llm-actions)
+
+## `generate_text_action`
+
+[Check LLM Actions for full reference](/docs/llm-actions)
+
+## `batch_send_plaintext_chat_notification`
+
+Sends a chat notification to a user.
+
+**Action Name:** `mw.batch_send_plaintext_chat_notification`
+
+**Input Parameters:**
+
+* **notifications** *(List\[Notification])*: The list of users notifications.
+
+  * **Notification** *(Object)*: The object containing the user record and the message
+
+    * **user\_record\_id**: To retrieve user record IDs you need to use the [Get User by Email](#get-user-by-email) or [Look up multiple users by email](#look-up-multiple-users-by-email) native actions (Required)
+    * **message** *(string)*: The message to send. (Required)
+
+**Request Schema:**
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      output_key: target_users
+      action_name: mw.batch_get_users_by_email
+      input_args:
+        user_emails: ["some emails in here"]
+  - action:
+      action_name: mw.batch_send_plaintext_chat_notification
+      output_key: notification_result
+      input_args:
+        notifications: 
+          MAP():
+            items: data.target_users.user_records
+            converter:
+              user_record_id: item.lookup_id
+              message: "This is a test notification"
+  ```
+</CodeGroup>
+
+## `batch_get_users_by_email`
+
+Retrieves multiple users by email against Moveworks' Internal Identity store.
+
+**Action Name:** `mw.batch_get_users_by_email`
+
+**Input Parameters:**
+
+* **user\_emails** *(List\[string])*: The email addresses of the users to retrieve.
+
+**Request Schema:**
+
+<CodeGroup>
+  ```bash bash
+  - action:
+        output_key: get_user_by_email_result
+        action_name: mw.get_user_by_email
+        progress_updates:
+          on_complete: ON_COMPLETE_MESSAGE
+          on_pending: ON_PENDING_MESSAGE
+        input_args:
+          user_emails: data.users_to_message_list # (easiest way to create this would be using a script action)
+  ```
+
+  ```bash bash
+  {
+    "user_emails": "List[string]",
+  }
+  ```
+</CodeGroup>
+
+**Result Schema:**
+
+<CodeGroup>
+  ```bash bash
+  {
+    "user_records": [
+      {
+        "lookup_id": "12345",
+        "user": {
+          "full_name": "John Doe",
+          "email_addr": "[email protected]",
+          ...
+        }
+      },
+      {
+        "lookup_id": "67890",
+        "user": {
+          "full_name": "Jane Smith",
+          "email_addr": "[email protected]",
+          ...
+        }
+      }
+    ]
+  }
+  ```
+</CodeGroup>
+
+You can find the full list of user fields in our [Moveworks Data Object](/docs/data-objects) page.
+
+## `get_user_by_email`
+
+Retrieve a user record according to their email address. This action will return all user attributes, along with custom attributes.
+
+**Action Name:** `mw.get_user_by_email`
+
+**Input Parameters:**
+
+* **user\_email** *(string)*: The email address of the user to retrieve.
+
+**Request Schema**
+
+<CodeGroup>
+  ```bash bash
+  - action:
+        output_key: get_user_by_email_result
+        action_name: mw.get_user_by_email
+        progress_updates:
+          on_complete: ON_COMPLETE_MESSAGE
+          on_pending: ON_PENDING_MESSAGE
+        input_args:
+          user_email: "[email protected]"
+  ```
+
+  ```bash bash
+  {
+    "user_email": "string"
+  }
+  ```
+</CodeGroup>
+
+**Result Schema**
+
+<CodeGroup>
+  ```bash bash
+  {
+    "user": {
+      "full_name": "John Doe",
+      "email_addr": "[email protected]",
+      ...
+    }
+  }
+  ```
+</CodeGroup>
+
+You can find the full list of user fields in our [Moveworks Data Object](/docs/data-objects) page.
+
+***
+
+[LLM Actions](/docs/llm-actions)
+
+[HTTP Actions](/docs/http-actions)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Using Built-in Actions](#using-built-in-actions)
+
+  * [Action Reference](#action-reference)
+
+  * * [create\_generic\_approval\_request](#create_generic_approval_request)
+    * [generate\_structured\_value\_action](#generate_structured_value_action)
+    * [generate\_text\_action](#generate_text_action)
+    * [batch\_send\_plaintext\_chat\_notification](#batch_send_plaintext_chat_notification)
+    * [batch\_get\_users\_by\_email](#batch_get_users_by_email)
+    * [get\_user\_by\_email](#get_user_by_email)

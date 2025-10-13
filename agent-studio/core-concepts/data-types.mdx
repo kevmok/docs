@@ -1,0 +1,107 @@
+---
+title: "Data Types"
+---
+
+# What are data types?
+
+Data types define the structure and format of values that variables can hold. They ensure type-aware behavior, enabling the AI agents to handle data consistently, such as collecting inputs in conversational [slots](/docs/slots), passing values between [actions](/docs/actions), or rendering them in [citations](/docs/citations).
+
+# Available Data Types
+
+Data types vary by context:
+
+* **Actions**: Currently limited to a fixed set of primitive and built-in types.
+* **Slots**: Include the same types as Actions, plus support for custom data types.
+
+## Data Types for Actions
+
+Actions currently support the following built-in data types.
+
+| Type      | Description               | Example Value                                                |
+| --------- | ------------------------- | ------------------------------------------------------------ |
+| `string`  | Text or identifiers       | `"[email protected]"`                                        |
+| `integer` | Whole numbers             | `42`                                                         |
+| `number`  | Decimals or floats        | `3.14`                                                       |
+| `boolean` | True/false flags          | `true`                                                       |
+| `object`  | Key-value pair structures | `{ "role": "admin" }`                                        |
+| `User`    | Moveworks user object     | ` { "id": "123", "email_addr": "[email protected]" }`        |
+| `List[T]` | List of the selected type | `List[string] -> ["[email protected]", "[email protected]"]` |
+
+#### Usage Notes:
+
+* Use these types when defining inputs for actions.
+* For lists, specify the inner type (e.g., `List[string]` for a list of strings).
+
+## Data Types for Slots
+
+Slots, used in conversational processes, support all the data types available in Actions, plus **custom data types**. Custom types allow integration with business systems, enabling slots to handle complex, system-specific objects.
+
+* **Built-in Types**: Identical to those in Actions (see table above).
+* **Custom Data Types**: User-defined types representing objects from external systems, such as `SalesforceAccount` or `JiraIssue`.
+
+### Key Differences
+
+* Custom types are exclusive to slots for advanced data collection in conversations.
+* They enable natural language resolution (e.g., converting "my latest ticket" to a `JiraIssue` object).
+* Do not merge custom types across systems—create separate types for similar objects in different systems (e.g., `SalesforceAccount` and `NetsuiteAccount`).
+
+# How do I configure Custom Data Types?
+
+Custom data types are configured exclusively for use in slots. Follow these steps to create and set them up in the Agent Studio.
+
+## Prerequisities
+
+* A JSON example of the data object from your business system (e.g., a sample API response).
+
+## Step-by-Step Configuration
+
+1. **Navigate to Data Types**
+
+2. **Create a New Custom Data Type**
+
+   1. Click **Create**
+
+3. **Set Name and Description**:
+
+   ![](/images/docs/3c2952dcbb0704bdb3b7a9f19e3176704a01960ea3d002b571cecf351e4388b7-CleanShot_2025-09-22_at_09.51.23.png)
+
+   1. **Name**: Must follow the convention `u_<DataTypeName>` (e.g., `u_SalesforceAccount`). This serves as a unique identifier.
+   2. **Description**: Provide a detailed explanation of the type, including its purpose and key fields.
+
+4. **Define the Data Type Schema**
+
+   ![](/images/docs/9bc2582f7db8ab39f4816f4128c696239989e7b2a2554fa0655bfa983a78dcd2-CleanShot_2025-09-22_at_09.53.44.png) ![](/images/docs/17119794f1814f971bcfc24d1105843634223f9a6559f03f5e6effb5f8d88f44-CleanShot_2025-09-22_at_09.54.13.png)
+
+   1. Use the **Import JSON** button in the top-right to paste a sample JSON object from your system.
+   2. A schema will be auto-generated based on the JSON structure.
+   3. Review and edit fields as needed (e.g., mark required fields or add validations).
+
+5. **Add Resolver Strategies**
+
+   1. Resolver strategies convert natural language inputs to custom data type objects.
+   2. These are only applicable to custom data types in slots.
+   3. Define a default strategy here to avoid repetition in individual plugins or slots.
+   4. For details on setup, see [Resolver Strategies](/docs/resolver-strategies). **Example Use Case**: For a `JiraIssue` type, a resolver might map "this week's most important bug" to a specific issue object.
+
+***
+
+What’s Next
+
+* [Resolver Strategies](/docs/resolver-strategies)
+* [Slots](/docs/slots)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What are data types?](#what-are-data-types)
+
+  * [Available Data Types](#available-data-types)
+
+  * * [Data Types for Actions](#data-types-for-actions)
+    * [Data Types for Slots](#data-types-for-slots)
+
+  * [How do I configure Custom Data Types?](#how-do-i-configure-custom-data-types)
+
+  * * [Prerequisities](#prerequisities)
+    * [Step-by-Step Configuration](#step-by-step-configuration)

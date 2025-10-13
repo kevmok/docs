@@ -1,0 +1,296 @@
+---
+title: "Resolver Strategies"
+---
+
+# What are resolver strategies?
+
+Resolver strategies instruct AI agents how to convert the user’s provided value (e.g. “this week's most important bug”) to a [Data Type](/docs/data-types) the system wants (e.g. `<JiraIssue>_BUG-732`).
+
+**Please read the [Slot Resolvers](/docs/slot-resolvers) documentation to understand how resolver strategies fit into the big picture.**
+
+# One Strategy, One Data Type
+
+Each resolver strategy produces one [data type](/docs/data-types). For example, if I have a resolver strategy that is bound to the `JiraIssue` data type, then it can **NOT** also return an `AsanaTask`
+
+# Methods
+
+Resolver strategies are made up of multiple “methods.” Each method provides a list of possible values that matches the data type.
+
+<Warning>
+  ### Resolver Strategy Limitation
+
+  A Resolver Strategy can only have **1 Static Method** or **multiple Dynamic Methods**.
+
+  It is not possible to have multiple Static Methods or a mix of Static & Dynamic Methods. If this something you think you need, reach out to your CSE or [\[email protected\]](/cdn-cgi/l/email-protection#f5868085859a8781b5989a8390829a879e86db949c)!
+</Warning>
+
+## Type of Methods
+
+You can build two types of methods:
+
+1. **Static methods** - preconfigure a multiple choice list of possible values. For example, if you're changing the status of a `JiraIssue`, you might specify a few status options
+
+   * Not Started (`id=4`)
+   * In Progress (`id=8`)
+   * Done (`id=10`) The AI agent will offer these options as part of [how slot resolvers work](/docs/slot-resolvers).
+
+2. **Dynamic methods** - use an action to retrieve possible values. For example, if you're trying to get a list of `JiraIssue` records that are assigned to the user, you can fetch them from the Jira Issues API and offer them to the user. You can send data from your
+   <Warning>
+     ### Warning
+
+     You can not currently use **compound actions**, but other action types are valid.
+   </Warning>
+
+## Output Cardinality
+
+For a given resolver, the action, after output mappings are applied, should return an instance of your data type.
+
+For example, a resolver strategy for `JiraIssue` might return
+
+* **A single`JiraIssue` record** - for example, if the user specified the issue by it's ID (e.g. "I want to close BUG-732"), then you can return the content as
+  <CodeGroup>
+    ```bash bash
+    {
+      "id": "BUG-732",
+      "title": "Set HTTP Status code correctly on custom REST API",
+      ...
+    }
+    ```
+  </CodeGroup>
+
+If you always retrieve a single object in your output and want the entire object select the below setting: **Interpret output as the exact value**.
+
+![](/images/docs/b164c96b08eb83f26db4a384bef6c7e6594e4da5002a4a54501e794f8242bc3d-Screenshot_2025-10-08_at_1.09.33_PM.png)
+
+* **A list of`JiraIssue` records**, for example, if the user said "Show me my tasks," you would return a list of records. (Note: you can return 0, or 1 records, but it must be a list).
+  <CodeGroup>
+    ```bash bash
+    [
+      {
+        "id": "BUG-732",
+        "title": "Set HTTP Status code correctly on custom REST API",
+        ...
+      },
+      {
+        "id": "BUG-733",
+        "title": "Envelope response under 'data' keyword",
+        ...
+      },
+      ...
+    ]
+    ```
+  </CodeGroup>
+
+If you always retrieve a list in your output and want the user to make a selection from the list choose the below setting:**Interpret output as a list of candidate values**.
+
+![](/images/docs/189ba591877ef0425ae1fb3d21f14fdc988af0f6c48ef3c7436964f1140c56c8-Screenshot_2025-10-08_at_1.09.27_PM.png)
+
+## Method Selection
+
+During the conversation, the AI agent picks the best method to use based on the conversation. For example, if you the following methods
+
+* Get `JiraIssue` by ID
+* Get `JiraIssue` assigned to user
+* Get `JiraIssue` by status & project
+
+Then the AI agent will choose the right method based on the conversation
+
+| Example Utterance                                                                                  | Resolver Strategy Method Selected   |
+| -------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| "Can you please update the due date of BUG-732 to next week"                                       | Get `JiraIssue` by ID               |
+| "I need to update the due date of my tasks"                                                        | Get `JiraIssue` assigned to user    |
+| "I'm preparing for a stand-up. Can we update the due date of in progress tasks for Project Orion?" | Get `JiraIssue` by status & project |
+
+# How do I configure Resolver Strategies?
+
+## The 2 ways to author Resolver Strategies
+
+First, it's worth mentioning that there are 2 ways to author a resolver strategy:
+
+1. As part of a Data Type. This will make your Resolver Strategy reusable wherever your data type is used.
+
+![](/images/docs/41fbdc48b04d31bd34f3b032abc8edd47d19feb5b815abf86f2b411d1859da82-CleanShot_2025-04-09_at_04.33.522x.png)
+
+2. As part of a Slot. This will tie your Resolver Strategy to a specific slot making it non-reusable.
+
+![](/images/docs/6ae155f727dca1cd1733db4bf18d7f3f3d3f5ba097c55fb272e9714e1fa4a1d9-Screenshot_2025-10-08_at_1.08.42_PM.png)
+
+## Resolver Basic Info
+
+![](/images/docs/ce78092350fed79ca1dc68bfdcd357a5c57b447816c6f1556d6315f22ef5d698-CleanShot_2025-04-09_at_04.35.582x.png)
+
+It's important to provide a detailed **Method Name** as this helps the AI Assistant choose which Method is best for each conversation with the user. The Method Name must be in snake\_case format.
+
+## Configuring a Static Resolver
+
+Static Resolvers allow you to configure a list of options to show the user every time. Each option has a **Display Value** (what the end user will see) and a **Raw Value** (what will be used in your Activities).
+
+![](/images/docs/a7985bae1fa22f39993c35b8e24ecfd02db8a30f03ee18a827621602a138d351-CleanShot_2025-04-09_at_04.38.502x.png)
+
+## Configuring a Dynamic Resolver
+
+Dynamic Resolvers require you to select an Action in order to dynamically lookup slot values.
+
+### Setting
+
+![](/images/docs/ad92efce386ddf6e770d815ac0e418ca5949083b4458fd1da5b6ecc9d081f285-CleanShot_2025-04-09_at_04.43.322x.png)
+
+### Selecting an Action
+
+Its recommend to only use HTTP Actions for Dynamic Resolvers; Compound Actions, Scripts, and Built-in Actions are currently not supported.
+
+### Input Arguments & Input Mapping
+
+![](/images/docs/d1c89e217d5176508cf07c92a045b107aefc1583994caf88ba5086cc4fa1807d-CleanShot_2025-04-07_at_16.06.512x.png)
+
+You can configure input arguments for your resolver method using a JSON schema. Inputs are added to the [resolver method's data bank](/docs/resolver-strategies#datainput_arg). For example, the following schema would provide a single `feature_request_id` string as `data.feature_request_id`. These will be collected from the user whenever the resolver slot is collected. The names of these are important as that is how the reasoning engine infers what it is collecting from the user. You can't pass in any data from the conversation's data bank you can only collect data from the user in the context of the resolver itself.
+
+<CodeGroup>
+  ```bash bash
+  {
+    "type": "object",
+    "properties": {
+      "feature_request_id": {
+        "type": "string"
+      },
+      "feature_request_name":{
+        "type": "string"
+      }
+    }
+  }
+  ```
+</CodeGroup>
+
+Learn more about how to write JSON schemas at the [official JSON schema docs](https://json-schema.org/learn/getting-started-step-by-step).
+
+### Output Mapping
+
+This represents the output object of your Activity. By default, it will capture all of the data that the action you selected returns. However, you can "dot walk" into the object if you want to limit the data returned.
+
+The output value from the http action in the resolver is stored as `response` when referencing it in the output mapper
+
+Clicking "Switch to advanced bender" will take you to a [JSON Bender](/docs/moveworks-bender-language-reference#overview) editor where you have more controls to fully define a custom output object.
+
+<Warning>
+  Note: the output mapper must always point to an array if the output cardinality is set to **interpret as a list of candidate values**. This is how we build the list of option the user can select from
+
+  For example given an action with an output like
+
+  JSON
+
+  ```
+  {
+    "hasErrors": false,
+    "results": [
+      {
+        "referenceId": "ref1",
+        "id": "0015g00000N1ABC",
+        "success": true,
+        "errors": [],
+        "fields": {
+          "Name": "Acme Corporation",
+          "Industry": "Technology",
+          "BillingCity": "San Francisco",
+          "Phone": "+1-415-555-1234",
+          "Website": "https://www.acme.com"
+        }
+      },
+      {
+        "referenceId": "ref2",
+        "id": "0035g00000M9XYZ",
+        "success": true,
+        "errors": [],
+        "fields": {
+          "FirstName": "John",
+          "LastName": "Doe",
+          "Title": "CTO",
+          "Email": "[email protected]",
+          "Phone": "+1-415-555-1111"
+        }
+      }
+    ]
+  }
+  ```
+</Warning>
+
+**The output mapping would be `response.results`**
+
+![](/images/docs/f24144b948aac1c150ba128afeb9db347ff96ba6337707c87659caeaec744253-396a7ceb38d533e11227771d519f4b626fa7c77b35dfdf87c3e93ea39b19936a-Screenshot_2025-09-25_at_4.08.53_PM_1.png)
+
+### Output Cardinality
+
+See the [Output Cardinality reference](/docs/resolver-strategies#output-cardinality) for guidance on which option to choose.
+
+![](/images/docs/2b88781ca1e18239d52e294acee239a51f011095414204730577ca03b2552143-CleanShot_2025-04-09_at_04.51.242x.png)
+
+# Data Bank Inside Of Dynamic Resolvers
+
+## `data.<input_arg>`
+
+You can reference the input arguments of your resolver method with the notation `data.<input_arg>`
+
+<Warning>
+  **Important Note:**
+
+  You can not reference the data bank of the conversation, you can only reference input args that you collect during the resolver step.
+</Warning>
+
+## `meta_info.user`
+
+You can reference user attributes about the current user (ie. the user that triggered the plugin) with the notation `meta_info.user`
+
+See [User Attributes Reference](/docs/user-attribute-reference) for examples.
+
+# How To Reference The Output Of Resolvers
+
+### Static Resolvers
+
+Once the user selects one of the presented static options you can reference the output in the conversational process in 2 ways.
+
+To reference the **display value** of the user's static resolver choice use:
+
+`data.<slot_name>.display_value`
+
+To reference the **raw value** of the user's static resolver choice use:
+
+`data.<slot_name>.value`
+
+### Dynamic Resolvers
+
+Once the user selects one of the presented dynamic options you can reference the output in the conversational process by simply using:
+
+`data.<slot_name>`
+
+***
+
+[Slots](/docs/slots)
+
+[Activities](/docs/activities)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What are resolver strategies?](#what-are-resolver-strategies)
+
+  * [One Strategy, One Data Type](#one-strategy-one-data-type)
+
+  * [Methods](#methods)
+
+  * * [Type of Methods](#type-of-methods)
+    * [Output Cardinality](#output-cardinality)
+    * [Method Selection](#method-selection)
+
+  * [How do I configure Resolver Strategies?](#how-do-i-configure-resolver-strategies)
+
+  * * [The 2 ways to author Resolver Strategies](#the-2-ways-to-author-resolver-strategies)
+    * [Resolver Basic Info](#resolver-basic-info)
+    * [Configuring a Static Resolver](#configuring-a-static-resolver)
+    * [Configuring a Dynamic Resolver](#configuring-a-dynamic-resolver)
+
+  * [Data Bank Inside Of Dynamic Resolvers](#data-bank-inside-of-dynamic-resolvers)
+
+  * * [data.\<input\_arg>](#datainput_arg)
+    * [meta\_info.user](#meta_infouser)
+
+  * [How To Reference The Output Of Resolvers](#how-to-reference-the-output-of-resolvers)

@@ -1,0 +1,205 @@
+---
+title: "Connect to other AI Agents"
+---
+
+# Objective
+
+This cookbook is helpful if your goal is to make it possible to chat with a 3P agent or LLM **through** your Moveworks Assistant.
+
+# Use Cases
+
+You can do this for..
+
+* **Other AI agents**: You can send a prompt to those agents and wait for them to do work (e.g. Workday's agent, M365 copilot). Note: This requires those vendors to expose a "Responses API", "Chat Completion API", or similar.
+* **RAG (Retrieval Augmented Generation) Systems:** In these models, the LLM is provided additional context in the prompt.
+* **In-House LLMs**: These are fine-tuned models trained on your data & come up with content based on its training data.
+* **Foundation Models:** These are general, off-the-shelf models, like ChatGPT, Claude, or other families of LLMs.
+
+<Info>
+  If you're trying to connect to a Foundation Model like GPT, try our built-in plugin: [QuickGPT](https://www.moveworks.com/us/en/platform/quick-gpt).
+</Info>
+
+# Architecture & Implementation
+
+If you want to connect Moveworks to other AI agents & applications, you can do so through our [plugins](/docs/assistants-agents-plugins#/). Your plugin will look something like this:
+
+```
+sequenceDiagram
+    participant User
+    participant AI_Assistant as AI Assistant
+    participant Claude_Plugin as Claude Plugin
+    participant Anthropic_API as Anthropic API
+    participant Search_Plugin as Search Plugin
+
+    %% First Turn
+    User->>AI_Assistant: "Get competitive intel on enterprise chat platforms"
+    AI_Assistant->>AI_Assistant: Select Claude_Plugin
+    AI_Assistant->>Claude_Plugin: Send prompt
+    Claude_Plugin->>Anthropic_API: Call Anthropic API
+    Anthropic_API-->>Claude_Plugin: Return competitive summary
+    Claude_Plugin-->>AI_Assistant: Return Claude’s output
+    AI_Assistant-->>User: Deliver competitive intel summary
+
+    %% Follow-up Turn
+    User->>AI_Assistant: "Now contrast that with our native chat capabilities"
+    AI_Assistant->>Search_Plugin: Retrieve product docs, internal feature specs, etc.
+    Search_Plugin-->>AI_Assistant: Return relevant internal context
+    AI_Assistant->>AI_Assistant: Combine Claude’s competitive intel with org context
+    AI_Assistant-->>User: Share analysis
+```
+
+For the easiest implementation, we recommend the following high-level approach.
+
+1. **Choose an invocation phrase for your LLM.** Here we are using "Hey Claude"
+
+   ![](/images/docs/d9ece8680a569e9b714e36cc4165c841676988218f67c4967de8efb1d5316c18-CleanShot_2025-10-05_at_07.52.582x.png)
+
+2. **Create two slots.**
+
+   | Slot Name             | Data Type | Slot Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+   | --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+   | query                 | string    | the query a user has input to you                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+   | conversation\_context | object    | `**Description**
+   Capture the immediate conversational context by recording the last user message and the last bot response. This object should NEVER be requested from the user; it should be populated automatically based on the conversation history to maintain relevance and continuity for subsequent turns.
+    **Properties**
+   last_user_message (string)
+
+   Description: NEVER ASK THE USER FOR THIS INFORMATION. This is the literal message of the last RELEVANT message the user sent. It represents the user's direct input that prompted your most recent response. Make it exact, do not summarize. Capturing the user's query or statement verbatim is crucial for understanding the immediate context of the conversation turn.
+
+   last_bot_message (string)
+   Description: NEVER ASK THE USER FOR THIS INFORMATION. This is the literal message of the last RELEVANT message you sent. Focus more on the content you've replied with and less about whether other plugins have found any knowledge. This is good for maintaining contextual relevance. Make it exact, do not summarize this at all, length is no issue here. Ignore things like "Here are the resolved argument" or progess updates. Only grab final content sent to the user` |
+
+3. Set up an [HTTP action](/docs/http-actions)
+
+   ```
+   curl https://api.anthropic.com/v1/messages \
+     -X POST \
+     -H 'Content-Type: application/json' \
+     -H "x-api-key: $ANTHROPIC_API_KEY" \
+     -H 'anthropic-version: 2023-06-01' \
+     -d '{
+       "model": "claude-3-5-sonnet-20241022",
+       "max_tokens": 1024,
+       "messages": [
+         { "role": "user", "content": "{{user_query}}" }
+       ]
+     }'
+   ```
+
+4. Configure your [Conversation Process](/docs/plugin-process#/) to use that HTTP action & pass the slots into the API call.
+
+   ![](/images/docs/168841f3f179eff4f2384eae02a97d5f05961bac53bc3d07c8ab1c56e0f98679-CleanShot_2025-10-05_at_08.05.282x.png)
+
+   ```
+   user_query: |
+       $CONCAT([
+           "'UserInput:'",data.query,
+           "'PreviousBotMessage:'",$TEXT(data.conversation_context)
+       ])
+   ```
+
+5. Add a content activity to help the AI assistant select your plugin on subsequent turns
+
+   ![](/images/docs/b466d94f156552b061ee309690d542fc287431df63e0779c80fd58acdb971e4c-CleanShot_2025-10-05_at_08.07.252x.png)
+
+# Check out our demo!
+
+# Architecture Decisions
+
+## Context Engineering
+
+There are three ways that you can manage context, each with their own pros & cons.
+
+| Strategy        | Description                                                                              | Pros                                                                                             | Cons                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| Slots           | Let the Agentic Reasoning Engine decide what conversation history to provide your model. | Can intelligently combine context with your org-specific knowledge (e.g. via the Search plugin). | Context is lossy. Reasoning engine won't provide ALL the detail for your external API to use. |
+| Threads API     | If your LLM supports it, generate a `thread_id` and collect it as a slot.                | All of your conversation context will be preserved between turns                                 | Limited availability across AI vendors. More complex setup.                                   |
+| Custom Database | Store user & system messages in a custom database                                        | Full control over the context engineering approach.                                              | Increases the # of systems touching your personal data. Databases will need to be secured.    |
+
+## Response Generation
+
+If you want to present the results directly to the user without letting the AI assistant mutate the outputs, you'll want to use a compound action instead of an HTTP action in your action activity. This lets
+
+Then hit the LLM API as before, but send the output to the user via a [notify step](/docs/notify#/) instead of returning it to the user conversationally.
+
+This bypasses the AI Assistant on the way to the user, allowing the original voice of your generation to be preserved.
+
+```
+sequenceDiagram
+    participant User
+    participant AI_Assistant as AI Assistant
+    participant Claude_Plugin as Claude Plugin
+    participant Anthropic_API as Anthropic API
+    participant Search_Plugin as Search Plugin
+
+%% First Turn
+    User->>AI_Assistant: "Get competitive intel on enterprise chat platforms"
+    AI_Assistant->>AI_Assistant: Select Claude_Plugin
+    AI_Assistant->>Claude_Plugin: Send prompt
+    Claude_Plugin->>Anthropic_API: Call Anthropic API
+    Anthropic_API-->>Claude_Plugin: Return competitive summary
+    Claude_Plugin-->>User: Notify user with EXACT output.
+```
+
+## Token Consumption and Cost
+
+LLM providers charge based on the number of tokens processed (both input prompt and output generation). Long conversations or large documents can become expensive quickly.
+
+**Best Practices:**
+
+1. **Set Limits**: Always use the `max_tokens` parameter in your API calls to cap the length of the response and prevent unexpectedly large (and expensive) outputs.
+2. **Be Concise**: Encourage users and design system prompts to be as concise as possible.
+3. **Monitor Usage**: Regularly check your API usage and cost dashboards on the LLM provider's platform.
+4. **Choose the Right Model**: For simpler tasks, consider using smaller, faster, and cheaper models instead of the most powerful (and most expensive) ones.
+
+## Data Security & Privacy
+
+Standard public LLM APIs may use your prompt data to train their models. Sending Personally Identifiable Information (PII) or sensitive company data is a significant risk.
+
+**Best Practices:**
+
+* **Consult Your Security Team**: Always review the data privacy and terms of service for any LLM provider.
+* **Prefer Enterprise Offerings**: Whenever possible, use enterprise-grade services like Azure OpenAI or an OpenAI Enterprise agreement, which typically guarantee that your data will not be used for model training.
+* **Anonymize Data**: If you must send potentially sensitive information, build steps in your workflow to find and replace sensitive data with placeholders before sending it to the LLM. You can use [our LLM Actions](/docs/llm-actions#/) to do this.
+* **Educate users**: Inform users about what data is being sent to a third-party service and advise them against submitting sensitive information. You can do this through a **Content Activity** & enabling the **Activity Confirmation Policy** on your API call.
+
+## Plugin Selection
+
+Triggering reliability can vary depending on the use case and breadth of positive utterance subject matter. Below are some options to optimize your LLM plugins
+
+1. **Define Diverse But Specific Utterances**: In your plugin's trigger configuration, provide a wide range of example phrases. For a summarization plugin, this could include:
+
+   * "summarize this document"
+   * "give me the tl;dr"
+   * "what are the key points of this?"
+   * "can you create an executive summary"
+
+2. **Define a trigger keyword**: Assign a deterministic triggering phrase to your plugin so that users can trigger the plugin on command.
+
+3. **Use a System Prompt**: Instead of relying on the user to frame their entire request, use the `system` message (or an equivalent field) in your API request body. This pre-prompts the LLM with its role or instructions (e.g., "You are an expert at rewriting text to be more professional"). The user then only needs to provide the core input, making the interaction much smoother.
+
+***
+
+[Ambient Agents Cookbook](/docs/ambient-agents-cookbook)
+
+[Mirroring Approvals](/docs/mirroring-approvals)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Objective](#objective)
+
+  * [Use Cases](#use-cases)
+
+  * [Architecture & Implementation](#architecture--implementation)
+
+  * [Check out our demo!](#check-out-our-demo)
+
+  * [Architecture Decisions](#architecture-decisions)
+
+  * * [Context Engineering](#context-engineering)
+    * [Response Generation](#response-generation)
+    * [Token Consumption and Cost](#token-consumption-and-cost)
+    * [Data Security & Privacy](#data-security--privacy)
+    * [Plugin Selection](#plugin-selection)

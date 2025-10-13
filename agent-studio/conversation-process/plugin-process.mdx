@@ -1,0 +1,96 @@
+---
+title: "Conversation Process"
+---
+
+# Introduction
+
+Conversation processes are the backbone of plugin functionality, enabling the automation of tasks through carefully orchestrated sequences of actions. Built using a low-code user interface, processes allow developers to connect actions, implement control flows, and leverage a data bank to use user data and reuse action outputs. Developers can define one or more processes, each tailored to specific objectives, such as automating IT support or streamlining data workflows.
+
+This section explains what processes are, their key components, how to design them, and best practices for creating efficient workflows, ensuring you can harness the full power of Agent Studio’s automation capabilities.
+
+# What is a Process?
+
+A process is a defined sequence of steps executed by a plugin to accomplish a task, orchestrated for reliable execution of steps like checking policies or performing activities. Processes rely on **slots** to collect essential user inputs, such as ticket IDs or device details, which are stored in the **data bank** for use by activities and control flow. For example, a process for renaming a Slack channel might use slots like "channel" and "new\_name" to gather required information from the user.
+
+Each plugin has a single process, but this process can be reused by other plugins, promoting consistency and efficiency across applications.
+
+# Components of a Process
+
+Processes in Agent Studio are built from four core components, integrated within the low-code UI:
+
+* **Activities**: Individual tasks or operations, such as retrieving data, sending notifications, updating systems, or displaying information. Activities are the functional units of a process, each performing a specific role. Learn more in the Activities documentation.
+* **Control Flow**: The logic governing the sequence and conditions of activity execution. This includes conditionals (e.g., if-then-else) ensuring straightforward and predictable workflows.
+* **Data Bank**: A repository storing outputs from activities, slot values, and metadata, enabling subsequent activities and control flow to use this data for dynamic processes.
+* **Slots**: Input values required to execute the plugin, collected from the user or AI assistant memory. Slots, such as a ticket ID or user comment, are stored in the data bank for use by activities and control flow. See Slots documentation.
+
+These components work together to create flexible, automated workflows tailored to specific tasks.
+
+# Designing a Process
+
+Agent Studio’s low-code UI simplifies process design, making it accessible to developers of all skill levels. Follow these steps to create a process:
+
+1. **Define Slots**: Specify input values (e.g., "device\_id") needed for the process.
+2. **Select Activities**: Choose from a library of predefined action activities or content activities, such as “Retrieve Device Data” or “Execute Diagnostic Script.”
+3. **Define Control Flow**: Use the visual interface to arrange activities in the desired sequence, adding conditionals (e.g., “If device is offline, run diagnostic”).
+4. **Configure Data Usage**: Connect activities to the data bank to pass outputs (e.g., diagnostic results) to subsequent activities, ensuring seamless data flow.
+
+# Process Architecture
+
+To understand how a process operates within Agent Studio, the following table and sequence diagram illustrate the components—activities, control flow, and data bank—and their relationships in a generic process. This example demonstrates a typical workflow, such as handling a system request, to highlight how components interact to automate tasks.
+
+```
+graph TD
+    AO[Plugin]
+    subgraph Process
+        Slots[Slots]
+        CF{Control Flow}
+        A[Activities]
+        DB[(Data Bank)]
+    end
+    AO -->|executes| Process
+    Slots -->|provides values| DB
+    A <-->|interacts with| DB
+    CF -->|reads from| DB
+    CF -->|directs| A
+
+    %% Styling with Moveworks color #6B2FC0
+    classDef moveworksStyle fill:#6B2FC0,stroke:#333,stroke-width:2px,color:#fff
+    class AO,Slots,CF,A,DB moveworksStyle
+```
+
+**Note**: This diagram showcases the process architecture:
+
+* The **Plugin** executes the **Process**.
+* **Slots** provide user inputs (e.g., ticket IDs) stored in the **Data Bank**.
+* **Activities** perform tasks, reading and writing to the **Data Bank** (including slot values).
+* **Control Flow** reads from the **Data Bank** to make decisions and directs **Activities**.
+* The **Data Bank** centralizes slot values and activity outputs for reuse.
+
+# Best Practices
+
+To create robust and efficient processes, consider the following:
+
+* **Define Clear Slots**: Use descriptive slot names (e.g., “ticket\_comment”) and detailed descriptions to guide AI behavior. Avoid generic names like “slot1”.
+* **Check Policies Early**: Ensure compliance or permissions are verified at the start to prevent issues downstream.
+* **Handle Errors Gracefully**: Implement error-handling mechanisms, such as fallback activities or user notifications, to manage exceptions.
+* **Optimize Activity Sequence**: Arrange activities to minimize processing time and resource usage, prioritizing critical tasks.
+* **Test Thoroughly**: Simulate processes in a test environment to verify functionality and performance.
+
+By following these practices, you can design processes that are reliable, reusable, and easy to maintain.
+
+***
+
+[Citations](/docs/citations-1)
+
+[Slots](/docs/slots)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Introduction](#introduction)
+  * [What is a Process?](#what-is-a-process)
+  * [Components of a Process](#components-of-a-process)
+  * [Designing a Process](#designing-a-process)
+  * [Process Architecture](#process-architecture)
+  * [Best Practices](#best-practices)

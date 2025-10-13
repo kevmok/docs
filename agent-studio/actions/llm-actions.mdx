@@ -1,0 +1,361 @@
+---
+title: "LLM Actions"
+---
+
+# Overview
+
+LLM Actions in Agent Studio provide built-in capabilities to leverage large language model (LLM) functionalities directly within your **[Compound Actions](/docs/compound-actions)** and **[Conversational Processes](/docs/plugin-process)**. These actions enable tasks such as summarization, reasoning, classification, data extraction, and content generation, allowing you to build workflows without custom integrations.
+
+This documentation focuses on two key LLM Actions: `generate_text_action` and `generate_structured_value_action`. These actions are designed to help you process unstructured data, generate insights, and structure outputs efficiently.
+
+# generate\_text\_action
+
+### Description
+
+The `generate_text_action` invokes an LLM to produce free-form text output based on user-provided input. This action is ideal for tasks requiring natural language generation, such as summarizing documents, generating responses, or performing step-by-step reasoning. Use this action when you need unstructured text results, like drafting emails, explaining concepts, or brainstorming ideas.
+
+### Input Parameters
+
+| Field              | Type     | Required | Description                                                                                                                                                                                |
+| ------------------ | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `system_prompt`    | `string` | ❌        | Defines the model's behavior or instructions. For example, "Act as a helpful assistant that summarizes technical articles."                                                                |
+| `user_input`       | `string` | ✅        | The primary context or query for the LLM to process.                                                                                                                                       |
+| `model`            | `string` | ❌        | Specifies the LLM model to use. See the Model Reference for available options. Defaults to `gpt-4o-mini-2024-07-18`                                                                        |
+| `temperature`      | `number` | ❌        | Control the randomness of the output. Higher values will make the output more random, while lower values will make it more focused and deterministic                                       |
+| `reasoning_effort` | `string` | ❌        | Optional reasoning effort argument. Can be set to one of "minimal" (only `gpt-5` models), `"low"`, `"medium"`, or `"high"`. Must be left empty for non-reasoning models such as `gpt-4.1`. |
+
+### Output
+
+| Field              | Type     | Description                      |
+| ------------------ | -------- | -------------------------------- |
+| `generated_output` | `string` | The LLM-generated text response. |
+
+### Usage Examples
+
+Here are practical examples demonstrating various LLM abilities. Each includes a sample request schema for integration into a Compound Action.
+
+#### Example 1: Text Summarization
+
+Summarize a lengthy article or user query into a concise overview.
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      action_name: mw.generate_text_action
+      input_args:
+        system_prompt: '''Summarize the following text in 3-5 bullet points, focusing on key takeaways.'''
+        user_input: data.article_content  # e.g., a long blog post fetched from an API
+        model: '''gpt-4o-mini'''
+  			temperature: 0.7
+      output_key: summary_output
+  ```
+
+  ```bash bash
+  system_prompt: '''Summarize the following text in 3-5 bullet points, focusing on key takeaways.'''
+  user_input: data.article_content  # e.g., a long blog post fetched from an API
+  model: '''gpt-4o-mini'''
+  temperature: 0.7
+  ```
+</CodeGroup>
+
+#### Example 2: Content Generation
+
+Generate creative or instructional content, such as drafting a user email.
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      action_name: mw.generate_text_action
+      input_args:
+        system_prompt: '''Write a professional email response based on the user's complaint.'''
+        user_input: data.user_complaint  # e.g., "My order is delayed by two weeks."
+      output_key: email_draft
+  ```
+
+  ```bash bash
+  system_prompt: '''Write a professional email response based on the user's complaint.'''
+  user_input: data.user_complaint  # e.g., "My order is delayed by two weeks."
+  ```
+</CodeGroup>
+
+#### Example 3: Step-by-Step Reasoning
+
+Guide the LLM through logical reasoning for problem-solving.
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      action_name: mw.generate_text_action
+      input_args:
+        system_prompt: '''Solve the problem step by step, explaining your reasoning.'''
+        user_input: '''What is the next number in the sequence: 2, 4, 8, 16?'''
+        reasoning_effort: '''high'''	
+  			model: '''gpt-5-2025-08-07'''
+      output_key: reasoning_output
+  ```
+
+  ```bash bash
+  system_prompt: '''Solve the problem step by step, explaining your reasoning.'''
+  user_input: '''What is the next number in the sequence: 2, 4, 8, 16?'''
+  reasoning_effort: '''high'''	
+  model: '''gpt-5-2025-08-07'''
+  ```
+</CodeGroup>
+
+***
+
+# generate\_structured\_value\_action
+
+### Description
+
+The `generate_structured_value_action` calls an LLM to extract or generate data in a predefined structured format (JSON schema). This is particularly useful for classification, entity extraction, or transforming unstructured input into queryable data.
+
+Apply this action for tasks where output consistency is critical, such as tagging content, extracting key-value pairs, or categorizing user inputs.
+
+### Input Parameters
+
+| Field                       | Type      | Required | Description                                                                                                                                                                                  |
+| --------------------------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload`                   | `object`  | ✅        | The data or text to analyze.                                                                                                                                                                 |
+| `user_input`                | `string`  | ❌        | The primary context or query for the LLM to process.                                                                                                                                         |
+| `output_schema`             | `object`  | ✅        | JSON Schema defining the expected output structure                                                                                                                                           |
+| `system_prompt`             | `string`  | ❌        | Defines the model's behavior or instructions. For example, "Act as a helpful assistant that summarizes technical articles."                                                                  |
+| `model`                     | `string`  | ❌        | Specifies the LLM model to use. Defaults to `"gpt-4o-mini-2024-07-18"`. IMPORTANT: This action is only compatible with `gpt-4o-mini-2024-07-18` and later and `gpt-4o-2024-08-06` and later. |
+| `strict`                    | `boolean` | ❌        | Enforces schema adherence. Defaults to `false`.                                                                                                                                              |
+| `output_schema_name`        | `string`  | ❌        | LLM-facing name for the schema (defaults to `extracted_value`)                                                                                                                               |
+| `output_schema_description` | `string`  | ❌        | Description of the schema for the LLM.                                                                                                                                                       |
+| `reasoning_effort`          | `string`  | ❌        | Optional reasoning effort argument. Can be set to one of "minimal" (only `gpt-5` models), `"low"`, `"medium"`, or `"high"`. Must be left empty for non-reasoning models such as `gpt-4.1`.   |
+
+### Output
+
+| Field              | Type     | Description                                   |
+| ------------------ | -------- | --------------------------------------------- |
+| `generated_output` | `object` | Structured data matching the provided schema. |
+
+### Usage Examples
+
+Examples illustrate extraction, classification, and more. Include request schemas for easy implementation.
+
+#### Example 1: Topic Classification (Existing Example, Expanded)
+
+Classify a research abstract into predefined topics.
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      action_name: mw.generate_structured_value_action
+      input_args:
+        payload: data.research_paper_abstract
+        system_prompt: '''Given a research paper abstract and a list of topic options, output up to 5 topics that accurately apply to the paper.'''
+        output_schema: >-
+          {
+              "type": "object",
+              "properties": {
+                  "topic_tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": data.topic_tag_options  # e.g., ["AI", "ML", "NLP"]
+                      }
+                  }
+              },
+              "required": ["topic_tags"],
+              "additionalProperties": false
+          }
+        strict: true
+      output_key: classified_topics
+  ```
+
+  ```bash bash
+  payload: data.research_paper_abstract
+  system_prompt: '''Given a research paper abstract and a list of topic options, output up to 5 topics that accurately apply to the paper.'''
+  output_schema: >-
+      {
+          "type": "object",
+          "properties": {
+              "topic_tags": {
+                  "type": "array",
+                  "items": {
+                      "type": "string",
+                      "enum": data.topic_tag_options  # e.g., ["AI", "ML", "NLP"]
+                  }
+              }
+          },
+          "required": ["topic_tags"],
+          "additionalProperties": false
+      }
+  strict: true
+  ```
+</CodeGroup>
+
+##### Expected Output
+
+<CodeGroup>
+  ```bash bash
+  generated_output: {
+    "topic_tags": ["LLM Capabilities", "Reinforcement Learning (RL)", "Reasoning"]
+  }
+  ```
+</CodeGroup>
+
+#### Example 2: Entity Extraction
+
+Extract named entities like names, dates, and locations from text.
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      action_name: mw.generate_structured_value_action
+      input_args:
+        payload: data.user_message  # e.g., "John Doe will arrive in New York on October 15, 2025."
+        system_prompt: '''Extract entities such as persons, locations, and dates from the text.'''
+        output_schema: >-
+          {
+              "type": "object",
+              "properties": {
+                  "persons": {"type": "array", "items": {"type": "string"}},
+                  "locations": {"type": "array", "items": {"type": "string"}},
+                  "dates": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["persons", "locations", "dates"],
+              "additionalProperties": false
+          }
+        reasoning_effort: '''low'''
+  			model: '''gpt-5-2025-08-07'''
+      output_key: extracted_entities
+  ```
+
+  ```bash bash
+  payload: data.user_message  # e.g., "John Doe will arrive in New York on October 15, 2025."
+  system_prompt: '''Extract entities such as persons, locations, and dates from the text.'''
+  output_schema: >-
+      {
+          "type": "object",
+          "properties": {
+              "persons": {"type": "array", "items": {"type": "string"}},
+              "locations": {"type": "array", "items": {"type": "string"}},
+              "dates": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["persons", "locations", "dates"],
+          "additionalProperties": false
+      }
+  reasoning_effort: '''low'''
+  model: '''gpt-5-2025-08-07'''
+  ```
+</CodeGroup>
+
+##### Expected Output
+
+<CodeGroup>
+  ```bash bash
+  generated_output: {
+    "persons": ["John Doe"],
+    "locations": ["New York"],
+    "dates": ["October 15, 2025"]
+  }
+  ```
+</CodeGroup>
+
+#### Example 3: Sentiment Classification
+
+Classify text sentiment with confidence scores.
+
+<CodeGroup>
+  ```bash bash
+  - action:
+      action_name: mw.generate_structured_value_action
+      input_args:
+        payload: data.customer_review
+        system_prompt: '''Analyze the sentiment of the review and output the category with a confidence score.'''
+        output_schema: >-
+          {
+              "type": "object",
+              "properties": {
+                  "sentiment": {
+                      "type": "string",
+                      "enum": ["positive", "negative", "neutral"]
+                  },
+                  "confidence": {"type": "number"}
+              },
+              "required": ["sentiment", "confidence"],
+              "additionalProperties": false
+          }
+      output_key: sentiment_analysis
+  ```
+
+  ```bash bash
+  payload: data.customer_review
+  system_prompt: '''Analyze the sentiment of the review and output the category with a confidence score.'''
+  output_schema: >-
+      {
+          "type": "object",
+          "properties": {
+              "sentiment": {
+                  "type": "string",
+                  "enum": ["positive", "negative", "neutral"]
+              },
+              "confidence": {"type": "number"}
+          },
+          "required": ["sentiment", "confidence"],
+          "additionalProperties": false
+      }
+  ```
+</CodeGroup>
+
+##### Expected Output
+
+<CodeGroup>
+  ```bash bash
+  generated_output: {
+    "sentiment": "positive",
+    "confidence": 0.85
+  }
+  ```
+</CodeGroup>
+
+***
+
+# Model Reference
+
+| Model                     | Context Window | Max Output  | Reasoning Effort Compatible | Best For                                                      | Availability                                       | Live web search capable |
+| ------------------------- | -------------- | ----------- | --------------------------- | ------------------------------------------------------------- | -------------------------------------------------- | ----------------------- |
+| `gpt-5-2025-08-07`        | 400k tokens    | 128k tokens | ✅                           | Advanced multi-modal reasoning and long-form content creation | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-5`                   | 400k tokens    | 128k tokens | ✅                           | Complex problem-solving with large datasets                   | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-5-mini-2025-08-07`   | 400k tokens    | 128k tokens | ✅                           | Efficient long-context analysis and summarization             | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-5-mini`              | 400k tokens    | 128k tokens | ✅                           | Quick prototyping of AI agents with extended memory           | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-5-nano-2025-08-07`   | 400k tokens    | 128k tokens | ✅                           | Processing of lengthy documents                               | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-5-nano`              | 400k tokens    | 128k tokens | ✅                           | Processing of lengthy documents                               | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o4-mini-2025-04-16`      | 200k tokens    | 100k tokens | ✅                           | Step-by-step reasoning for technical documentation            | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o4-mini`                 | 200k tokens    | 100k tokens | ✅                           | Optimized chain-of-thought for research tasks                 | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4.1-2025-04-14`      | 1M tokens      | 32k tokens  | ❌                           | Ultra-long document processing and archival analysis          | Available to all commercial orgs.                  | ❌                       |
+| `gpt-4.1`                 | 1M tokens      | 32k tokens  | ❌                           | Ultra-long document processing and archival analysis          | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4.1-mini-2025-04-14` | 1M tokens      | 32k tokens  | ❌                           | High-volume text extraction from large documents              | Available to all commercial orgs.                  | ❌                       |
+| `gpt-4.1-mini`            | 1M tokens      | 32k tokens  | ❌                           | High-volume text extraction from large documents              | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4.1-nano-2025-04-14` | 1M tokens      | 32k tokens  | 32k tokens                  | Real-time processing of voluminous logs and transcripts       | Available to all commercial orgs.                  | ❌                       |
+| `gpt-4.1-nano`            | 1M tokens      | 32k tokens  | ❌                           | Real-time processing of voluminous logs and transcripts       | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o3-2025-04-16`           | 200k tokens    | 100k tokens | ✅                           | Rigorous logical deduction                                    | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o3`                      | 200k tokens    | 100k tokens | ✅                           | In-depth strategic planning                                   | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o3-mini-2025-01-31`      | 200k tokens    | 100k tokens | ✅                           | Educational tools for step-by-step learning paths             | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o3-mini`                 | 200k tokens    | 100k tokens | ✅                           | Debugging complex workflows with explanatory outputs          | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o1-2024-12-17`           | 200k tokens    | 100k tokens | ✅                           | Mathematical proofs and logical puzzle solving                | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `o1`                      | 200k tokens    | 100k tokens | ✅                           | Creative brainstorming with structured ideation               | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4o-2024-11-20`       | 128K tokens    | 16k tokens  | ❌                           | Content generation                                            | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4o`                  | 128K tokens    | 16k tokens  | ❌                           | Content generation                                            | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4o-mini-2024-07-18`  | 128K tokens    | 16k tokens  | ❌                           | Quick content drafting and idea generation                    | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4o-mini`             | 128K tokens    | 16k tokens  | ❌                           | Quick content drafting and idea generation                    | OpenAI direct only. Not available to Azure OpenAI. | ❌                       |
+| `gpt-4o-search-preview`   | 128K tokens    | 16k tokens  | ❌                           | Real-time information retrieval and fact-checked responses    | OpenAI direct only. Not available to Azure OpenAI. | ✅                       |
+
+***
+
+[Actions](/docs/actions)
+
+[Built-in Actions](/docs/built-in-actions)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+  * [generate\_text\_action](#generate_text_action)
+  * [generate\_structured\_value\_action](#generate_structured_value_action)
+  * [Model Reference](#model-reference)

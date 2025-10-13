@@ -1,0 +1,384 @@
+---
+title: "Plugin Architecture Guide"
+---
+
+# 1. Architecting Plugins
+
+#### Why Proper Architecture Matters
+
+Building plugins in Agent Studio at scale, think of hundreds deployed enterprise-wide, demands thoughtful design. Poor architecture risks silos (isolated components that don't share), security gaps (leaky data flows), and brittle plugins (ones that break under load or changes). In contrast, solid architecture drives reusability (e.g., a shared HR connector across plugins), streamlines maintenance, and helps the Agentic Reasoning Engine better interpret your high-level specs for reliable, context-aware behaviors. This approach, rooted in the platform's [design philosophy](/docs/agent-studio-design-philosophy/), lets you focus on what your plugin achieves (e.g., seamless PTO checks) rather than low-level details like LLM tuning.
+
+Walk through a simple 6-step flow to architect any plugin. Using a bottom-up approach, starting with purpose and building to launch to your users.
+
+### Recommended 6-step Flow
+
+1. **Define Plugin Purpose**
+2. **Define Plugin Type**
+3. **Define Core Components**
+4. **Build Your Process/Flow**
+5. **Configure The Triggers**
+6. **Link the Flow and Launch**
+
+```
+flowchart TD
+A[Define Purpose
+e.g., PTO Check] --> B[Define Type
+Ambient or Conversational]
+B --> C[Core Components
+Actions + Inputs]
+C --> D[Connect Together
+Chain Logic with CA or CP]
+D --> E[Specify Triggers
+Conversational or System]
+E --> F[Link & Launch]
+style A fill:#e1f5fe
+style F fill:#c8e6c9
+```
+
+This sequence empowers quick prototyping while ensuring robust, reusable results.
+
+## 1.1 Define Plugin Purpose
+
+Start here to ground your plugin in real value. Outline the business problem it solves, who it serves, and the desired user experience. This step ensures your design aligns with outcomes, not just tech. Focus on the end-to-end flow: how users (or systems) interact and what success looks like.
+
+#### Key Questions to Answer
+
+* **Business Problem**: What gap does this plugin fill? (For example, manual PTO checks wasting HR time.)
+* **End Users**: Who benefits? (For example, employees querying balances; managers approving requests.)
+* **UX Journey**: What flow feels natural? Consider if it's a quick response or guided steps. Map it in the [Chat Designer](https://marketplace.moveworks.com/purple-chat?conversation=%7B%22messages%22%3A%5B%7B%22role%22%3A%22user%22%2C%22parts%22%3A%5B%7B%22richText%22%3A%22Hello+World%22%7D%5D%7D%2C%7B%22role%22%3A%22assistant%22%2C%22parts%22%3A%5B%7B%22richText%22%3A%22%3Cp%3EThis+is+a+message+with+%3Cstrong%3Ebold%3C%2Fstrong%3E%2C+%3Cem%3Eitalics%3C%2Fem%3E%2C+%3Ca+href%3D%5C%22https%3A%2F%2Fgoogle.com%5C%22%3Elinks%3C%2Fa%3E%2C+%F0%9F%94%A5+emojis.%3C%2Fp%3E%3Cp%3ENew+line+characters.%3C%2Fp%3E%3Cul%3E%3Cli%3EUnordered%3C%2Fli%3E%3Cli%3ELine%3C%2Fli%3E%3Cli%3EItems%3C%2Fli%3E%3C%2Ful%3E%3Cp%3EAs+well+as%3C%2Fp%3E%3Col%3E%3Cli%3EOrdered%3C%2Fli%3E%3Cli%3ELine%3C%2Fli%3E%3Cli%3EItems%3C%2Fli%3E%3C%2Fol%3E%3Cp%3EWe+will+allow+this+behavior+in+messages%2C+card+content%2C+and+reasoning+steps.%3C%2Fp%3E%22%7D%5D%7D%2C%7B%22role%22%3A%22assistant%22%2C%22parts%22%3A%5B%7B%22richText%22%3A%22%3Cp%3EMessage%3C%2Fp%3E%22%7D%2C%7B%22buttons%22%3A%5B%7B%22buttonText%22%3A%22Button+1%22%7D%2C%7B%22buttonText%22%3A%22Button+2%22%2C%22style%22%3A%22outlined%22%7D%2C%7B%22buttonText%22%3A%22Button+3%22%2C%22style%22%3A%22text%22%7D%5D%7D%5D%7D%2C%7B%22role%22%3A%22assistant%22%2C%22parts%22%3A%5B%7B%22richText%22%3A%22%3Cp%3EMessage%3C%2Fp%3E%22%7D%2C%7B%22citations%22%3A%5B%7B%22connectorName%22%3A%22slack%22%2C%22citationTitle%22%3A%22Citation+name%22%7D%2C%7B%22connectorName%22%3A%22google-calendar%22%2C%22citationTitle%22%3A%22Citation+name%22%7D%5D%7D%2C%7B%22apiBlock%22%3A%7B%22title%22%3A%22API+Response%22%2C%22connectorName%22%3A%22slack%22%2C%22code%22%3A%22%7B%5Cn++%5C%22ok%5C%22%3A+true%2C%5Cn++%5C%22channel%5C%22%3A+%7B%5Cn++++%5C%22id%5C%22%3A+%5C%22C1234567890%5C%22%2C%5Cn++++%5C%22name%5C%22%3A+%5C%22general%5C%22%5Cn++%7D%5Cn%7D%22%2C%22caption%22%3A%22Successfully+created+channel%22%7D%7D%5D%7D%2C%7B%22role%22%3A%22assistant%22%2C%22parts%22%3A%5B%7B%22reasoningSteps%22%3A%5B%7B%22status%22%3A%22success%22%2C%22richText%22%3A%22%3Cp%3EAdding+you+to+the+list+in+%3Cb%3EOkta%3C%2Fb%3E%3C%2Fp%3E%22%7D%2C%7B%22status%22%3A%22success%22%2C%22richText%22%3A%22%3Cp%3EDoing+additional+work%3C%2Fp%3E%22%7D%2C%7B%22status%22%3A%22pending%22%2C%22richText%22%3A%22%3Cp%3EFinishing+up%3C%2Fp%3E%22%7D%5D%7D%2C%7B%22generator%22%3A%22full%22%7D%2C%7B%22generator%22%3A%22citation%22%7D%5D%2C%22showFeedbackTray%22%3Afalse%7D%2C%7B%22role%22%3A%22assistant%22%2C%22parts%22%3A%5B%7B%22error%22%3A%7B%22title%22%3A%22Connection+Error%22%2C%22message%22%3A%22Failed+to+connect+to+the+external+service%22%2C%22details%22%3A%22Error%3A+ECONNREFUSED+at+connect+%28net.js%3A1234%29%5Cn++at+Socket.connect+%28socket.js%3A567%29%5Cn++at+TCPConnectWrap.afterConnect+%5Bas+oncomplete%5D+%28net.js%3A890%29%22%7D%7D%5D%7D%5D%7D).
+
+#### Example: PTO Balance Checker (Conversational Flow)
+
+For a conversational plugin, map a simple query like: `"Do I have enough PTO to take off a week in November?"` The assistant fetches the balance and responds: `"You have 12 days left. Yes, that's enough for a week off in November."`
+
+```
+flowchart TD
+    A[User Query] --> B[Assistant: Fetch Balance<br>via HR API]
+    B --> C[Calculate Availability<br>e.g., 12 days > 5 needed]
+    C --> D[Response]
+    style A fill:#fff3e0
+    style D fill:#e8f5e8
+```
+
+#### Example: PTO Approval (Ambient Flow)
+
+For a plugin triggered by system events, it activates on an HR Event (e.g., new request submitted). Run in background, then notify for approval.
+
+```
+flowchart TD
+    A[Event Trigger:<br>HR Request Submitted] --> B[Background: Validate Policy<br>& Fetch Approver]
+    B --> C[Notify Approver:<br>]
+    C --> D{Approve/Deny?}
+    D -->|Approve| E[Update Systems<br>]
+    D -->|Deny| F[Notify Requester<br>]
+    style A fill:#f3e5f5
+    style E fill:#e8f5e8
+    style F fill:#ffebee
+```
+
+#### Example: Unmoderated Ambient PTO Sync (No Human-in-the-Loop)
+
+For fully automated plugins (e.g., nightly PTO accrual sync), no notifications needed, just ensure it runs silently and logs outcomes for audits.
+
+```
+flowchart TD
+    A[Scheduled Trigger:<br>Nightly Cron Job] --> B[Background: Fetch Accruals<br>from HR API]
+    B --> C[Update Database<br>e.g., Add 1.5 days per employee]
+    C --> D[Log Success/Failure]
+    style A fill:#f3e5f5
+    style D fill:#e8f5e8
+```
+
+<Info>
+  #### Tips
+
+  **Keep it outcome-focused**
+
+  * For user-involved flows, prioritize natural presentation (e.g., summaries over raw data).
+  * For ambient agents with human-in-the-loop, emphasize clear notifications and CTAs (e.g., approve buttons).
+  * For unmoderated ambient agents, align on silent efficiencies like reduced manual syncs, with logging for monitoring.
+</Info>
+
+#### Success Criteria
+
+* [ ] UX journey sketched in Chat Designer (3-5 steps visualized).
+* [ ] Agent type identified: Conversational (user-driven) or Ambient (background/event-driven).
+* [ ] 1-2 sentence purpose statement written (e.g., "Solves PTO queries for employees via instant checks").
+* [ ] End users and business problem documented (e.g., "Employees save 10 min/query; HR reduces emails").
+
+Now that you understand the UX and purpose, it's time to think about the components needed to build the plugin.
+
+## 1.2 Define Plugin Type
+
+Building on the purpose and UX from Step 1.2, classify your plugin as Ambient or Conversational. This decision will guide your component choices and ensure the plugin matches user or system expectations.
+
+### Ambient Agent
+
+Use Ambient plugins for proactive, background processes triggered by system events or schedules. They handle automation without direct user initiation, ideal for efficiency gains behind the scenes.
+
+* **When to Use:** If the flow is event-driven (e.g., webhook from an HR system) or scheduled (e.g., nightly sync).
+* **How to Determine:** Does the plugin run independently of user queries? Is it focused on system integrations or batch processing?
+
+### Conversational Agent
+
+Use Conversational plugins for reactive, interactive flows triggered by user queries. They support multi-turn dialogues, input collection, and personalized responses.
+
+* **When to Use:** If the flow involves user questions, clarifications, or consents (e.g., querying PTO balance with follow-ups).
+* **How to Determine:** Does the plugin need user context or decisions? Is the UX centered on chat-based interactions?
+
+### Examples
+
+* **PTO Balance Checker:** Conversational—user initiates via query, requires interactive response.
+* **Unmoderated PTO Sync:** Ambient—scheduled automation, no user involvement.
+
+#### Success Criteria
+
+* [ ] Plugin type identified: Ambient (background/event-driven) or Conversational (user-driven).
+
+With the type defined, identify the building blocks for your plugin.
+
+## 1.3 Define Core Components
+
+With your plugin's purpose clear, identify and prototype the building blocks. Focus on actions as the core, along with supporting connectors and inputs. This promotes reusability and aligns with the platform's component-based design.
+
+Follow this sequence to define and test your components:
+
+1. **Check or Create Connectors**: Review if an existing connector fits. If not, build a custom one to authenticate and handle system access. This ensures secure, reusable links to external services.
+
+2. **Identify APIs and Build HTTP Actions**: List required endpoints (e.g., `GET /pto-balance`). Create actions to interact with them:
+   1. Create **HTTP Actions** to call endpoints and test each for success (e.g., `200 OK` response with sample data).
+
+3. **List out Inputs**:
+
+   1. For Conversational types: You will use slots to collect user information mid-flow (e.g., prompt for PTO type).
+   2. For Ambient types: You will map inputs from event payloads (e.g., employee ID from a webhook).
+
+#### PTO Examples
+
+* **Conversational PTO Checker:**
+
+  * **Connector:** Workday.
+  * **Actions:** HTTP Action for `GET /pto-balance/{user_id}?type={pto_type}`.
+  * **Inputs**: Slot `pto_type` for "vacation/sick" pto type
+
+* **Ambient PTO Approval:**
+
+  * **Trigger:** Workday.
+  * **Connector:** Workday.
+  * **Actions:** HTTP Action for `POST /approve-request/{request_id}`.
+  * **Inputs:** Mapped from event (e.g., `request_id`).
+
+```
+flowchart TD
+A[Connectors
+Check/Create] --> B[Actions
+Map APIs & Test 200 OK]
+B --> C[Inputs
+Slots for User Data or Mapped from Events]
+style A fill:#e1f5fe
+style C fill:#c8e6c9
+```
+
+<Info>
+  #### Tips
+
+  * Prototype one action at a time to catch API gaps early.
+  * Create connectors and actions that are generic and reusable across plugins.
+</Info>
+
+#### Success Criteria
+
+* [ ] Connectors ready
+* [ ] HTTP Actions created and tested individually
+* [ ] Inputs identified
+
+Your components are now solid building blocks. Next assemble them into a cohesive flow.
+
+## 1.4 Connect Components Together
+
+Orchestrate your actions and inputs into a unified flow. This adds logic, such as sequencing or decisions, to drive the plugin. Choose between `Compound Actions` (CA) for Ambient agents or `Conversational Processes` (CP) for Conversational agents, based on Step 1.2.
+
+#### Understanding Compound Actions and Conversational Processes
+
+* **Compound Actions:** Ideal for backend system processes in Ambient agents. They handle proactive automation, like responding to events or running schedules, without user interaction. Use for scenarios like event-driven tasks, background processing, or scheduled jobs.
+* **Conversational Processes:** Suited for interactive dialogues in Conversational agents. They manage user inputs, multi-turn conversations, and consents, reacting to user queries.
+
+#### When to Use Which:
+
+* Choose CA if it is Ambient.
+* Choose CP if it is Conversational.
+* For guidance, see [When to Use Compound Actions vs. Conversational Processes](/docs/when-to-use-compound-actions-vs-conversational-processes).
+
+#### Hybrid Flows
+
+You can blend CA and CP for advanced scenarios, like triggering a background CA from a CP for asynchronous tasks. For details on integration, see the guide on [connecting ambient and conversational agents](/docs/connecting-ambient-agents-to-conversational-agents).
+
+#### Core Build Patterns
+
+```
+flowchart TD
+A[From Step 2: Type?] --> B[Ambient: Use CA <br> Conversation: Use CP]
+B --> D[Add Actions: Single or Chained]
+D --> E[Layer Controls: Decisions, loops, etc]
+E --> F[Consider Hybrid Flows]
+style A fill:#e1f5fe
+style F fill:#c8e6c9
+```
+
+#### PTO Examples
+
+* **Conversational PTO Checker:** Use CP to chain fetch action with input slots, adding decision for balance check.
+* **Ambient PTO Approval:** Use CA to sequence validation and update actions from event inputs.
+
+#### Success criteria
+
+* [ ] Orchestration created (CA or CP) with integrated actions.
+* [ ] Controls applied minimally (e.g., decisions/loops as needed).
+
+Your flow is now orchestrated. Next, define activation mechanisms.
+
+## 1.5 Specify Triggers
+
+Define how the plugin activates, bridging the flow to real-world events or queries. Select based on Step 1.2's type: Conversational for user-driven or System for Ambient.
+
+#### Conversational Triggers (User-Driven)
+
+For CP flows, choose the "conversational" trigger type. Agent Studio auto-generates example utterances (e.g., "Check my PTO balance") based on your plugin's name and description. Refine these to cover natural variations.
+
+*Tip: Set a clear name/description early*.
+
+#### System Triggers (Event-Driven)
+
+For CA flows, select "system" trigger. Choose subtype:
+
+* **Webhooks**: For real-time external events (e.g., HR system pushes a new PTO request). Create a listener, link it to your plugin, and add filters for events your plugin cares about. Filters route relevant payloads to your plugin while sharing the listener across other plugins.
+
+* **Schedules**: For periodic runs from Agent Studio. Choose:
+
+  * **Cron**: For custom patterns (e.g., every Friday at 5 PM).
+  * **Interval**: For repeats (e.g., every 6 hours).
+  * **Calendar**: For one-offs (e.g., end-of-month on the 30th at 10 AM).
+
+#### Build Sequence
+
+```
+flowchart TD
+    A[From Step 1.2: Agent Type?] --> B{Conversational?}
+    B -->|Yes| C[Select Conversational<br>Refine Auto-Utterances]
+    B -->|No| D[System Trigger<br>Webhook or Schedule?]
+    D -->|Real-Time External| E[Webhook: Create Listener<br>Add Filters]
+    D -->|Periodic Internal| F[Schedule: Cron/Interval/Calendar<br>Set Cadence]
+    C --> G[Attach Flow & Test]
+    E --> G
+    F --> G
+    style A fill:#e1f5fe
+    style G fill:#c8e6c9
+```
+
+Triggers now activate your plugin. Let's now link your flow to the plugin
+
+## 1.6 Link the Flow and Launch
+
+Your plugin is nearly ready, now link the flow from Step 1.4 to the trigger from Step 1.5. This final assembly wraps your components into a production-ready plugin. Set launch rules like permissions or scopes to control access of who can trigger the plugin.
+
+#### Linking for Conversational Triggers
+
+Attach your CP as the body. Utterances cue execution.
+
+#### Linking for System Triggers
+
+Attach your CA as the body. For webhooks, map input fields from payloads. Input mappers are optional for scheduled flows.
+
+<Info>
+  ### *Note: Security for Ambient Agents*
+
+  *Ambient agents run in the background and are not constrained by launch rules for user permissions.*
+</Info>
+
+#### PTO Example
+
+* **Conversational**: Body = PTO Process
+* **System Webhook**: Map `requestId` from payload to compound action for approval update
+
+#### Build Sequence
+
+```
+flowchart TD
+    A[From Step 4: Trigger Type?] --> B{Conversational?}
+    B -->|Yes| C[Attach Process as Body<br>No Mapping Needed]
+    B -->|No| D[System: Attach Compound as Body<br>Map Webhook Fields via Mapper]
+    C --> E[Set Launch Rules<br>e.g., Permissions, Scopes]
+    D --> E
+    E --> F[Validate & Publish<br>Simulate Full Run]
+    style A fill:#e1f5fe
+    style F fill:#c8e6c9
+```
+
+#### Success criteria
+
+* [ ] Process attached as plugin body (conversational or compound).
+* [ ] Input mapping configured for system triggers (if webhook).
+* [ ] Launch rules set
+
+This completes the architectural blueprint for your plugin. The modular design promotes reusability, allowing easy adaptation for similar plugin use cases.
+
+# 2. Naming Conventions and Patterns
+
+All resource names in Agent Studio must adhere to these foundational guidelines to ensure compatibility, searchability, and collaboration across workspaces.
+
+#### Global Rules Summary
+
+* Start with a letter (a-z, A-Z).
+* Contain only letters (a-z, A-Z) and numbers (0-9).
+* Use underscores (\_) instead of spaces or hyphens.
+* Maximum length of 64 characters.
+* No special characters (e.g., @, #, $, %) allowed.
+
+## Core Rules
+
+The standard format for most resources follows a Camel\_Snake\_Case structure: `[system optional]_Verb_Noun_[Type]`. The system prefix (e.g., "Salesforce") is optional but recommended for integrations. This format promotes clarity and reusability.
+
+* **Casing and Structure**: Use PascalCase (capitalized words) separated by underscores for Camel\_Snake\_Case, ensuring each word is descriptive (e.g., Verb for action, Noun for resource).
+* **Prefixes and Suffixes**: Personal prefix for ownership (e.g., "John\_Doe"); optional system for context; type suffix (e.g., "\_Action", "\_Connector") for categorization.
+
+## Examples Across Components
+
+This subsection illustrates the Camel\_Snake\_Case format across key components, with propagation notes for how names flow (e.g., from Action to Process).
+
+| Component            | Format                                                 | Example                                                                     | Notes                                              |
+| -------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| Connector            | `{System_Name}_{Auth_Type}`                            | `Salesforce_Oauth` `Slack_Bearer`                                           | "connector" is not necessary                       |
+| Action               | `{System_Name}_{Method}_{Resource}_{Operation}_Action` | `Salesforce_Get_Contact_List_Action` `Jira_Put_Ticket_Update_Action`        | HTTP method as Verb (Get, Post); resource as Noun. |
+| Compound Action      | `{Business_Process}_Ca`                                | `Hr_Pto_Approval_Ca` `It_Ticket_Escalation_Ca`                              | Descriptive process; "\_Ca" suffix.                |
+| Conversation Process | `{Business_Process}_Process`                           | `Update_Account_Owner_Process` `Update_Account_Owner_In_Salesforce_Process` | "\_Process" suffix.                                |
+| Plugin               | `{Business_Process}`                                   | `New_Lead_Notification` `Get_Mw_Pto_Balance`                                | user-friendly, no suffix.                          |
+
+## Common Pitfalls
+
+* **Overly Generic Names**: Vague terms like `Get_Data_Action` hinder searches; fix with specifics (e.g., `Salesforce_Get_User_Pto_Action`).
+* **Missing Suffixes**: Omitting "\_Action" or "\_Process" confuses categorization; fix by always appending type for quick identification in libraries.
+
+***
+
+[Mirroring Approvals](/docs/mirroring-approvals)
+
+[Agent Studio Design Philosophy](/docs/agent-studio-design-philosophy)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [1. Architecting Plugins](#1-architecting-plugins)
+
+  * * [1.1 Define Plugin Purpose](#11-define-plugin-purpose)
+    * [1.2 Define Plugin Type](#12-define-plugin-type)
+    * [1.3 Define Core Components](#13-define-core-components)
+    * [1.4 Connect Components Together](#14-connect-components-together)
+    * [1.5 Specify Triggers](#15-specify-triggers)
+    * [1.6 Link the Flow and Launch](#16-link-the-flow-and-launch)
+
+  * [2. Naming Conventions and Patterns](#2-naming-conventions-and-patterns)
+
+  * * [Core Rules](#core-rules)
+    * [Examples Across Components](#examples-across-components)
+    * [Common Pitfalls](#common-pitfalls)

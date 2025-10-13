@@ -1,0 +1,386 @@
+---
+title: "Compound Action Patterns"
+description: "This document's purpose is to accelerate your development process by providing a collection of reusable patterns for common tasks."
+---
+
+Instead of showcasing entire\*\* end-to-end\*\* use cases, this guide focuses on individual, common "steps" you'll encounter while building. For each pattern, we recommend the most efficient method, whether it's an LLM action, a Moveworks Data Mapper expression, a DSL query, or a Python Script.
+
+Let's dive into the patterns.
+
+# Performing Actions in Batch
+
+**Problem**: You want to perform a series of actions repetitively for a list elements. For example, sending a notification to a group of users.
+
+#### List of users
+
+<CodeGroup>
+  ```bash bash
+  {
+    "data": {
+      "email_list": [
+        "[email protected]",
+        "[email protected]",
+        "[email protected]",
+        "[email protected]",
+        "[email protected]",
+        "[email protected]"
+      ]
+    }
+  }
+  ```
+</CodeGroup>
+
+#### Usage Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        action_name: mw.batch_get_users_by_email
+        output_key: list_of_users
+        input_args:
+          user_emails: data.email_list
+    - for:
+        output_key: list_of_notifications
+        each: record
+        in: data.list_of_users.user_records
+        index: idx
+        steps:
+          - notify:
+              output_key: notification_output
+              recipient_id: record.lookup_id
+              message:
+                RENDER():
+                  args:
+                    user_name: record.user.full_name
+                  template: Hi {{user_name}}, you have not submitted your project update this week. Please do before the end of the day!
+          - action:
+              action_name: do_some_action_for_user
+              output_key: action_result
+              input_args:
+                user: record.user
+  ...
+  ```
+</CodeGroup>
+
+# Deduplicating a List
+
+**Problem**: You have a list that contains duplicate values, and you need a list with only unique elements.
+
+### Deduplicating a list of scalars
+
+#### Input
+
+<CodeGroup>
+  ```bash bash
+  {
+    "data": {
+      "duplicated_fruit_list": ["apple", "banana", "cherry", "apple", "banana", "date"]
+    }
+  }
+  ```
+</CodeGroup>
+
+<CodeGroup>
+  ```bash bash
+  seen = set()
+  unique = []
+  for x in elements:
+      if x in seen:
+          continue
+      seen.add(x)
+      unique.append(x)
+  return unique
+  ```
+</CodeGroup>
+
+#### Usage in Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+  		  name: deduplicate_list
+  			output_key: deduplicate_list_result
+        input_args:
+          elements: data.duplicated_fruit_list
+    - return:
+        output_mapper:
+          unique_list: steps.deduplicate_list
+  ```
+</CodeGroup>
+
+#### Result
+
+<CodeGroup>
+  ```bash bash
+  {
+  	"duplicated_fruit_list": ["apple", "banana", "cherry", "date"]
+  }
+  ```
+</CodeGroup>
+
+### Deduplicating a list of objects
+
+In this case we will deduplicating a list of objects that have the same `email` key
+
+<CodeGroup>
+  ```bash bash
+  seen = set()
+  out = []
+  for obj in elements:
+      if not isinstance(obj, dict) or key_field not in obj:
+          continue
+      k = obj[key_field]
+      if k in seen:
+          continue
+      seen.add(k)
+      out.append(obj)
+  return out
+  ```
+</CodeGroup>
+
+#### Usage in Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+  		  name: deduplicate_object_list
+  			output_key: deduplicate_list_result
+        input_args:
+        elements: data.input_list
+  			key_field: '''email'''
+    - return:
+        output_mapper:
+          unique_list: steps.deduplicate_list
+  ```
+</CodeGroup>
+
+***
+
+# Sort Alphabetically
+
+**Problem**: You need to provide a list of elements sorted alphabetically
+
+#### Input Arguments
+
+<CodeGroup>
+  ```bash bash
+  {
+    "data":{
+    "fruits": ["red", "green", "blue", "yellow", "purple"]
+    }
+  }
+  ```
+</CodeGroup>
+
+#### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        name: enter_fruits_into_system
+        ouput_key: fruits_result
+        inputs_args:
+          sorted_fruits:
+            SORT():
+              items: data.fruits
+              key: item
+  ```
+</CodeGroup>
+
+#### Result
+
+<CodeGroup>
+  ```bash bash
+  {
+    "sorted_fruits": [
+      "blue",
+      "green",
+      "purple",
+      "red",
+      "yellow"
+    ]
+  }
+  ```
+</CodeGroup>
+
+***
+
+# Sort Timestamps
+
+**Problem**: You want to sort a list of based on the timestamp
+
+### Sorting a list of timestamps
+
+#### input
+
+<CodeGroup>
+  ```bash bash
+  {
+    "data": {
+      "ts": [
+        "Monday, Sep 22, 2025 at 8:15 AM MDT",
+        "Saturday, Sep 20, 2025 at 10:30 AM MDT",
+        "Friday, Sep 19, 2025 at 5:07 PM MDT",
+        "Friday, Sep 19, 2025 at 9:00 PM MDT"
+      ]
+    }
+  }
+  ```
+</CodeGroup>
+
+#### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        name: enter_timestamps
+        ouput_key: timestamps_result
+        inputs_args:
+          sorted_timestamps:
+            SORT():
+              items: data.ts
+              key: item.$PARSE_TIME()
+  ```
+</CodeGroup>
+
+#### Result
+
+<CodeGroup>
+  ```bash bash
+  {
+    "sorted_timestamps": [
+      "Friday, Sep 19, 2025 at 5:07 PM MDT",
+      "Friday, Sep 19, 2025 at 9:00 PM MDT",
+      "Saturday, Sep 20, 2025 at 10:30 AM MDT",
+      "Monday, Sep 22, 2025 at 8:15 AM MDT"
+    ]
+  }
+  ```
+</CodeGroup>
+
+### Sorting a list of objects by timestamp
+
+#### Input
+
+<CodeGroup>
+  ```bash bash
+  {
+    "data": {
+      "finances": [
+        {
+          "id": "txn_k5p1",
+          "ts": "2025-09-20T10:30:00-06:00",
+          "amount": 2500.0
+        },
+        {
+          "id": "txn_z7h3",
+          "ts": "2025-09-22T08:15:00-06:00",
+          "amount": -29.99
+        },
+        {
+          "id": "txn_8x4f",
+          "ts": "2025-09-19T17:14:04-06:00",
+          "amount": -8.5
+        },
+        {
+          "id": "txn_a2d9",
+          "ts": "2025-09-19T21:00:00-06:00",
+          "amount": 150.75
+        }
+      ]
+    }
+  }
+  ```
+</CodeGroup>
+
+#### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  steps:
+    - action:
+        name: enter_finances
+        ouput_key: finances_result
+        inputs_args:
+          sorted_financials:
+            SORT():
+              items: data.finances
+              key: item.ts.$PARSE_TIME()
+  ```
+</CodeGroup>
+
+#### Result
+
+<CodeGroup>
+  ```bash bash
+  {
+    "sorted_financials": [
+      {
+        "amount": -8.5,
+        "id": "txn_8x4f",
+        "ts": "2025-09-19T17:14:04-06:00"
+      },
+      {
+        "amount": 150.75,
+        "id": "txn_a2d9",
+        "ts": "2025-09-19T21:00:00-06:00"
+      },
+      {
+        "amount": 2500,
+        "id": "txn_k5p1",
+        "ts": "2025-09-20T10:30:00-06:00"
+      },
+      {
+        "amount": -29.99,
+        "id": "txn_z7h3",
+        "ts": "2025-09-22T08:15:00-06:00"
+      }
+    ]
+  }
+  ```
+</CodeGroup>
+
+### Easiest way for multiline string usage in YAML
+
+**Problem**: You want to a multiline string's structure to be maintained
+
+**Solution**: Use **Render()** and the | character with your template value indented
+
+#### Compound Action
+
+<CodeGroup>
+  ```bash bash
+  result:
+    display_instruction_for_model:
+      RENDER():
+        template: |
+          Each row = one unique order line item in a customer’s purchase.
+          Uniqueness: LINE_ITEM_ID is the primary key (unique per row).
+          Aggregation grain:
+            - Line item–level -> count rows / COUNT(DISTINCT LINE_ITEM_ID)
+            - Order-level -> COUNT(DISTINCT ORDER_ID)
+            - Customer-level -> COUNT(DISTINCT CUSTOMER_ID)
+            - Product-level -> COUNT(DISTINCT PRODUCT_ID)
+          Rule: Always aggregate at the appropriate grain to ensure metrics align correctly with the business question.
+  ```
+</CodeGroup>
+
+***
+
+[Input Arguments](/docs/compound-action-input-arguments)
+
+[Compound Action Data Bank](/docs/compound-action-exposed-data)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Performing Actions in Batch](#performing-actions-in-batch)
+  * [Deduplicating a List](#deduplicating-a-list)
+  * [Sort Alphabetically](#sort-alphabetically)
+  * [Sort Timestamps](#sort-timestamps)

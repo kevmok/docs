@@ -1,0 +1,31 @@
+---
+title: "Reasoning Instructions"
+description: "The Agentic Reasoning Engine understands how to use your plugins without the need for any prompt engineering. However, your organization may still want to customize that treatment for special situations. For example:"
+---
+
+* The reasoning engine assumes the `start_date` of any sick leave should be today, but in your organization, sick leaves are submitted retroactively with a doctor's note.
+* The reasoning engine assumes the `country_code` should be set based on the current user's profile, but you want it to ask.
+* After the reasoning engine executes a plugin, you want to promote specific related plugins (e.g. present a `Book timeoff plugin` after user views their `Timeoff balance plugin`)
+
+Adding **instructions** to your plugin makes it possible for the Agentic Reasoning Engine to understand & achieve your desired behavior.
+
+* [Triggering instructions](/docs/natural-language-triggers#triggering-instructions)
+* [Slot instructions](/docs/slots#slot-instructions)
+* [Progress update instructions](/docs/plugin-responses#progress-update-instructions)
+* [Response instructions](/docs/plugin-responses#plugin-result-instructions)
+
+Don't worry, these instructions won't compromise your AI agent's guardrails & safety protections or attack other plugins. Our reasoning engine treats them as **Tool Outputs**, which can't break your AI agent.
+
+<Frame caption="From OpenAI's paper ()">
+  <img src="/images/docs/0952d0a93c0a582545b550f674ae5b4107ee562d9c4a3dc84c4865fa1842e9cc-CleanShot_2024-12-13_at_16.29.302x.png" />
+
+  [https://arxiv.org/pdf/2404.13208](https://arxiv.org/pdf/2404.13208)
+</Frame>
+
+If you want to strictly enforce plugin behaviors, consider using [policies](/docs/policies) or managing other logic in the [Action Orchestrator](/docs/actions)
+
+***
+
+[Assistants, Agents, & Plugins](/docs/assistants-agents-plugins)
+
+[Plugin Responses](/docs/plugin-responses)

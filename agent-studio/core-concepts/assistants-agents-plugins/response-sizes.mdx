@@ -1,0 +1,139 @@
+---
+title: "Response Sizes"
+---
+
+# What is the maximum response size?
+
+There are **two** limits to keep in mind: **400KB** and **7k tokens**.
+
+* **400KB** is the limit of the amount of **compressed** data which can be returned to the [Reasoning Engine’s Working Memory](/docs/memory-constructs-in-the-ai-assistant#working-memory). Moveworks manages the compression for you. For reference, a 10 column, 30k row CSV with a mix of string and numeric columns is \~3MB, but compresses to \~400KB. If the size of the data after Moveworks compression is >400KB, it will result in a hard failure of the plugin.
+* **7k tokens (\~28kB)** is the limit for the amount of information we can semantically summarize. If the Reasoning Engine runs into this limit, it will inform the user that there is too much data.
+  <Warning>
+    If there is too much data, the Reasoning Engine will attempt to use its [Code Interpreter](/docs/code-interpreter) to analyze data. This is only possible if your plugin response does not contain [semi-structured data](/docs/code-interpreter#limitations).
+  </Warning>
+
+![](/images/docs/b730117de04143efc77427c9c16c5163128a1c2d8505ae9b9877c69f6bbe659e-CleanShot_2025-06-11_at_13.32.332x.png)
+
+# What are tokens?
+
+Tokens are the basic units of input and output in a Large Language Model. It can be a word, part of a word, a character, or more.
+
+To approximate the number of the tokens in your plugin response, you can use this helpful tokenizer tool from OpenAI: [https://platform.openai.com/tokenizer](https://platform.openai.com/tokenizer)
+
+# Recommendations
+
+If you're building a plugin that will return a lot of data, we recommend the following.
+
+## Plugin Selection
+
+1. **Describe the response schema:** Always mention all fields from the returned data in the plugin description.
+
+   * ❌ **GetSalesforceCustomers:** returns data from customers in Salesforce.
+   * ✅ **GetSalesforceCustomers:** returns account name, owner, and renewal data for customers in Salesforce.
+
+   This will ensure more reliable plugin selection for all the different use cases the data may support.
+
+2. **One plugin, one data source:** Multiple overlapping plugins on the same dataset can create inconsistent experiences.
+
+   * ❌ GetOpenAccountsPlugin, GetEnterpriseAccountsPlugin, GetProspectAccountsPlugin
+   * ✅ GetSalesforceAccountsPlugin, GetSalesforceOpportunitiesPlugin
+
+## Response Structure
+
+1. **Use friendly names.** Drop the business system default names, and rename fields to friendly, intuitive names that are easy for the model to understand. This will also make the data more friendly when it is exposed back to the user in a message, citation, or future medium.
+
+2. **Flatten your data.** When possible, flatten your data into tabular fields, avoiding a nested JSON structure. This makes the data easier to work with resulting in higher model reliability.
+
+   * Bad Example
+     <CodeGroup>
+       ```bash bash
+       {
+           "people": [
+               {
+                   "name": "John Doe",
+                   "details": {
+                       "age": 30,
+                       "city": "New York"
+                   }
+               },
+               {
+                   "name": "Anna Smith",
+                   "details": {
+                       "age": 25,
+                       "city": "London"
+                   }
+               },
+           ]
+       }
+       ```
+     </CodeGroup>
+   * Good Example
+     <CodeGroup>
+       ```bash bash
+       {
+           "people": [
+               {
+                   "name": "John Doe",
+                   "age": 30,
+                   "city": "New York"
+               },
+               {
+                   "name": "Anna Smith",
+                   "age": 25,
+                   "city": "London"
+               }
+           ]
+       }
+       ```
+     </CodeGroup>
+
+## UX Recommendations
+
+1. **Disable the[Activity Confirmation Policy](/docs/activities#activity-confirmation-policy).** Given the goal is to simply fetch data, unless it is computationally expensive or you have tight rate limits, we don't recommend getting user confirmation first. This creates needless friction for your users.
+2. **Add a URL field.** This allows the model to link the specific business system record in the response.
+   <CodeGroup>
+     ```bash bash
+     LinkToAccount: "$CONCAT(['https://moveworks.lightning.force.com/lightning/r/Account/", item.Id, "/view"], "")
+     ```
+   </CodeGroup>
+3. **Avoid Analysis Instructions.** Unless you see plugin-specific behavior that is not intended, avoid adding instructions about how the model should analyze data (e.g. "please fuzzy match `Telecam` to `Telecom`"). This will likely be ignored and could negatively impact performance.
+4. **Configure Citations**: if you want business records to be cited, you need to add `id` or `friendly_id` so that each record can be individually cited ([instructions](/docs/citation-configuration)).
+
+## Reducing the original size
+
+If you're still running into issues with the size of your plugin response, consider the following
+
+1. **Schema Pruning.** Eliminate fields from a data structure using the MERGE statement from [our Data Mapper](/docs/moveworks-bender-language-reference).
+
+2. **Attribute Compression.** Reduce the length of a text field using the [summarize text action](https://developer.moveworks.com/creator-studio/reference/action_types/#summarize-text-action)
+
+3. **Record Filtering.** Remove records from your list.
+
+   1. **Pre-filtering.** You can collect slots or use meta info to reduce the number of records you fetch from an external system.
+
+      1. Retrieve time series between a `start_date` & `end_date`
+      2. Constrain records that are `assigned_to` the current user
+      3. Fetch records where a numeric attribute is greater than some value (e.g. accounts above 500 users) You can define multiple of these inputs on the same plugin & mark the inputs as optional.
+
+   2. **Post-filtering.** If the system doesn't support API-based filtering, you can also filter the data inside your plugin's process with [DSL](/docs/moveworks-dsl-reference#filter) FILTER expressions
+
+***
+
+[Plugin Responses](/docs/plugin-responses)
+
+[Agentic Automation Engine](/docs/agentic-automation-engine)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What is the maximum response size?](#what-is-the-maximum-response-size)
+
+  * [What are tokens?](#what-are-tokens)
+
+  * [Recommendations](#recommendations)
+
+  * * [Plugin Selection](#plugin-selection)
+    * [Response Structure](#response-structure)
+    * [UX Recommendations](#ux-recommendations)
+    * [Reducing the original size](#reducing-the-original-size)

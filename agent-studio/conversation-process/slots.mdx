@@ -1,0 +1,150 @@
+---
+title: "Slots"
+---
+
+# What are slots?
+
+When building AI agents, you need "slots," or **input values**, to successfully execute a conversation process. These can be collected from the user or they can be data stored in your AI assistant's memory. For example...
+
+* If you're building a plugin to close a Jira ticket, you might need a `ticket` slot.
+* If you're building a plugin to rename a Slack channel, you might need a `channel` slot and a `new_name` slot.
+* If you're building a plugin to submit a Workday PTO request, you might need a `num_days` slot.
+
+# Slots Key Components
+
+## Slot Naming and Descriptions
+
+Slot names & descriptions are used by your Copilot to reason about your slots.
+
+<Frame caption="Agent Studio > Plugin Workspace">
+  <img src="/images/docs/7ba62a90273181f40e9750b23ab27be3985a468d2ea19bfe29fbb272b3059ead-CleanShot_2025-04-09_at_03.53.45.png" />
+</Frame>
+
+<Frame caption="Agent Studio (Classic) > Plugin Workspace">
+  <img src="/images/docs/d977e9444ac05ccac8691b9f1ac7eb3ea9096314635fd9fb5f0ef6cdeb4e3a4b-image.png" />
+</Frame>
+
+| Best Practice                       | Good Examples                                                                                                                                                                                       | Bad Examples                                          |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Be as descriptive as possible       | name: "ticket\_comment" description: "Collect user's comment for their salesforce ticket. Do NOT summarize the comment. Pass the user input verbatim."                                              | name: "slot1" description:-                           |
+| Make slot names semantically unique | name: "comment\_for\_approval" description: "Collect user's comment for approving their request."name: "comment\_for\_rejection" description: "Collect user's comment for rejecting their request." | name: "slot1" description:-name: "slot2" description: |
+
+### Tip: Using Slot Descriptions to control AI Assistant behavior
+
+Slot descriptions can be used to clarify AI Assistant slot inference and formatting behavior. Here are examples:
+
+* Clarify how to format slot before passing it to APIs (e.g. `Timestamp should follow ALWAYS the following format: YYYY-MM-DDT23:59:59.`")
+* Clarify how to set default slot values (e.g. `If the user doesn't specify start_date, set the start_date as the current date & time.`)
+* Clarify disclaimers and help text for slot (e.g. `Present user a disclaimer that start_date should NOT be in the past`)
+* Clarify how slot should be inferred by Copilot (e.g. `Do NOT infer the country_code from user's profile. Always ask the user explicitly for it`)
+
+## Slot Data Types
+
+This will determine the data type of the value that is passed into your Plugin. There are two categories of slot types:
+
+1. **Built-in Data Types**
+
+   * `string` - text
+   * `integer` - valid integers
+   * `number` - floating point numbers
+   * `boolean` - true / false
+   * `User` - another employee in your organization.
+     * Uses built in resolver strategy
+
+2. **Custom Data Types**
+   * [See our documentation on Custom Data Types](/docs/data-types)
+
+## Slot Validation Policy
+
+<Warning>
+  ### This feature is only supported in Agent Studio
+
+  This is not a feature that is or will be supported in Agent Studio (Classic)
+</Warning>
+
+![](/images/docs/3e216d901769e3091fa930659c28d7255d538e9308adfc21891c2fdccc135c39-CleanShot_2025-04-09_at_03.57.34.png)
+
+Every slot can have validate the `value` that is collected. This uses [Moveworks DSL language](/docs/moveworks-dsl-reference).
+
+For example, if you if you have a slot called `due_date`, you may only want to collect a date value that is today or later. This condition would be: `$PARSE_TIME(value) > $TIME()`
+
+## Slot Inference Policy
+
+<Warning>
+  ### This feature is only supported in Agent Studio
+
+  This is not a feature that is or will be supported in Agent Studio (Classic)
+</Warning>
+
+![](/images/docs/6aece47658e57267f1d017733ac01311b4de9e99fc39bbe8cfb76a38ff70793b-CleanShot_2025-04-09_at_04.00.49.png)
+
+Slot Inference Policy influences how the AI Assistant collects the values needed for Plugin execution. There are 2 options:
+
+1. **Infer slot value if available**: This tells the AI Assistant to infer the value of a slot from conversation context, if available.
+2. **Always explicitly ask for slot**: This tells the AI Assistant to ***always*** ask the end user for the value.
+
+## Slot Cardinality
+
+<Warning>
+  ### This feature is only supported in Agent Studio (Classic)
+
+  This is not a feature that is currently support in Agent Studio. We plan on adding support for List\[type] in H1 2025.
+</Warning>
+
+Every slot can either be a list or a single record. You set this when you pick the `List[type]` vs `[type]` in the dropdown.
+
+![](/images/docs/b55b4eeece31366fa59d33b514c2f9a6d2f76ea5b96e6c9d6a88fdcb2048c197-CleanShot_2024-12-11_at_17.09.092x.png)
+
+Users can specify lists however they see fit in the conversation.
+
+* "1 and 2 and 3"
+* "1, 2, 3"
+* "\[1, 2, 3]"
+* "all the numbers 1-3"
+
+## Resolver Strategies
+
+<Warning>
+  ### This feature is only supported in Agent Studio
+
+  This is not a feature that is or will be supported in Agent Studio (Classic)
+</Warning>
+
+Resolver strategies instructs your AI assistant on how it should convert the user’s version of the value (e.g. “my blog task”) to a Data Type the system wants (e.g. Asana task object). Read more about our unique [Slot Resolver](/docs/slot-resolvers) technology.
+
+Any slot can inherit the resolver strategy of its data type or you can create a in-line resolver strategy in your plugin. Read more on how to configure [Resolver Strategies](/docs/resolver-strategies)
+
+# How do I configure slots?
+
+Slots will be explicitly defined in the **Plugin Lowcode Editor**.
+
+![](/images/docs/9cbb4ad48e8565c98bfb10694ebc0f8a1c1bef7ba64c4acea7c564fc54174627-CleanShot_2025-02-05_at_11.12.162x.png)
+
+# How does the AI agent ask for slots?
+
+The AI agent will read your slot configuration and determine the best way to ask the user for the information.
+
+***
+
+[Conversation Process](/docs/plugin-process)
+
+[Resolver Strategies](/docs/resolver-strategies)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [What are slots?](#what-are-slots)
+
+  * [Slots Key Components](#slots-key-components)
+
+  * * [Slot Naming and Descriptions](#slot-naming-and-descriptions)
+    * [Slot Data Types](#slot-data-types)
+    * [Slot Validation Policy](#slot-validation-policy)
+    * [Slot Inference Policy](#slot-inference-policy)
+    * [Slot Cardinality](#slot-cardinality)
+    * [Resolver Strategies](#resolver-strategies)
+
+  * [How do I configure slots?](#how-do-i-configure-slots)
+
+  * [How does the AI agent ask for slots?](#how-does-the-ai-agent-ask-for-slots)

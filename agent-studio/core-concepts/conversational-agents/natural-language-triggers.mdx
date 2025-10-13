@@ -1,0 +1,105 @@
+---
+title: "Conversational Triggers"
+---
+
+# Overview
+
+There are two main parts of a conversational trigger
+
+1. **Triggering Examples** – these help your Conversational AI agent shortlist which plugins are most relevant
+2. **Triggering Instructions** - these help your Conversational AI agent choose the right plugin from a shortlist
+
+# Triggering Examples
+
+To activate your plugin, the Assistant must understand when a user wants to use it. This is where **triggering examples** come in—specific phrases or sentences that users might say to trigger your plugin.
+
+For a PTO plugin, examples of utterances could include:
+
+* "I want to check my PTO balance"
+* "Can I take time off next week?"
+* "How many vacation days do I have left?"
+
+These phrases act as cues for the AI Assistant to recognize the user’s intent and launch your plugin.
+
+## How are triggering examples generated?
+
+Our conversational triggers are built based on fully understanding the plugin's contents. During configuration, the Agentic Reasoning Engine analyzes the plugin and confirms its understanding with the developer through a **contrastive learning** experience.
+
+![](/images/docs/fbc82ae0e76aecf6f7798837e187b92947a32bb59354ef24b3fa543f35b0ea48-CleanShot_2024-10-24_at_16.35.372x.png)
+
+## Adding your own triggering examples
+
+You should:
+
+* Add triggering examples that span a few diverse examples.
+* Never add the same / semantically identical triggering examples as both positive or negative examples for the same plugin.
+* Do not add positive examples for vague or generic utterances such as "ticket" or "comment".
+* Think about natural language—include questions, statements, or commands to make triggering more intuitive\_
+
+Additionally, depending on your situation you should either add positive or negative triggering examples.
+
+| Situation                                               | What you should do                                                                                                                                |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plugin is not triggering for expected utterances        | Add few of these utterances as positive examples                                                                                                  |
+| Two or more similar plugins have overlapping triggering | Add the same utterances as positive examples for 1 plugin & negative examples for the other(s). This clarifies overlapping triggering boundaries. |
+| Plugin is over-triggering for certain utterances        | Add few of these utterances as negative examples                                                                                                  |
+
+# Triggering Instructions
+
+Along with triggering examples, you can add triggering instructions to your plugin descriptions. Here are examples:
+
+* Clarify when to use the plugin (e.g. `You can only search and query meetings, you cannot do any other read, update, or write actions such as cancel, edit, update, delete.`)
+* Clarify when to not use the plugin (e.g. `Do NOT use this plugin for checking common availability between multiple users, use the "find_availability_between_users" plugin for that purpose. DO NOT attempt to look up someone else's calendar.`)
+* Clarify how the plugin displays information (e.g. `Order records by created date and always use the unique ID as the record key. Please order the sub-fields as: Amount, Created Date, Approver`)
+
+![](/images/docs/54c6b0518b145f32fc9792b8c1527e1e738424a2c7a07e72ee5f00a6e922f42c-image.png)
+
+# Troubleshooting
+
+## My plugin is not triggering
+
+There are a number of reasons why your plugin may not trigger.
+
+**To isolate the issue, first try to trigger your plugin with one of your configured utterances**
+
+<Frame caption="Copy & paste the exact example into your AI agent">
+  <img src="/images/docs/4fed99e9077456e3d9c64ef0f505bb467edd77f9b749d016c836857b1554ca69-CleanShot_2025-01-30_at_12.12.352x.png" />
+</Frame>
+
+### Exact match doesn't trigger
+
+If it still doesn't trigger even with the exact match, there are a few reasons why:
+
+1. **Plugin not deployed** - Plugins take \~10 seconds to deploy to your AI agent. Retry in a minute.
+2. **Access control failed** - Your user might not have access to the plugin. Please double check your [Launch Configuration](/docs/launch-configuration).
+3. **Conflicting triggering configuration** - Your example utterance might be also configured as a negative example, which would prevent it from triggering. Remove it from the **Do not trigger** list.
+
+### Exact match triggers
+
+If the exact match triggers, it is likely that your AI agent doesn't believe your plugin is relevant to the user. There are a few options you have
+
+1. Add more [triggering examples](/docs/natural-language-triggers#how-to-write-good-triggering-examples).
+2. Update your [triggering instructions](/docs/natural-language-triggers#triggering-instructions).
+
+***
+
+[Conversational Agents](/docs/conversational-agents)
+
+[Configuring Triggering Examples](/docs/how-to-configure-generative-intents)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+
+  * [Triggering Examples](#triggering-examples)
+
+  * * [How are triggering examples generated?](#how-are-triggering-examples-generated)
+    * [Adding your own triggering examples](#adding-your-own-triggering-examples)
+
+  * [Triggering Instructions](#triggering-instructions)
+
+  * [Troubleshooting](#troubleshooting)
+
+  * * [My plugin is not triggering](#my-plugin-is-not-triggering)

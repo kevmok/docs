@@ -1,0 +1,64 @@
+---
+title: "Script Actions"
+---
+
+# Using Script Actions
+
+In Pre-April 2025 versions of the Plugin Workspace, Script Actions are defined in a [Compound Actions](/docs/compound-actions). In Post-April 2025 versions of the Plugin Workspace, Script Actions can be defined independently and referenced in either [Compound Actions](/docs/compound-actions) or [Plugins](/docs/ai-agents-and-plugins).
+
+To provide a secure runtime, each Script Action adds non-negligible latency to your plugins. Please make sure to use [DSL](/docs/moveworks-dsl-reference) and our [Data Mapper](/docs/moveworks-bender-language-reference) for common data transformation operations.
+
+## Option 1: Creating a standalone Script Action
+
+You can create a script action inside of plugin workspace, under the Actions > Script Actions Tab. Once created, this action can be referenced inside of plugins through Action Activities.
+
+## Option 2: Creating a Script Action inside of a compound action
+
+You can insert a script action using the `script` keyword.
+
+![](/images/docs/9bdc6e4381a01f5cb97a86e9215e212eb6d589992bdd0c0bdf072aa2a26c55a0-CleanShot_2024-12-11_at_21.32.192x.png)
+
+## Fields for entry
+
+The following fields are relevant for Script Actions, regardless of which setup flow you followed (standalone vs. in a compound action).
+
+**Fields:**
+
+* **`output_key`:** A variable to store the result of the action.
+
+  * **Type:** `str`
+  * **Mandatory:** Yes
+
+* **`input_args`:** A dictionary mapping input arguments to their values, allowing for dynamic inputs to the action.
+
+  * **Type:** `dictionary` `{}` - Accepts [Moveworks Data Mapping Syntax](/docs/moveworks-bender-language-reference)
+  * **Mandatory:** No
+
+* **`code`**: A string that represents the code to execute.
+
+  * **Type:** `str`
+  * **Mandatory:** Yes
+
+# Supported Languages
+
+Moveworks currently supports a variation of Python called APIthon. This provides a familiar and powerful scripting environment for developers.
+
+Follow [our roadmap item](https://community.moveworks.com/ideas/actions-python-1522) to be the first to get full Python support in your instance.
+
+***
+
+[HTTP Action Data Bank (Legacy)](/docs/http-action-data-bank-legacy)
+
+[APIthon Reference](/docs/apithon-a-special-kind-of-python)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Using Script Actions](#using-script-actions)
+
+  * * [Option 1: Creating a standalone Script Action](#option-1-creating-a-standalone-script-action)
+    * [Option 2: Creating a Script Action inside of a compound action](#option-2-creating-a-script-action-inside-of-a-compound-action)
+    * [Fields for entry](#fields-for-entry)
+
+  * [Supported Languages](#supported-languages)

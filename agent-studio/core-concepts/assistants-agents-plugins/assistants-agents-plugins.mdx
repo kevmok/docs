@@ -1,0 +1,64 @@
+---
+title: "Assistants, Agents, & Plugins"
+---
+
+# Assistants & AI Agents
+
+In Moveworks, you work with AI agents through your AI Assistant. You add capabilities to your AI Assistant through **plugins.** This results in two types of AI agents:
+
+1. **Conversational AI Agents**
+
+   1. Users "chat" with them through the AI assistant.
+   2. The intelligence is powered by our **Agentic Reasoning Engine**
+   3. They have access to **one or more plugins with conversational triggers**. These are the "tools" that allow them to automate work.
+
+2. **Ambient AI Agents**
+
+   1. They run in the background, but can reach out to users via the AI Assistant when human input is needed.
+   2. The intelligence is powered by [LLM actions](/docs/llm-actions#/).
+   3. Each **plugin with a system trigger** fully controls its own execution logic & is its own Ambient AI agent.
+
+# Plugins
+
+Agent Studio is where you build those **Plugins**. Plugins are made up of a **Trigger** and some **Execution Logic**
+
+* If your plugin uses a **[Conversational Trigger](/docs/natural-language-triggers#/)**, it gets compiled to a "tool" – which gives your **[Conversational AI Agents](/docs/conversational-agents#/)** more advanced capabilities. The [Agentic Reasoning Engine](/docs/agentic-reasoning-engine#/) decides when to call it & how it works with other conversational plugins.
+* If your plugin uses a **[System Trigger](/docs/system-triggers-overview#/)**, it gets compiled to an [Ambient AI Agent](/docs/ambient-agents#/), which runs in the background without human intervention.
+
+![](/images/docs/a8662f4a7884b169a3af9e11c39e24ef913a8713f67ce43e2f32b2e4bfda2792-CleanShot_2025-10-02_at_00.36.262x.png)
+
+# Triggers
+
+Triggers bridge the gap between user interactions, system events, and plugin execution. Agent Studio supports three types of triggers to cover a wide range of scenarios:
+
+* **[Conversational Triggers](/docs/natural-language-triggers#/)**: Activated by user utterances in natural language.
+
+* **[System Triggers](/docs/system-triggers-overview#/)** - Activated by a system, not a user
+
+  * **[Webhook Triggers](/docs/webhook-triggers-limited-preview#/)**: Respond to external events via APIs or webhooks.
+  * **[Scheduled Triggers](/docs/scheduled-triggers-limited-preview#/)**: Run plugins at specified intervals or times..
+
+```
+graph TD
+    A[User Input<br>e.g., Schedule a meeting] -->|Conversational Trigger| B[Plugin Trigger]
+    C[External Event<br>e.g., System Alert via API] -->|Webhook Trigger| B
+    D[Scheduled Time<br>e.g., Daily at 9 AM] -->|Scheduled Trigger| B
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style D fill:#bfb,stroke:#333,stroke-width:2px
+    style B fill:#6B2FC0,stroke:#333,stroke-width:2px,color:#fff
+```
+
+***
+
+[Purple API Tool](/docs/purple-api-tool)
+
+[Reasoning Instructions](/docs/reasoning-instructions)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Assistants & AI Agents](#assistants--ai-agents)
+  * [Plugins](#plugins)
+  * [Triggers](#triggers)

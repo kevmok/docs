@@ -1,0 +1,71 @@
+---
+title: "Control Flow"
+description: "Control Flow blocks that are available in the Plugin Editor."
+---
+
+# Conversation Process Decision Policy
+
+![](/images/docs/f1008e134bc41b798712af557db6ff44de7a6197227f1e7c10ec505909a87365-CleanShot_2025-04-13_at_20.40.162x.png)
+
+## What is a Conversation Process Policy? How should it be used?
+
+A **Conversation Process Policy** executes a set of process blocks in the plugin if a condition is met. Learn more about [policies here](/docs/policies#what-are-policies).
+
+This policy block effectively controls the decision making process of AI agents. It's meant to emulate the decision making process of humans.
+
+For example, your organization might have a policy that flights must be booked at least 7 days in advance. You can use a decision policy to split the AI agent's process.
+
+* If more than 7 days, the AI agent can book the flight for the user.
+* If less than 7 days, the AI agent can collect an approval from a skip manager, and then book the flight.
+* If less than 3 days, the AI agent can inform the user to book the flight with a personal card & submit a reimbursement request.
+
+## Anatomy of a Decision Policy
+
+* **Required Slots** - a the set of slots which must be collected before making the decision.
+
+![](/images/docs/b00ac985ded042d07089f5306e58c10ed1b7499b0bbfcb3fd3af549ce64a8766-CleanShot_2025-04-13_at_20.48.262x.png)
+
+* **Cases** - Each case executes a series of process blocks if a [DSL expression](/docs/moveworks-dsl-reference) evaluates to `true`
+
+  **For Example** : Let assumed you have a slot called **`asana_project`**. And based on the user choice for this slot, you want to write a rule which will decide the flow of the Use case.
+
+  * In order to reference Slot values effectively in the DSL use then as follows
+
+```
+data.<slot_name>.vlaue == "<project_name>"
+```
+
+![](/images/docs/e6c5a3b910f7e6524cc5c903a5bcc7a731178ac76cb8ee17e97ee3c4521d4967-CleanShot_2025-04-13_at_20.48.512x.png)
+
+* **Default** - The series of process blocks to execute if none of the cases evaluate to `true`
+
+# Exit Block
+
+![](/images/docs/2faa91fee30c3780788a5e7ac81fc3e8dc6d443bcde2445babc532961d6a62fe-CleanShot_2025-04-13_at_20.49.512x.png)
+
+* **Exit Block** does *nothing*. we need this if we require a “default” clause to every switch statement, which many languages require. If someone doesn’t want to do anything in the default case, great news - they can put a noop in the default!
+
+# Continue Block
+
+![](/images/docs/cf713f22e35ad1bde7bd64c325a3ee3de96b1d3da8f8cb7d56b9dbfbe0df2ece-CleanShot_2025-04-13_at_20.49.512x.png)
+
+* **Continue Block** exits the whole program. Critical for control flow, especially if users want to exit after one branch in a nested switch statement, but other branches in that switch don’t exit. Exit is NOT in charge of returning data, btw (data is “returned” via activities!). It is just an exit() call.
+
+***
+
+[Activities](/docs/activities)
+
+[Conversation Process Data Bank](/docs/plugin-process-data-bank)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Conversation Process Decision Policy](#conversation-process-decision-policy)
+
+  * * [What is a Conversation Process Policy? How should it be used?](#what-is-a-conversation-process-policy-how-should-it-be-used)
+    * [Anatomy of a Decision Policy](#anatomy-of-a-decision-policy)
+
+  * [Exit Block](#exit-block)
+
+  * [Continue Block](#continue-block)

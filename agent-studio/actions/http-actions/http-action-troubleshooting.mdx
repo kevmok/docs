@@ -1,0 +1,86 @@
+---
+title: "HTTP Action Troubleshooting"
+---
+
+# Error Code: 10107
+
+<Warning>
+  ### Authorization failed
+
+  This error message is typically surfaced when the **connector** uses a 2-step authentication method and needs make a `/token` request first. In these cases, the `/token` request failed.
+</Warning>
+
+For example, connectors that use **OAuth 2.0 Client Credentials**, make a request to a `/token` endpoint in order to get an `access_token`. We then use that `access_token` to make the primary request.
+
+We recommend validating your HTTP action in [Postman](https://postman.com/) or another API testing tool first. Once you are confident your API works, then you can recreate it in Moveworks using the cURL import option. Make sure that all headers, query params, and body are properly set.
+
+# Error Code: 10111
+
+<Warning>
+  ### Failed to construct request. Please make sure that all variables denoted by \{\{\{}}} have corresponding example values
+
+  There are a few reasons why your request may fail to be constructed properly.
+</Warning>
+
+## Missing Variables
+
+Your error message may have more details like
+
+> missing variable \”okta\”
+
+or some other variable. This means that variable was never defined:
+
+## Incorrect Usage of Brackets
+
+Moveworks uses the [Mustache](https://mustache.github.io/) protocol for body templating. This means...
+
+* All strings should be escaped in **triple brackets** & **inside quotes** (e.g. `"{{{my_string_value}}}"`)
+  * Note: **triple brackets** disable HTML escaping, but if you want to leave HTML escaping on, then provide **double brackets**
+* All numbers or booleans should be provided in **double brackets** (e.g. `{{number}}`)
+
+# Error Code: 10118
+
+<Warning>
+  ### Invalid host name
+
+  Check if the base URL in your connector starts with https\:// or http\://
+</Warning>
+
+<Warning>
+  ### Unable to resolve host name
+
+  The hostname may not exist. Double check your base URL is configured properly
+
+  The hostname may be private. You can check if a DNS Record is found by copy & pasting your base URL on mxtoolbox.com
+</Warning>
+
+# Error Code: 10113
+
+<Warning>
+  ### Failed to make API request
+
+  This error message forwards the response of the original API Request.
+</Warning>
+
+We recommend validating your HTTP action in [Postman](https://postman.com/) or another API testing tool first. Once you are confident your API works, then you can recreate it in Moveworks using the cURL import option. Make sure that all headers, query params, and body are properly set.
+
+***
+
+[HTTP Action Data Bank](/docs/http-action-data-bank)
+
+[HTTP Action Data Bank (Legacy)](/docs/http-action-data-bank-legacy)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Error Code: 10107](#error-code-10107)
+
+  * [Error Code: 10111](#error-code-10111)
+
+  * * [Missing Variables](#missing-variables)
+    * [Incorrect Usage of Brackets](#incorrect-usage-of-brackets)
+
+  * [Error Code: 10118](#error-code-10118)
+
+  * [Error Code: 10113](#error-code-10113)

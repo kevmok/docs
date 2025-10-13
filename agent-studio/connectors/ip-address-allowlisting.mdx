@@ -1,0 +1,41 @@
+---
+title: "Network Allowlisting"
+---
+
+# Trusted Certificates
+
+You'll need to ensure your services trust requests come from our Certificate Authority. We use the standard AWS Certificates: [https://www.amazontrust.com/repository/](https://www.amazontrust.com/repository/)
+
+```
+CN=Amazon Root CA 1,O=Amazon,C=US	
+CN=Amazon Root CA 2,O=Amazon,C=US
+CN=Amazon Root CA 3,O=Amazon,C=US	
+CN=Amazon Root CA 4,O=Amazon,C=US	
+```
+
+# IP Addresses
+
+When connecting Moveworks' production services to your applications, you may need to allowlist the IP addresses of our applications.
+
+You can view the IP addresses you need to allowlist via **Setup > Organization Details > General Information > Network Details**.
+
+![](/images/docs/c5dcbe6dedc193c73f693df30cc0cdf04308daa05ecd3885ef38f589ec85c6c0-CleanShot_2025-02-15_at_11.24.282x.png)
+
+<Warning>
+  ### Dynamic IPs
+
+  If you notice blank values for any of these IP addresses, then your organization's production services dynamic IP addresses. This is typically dependent on your data center.
+</Warning>
+
+***
+
+[JWKS Auth](/docs/jwks-auth)
+
+[System Triggers](/docs/system-triggers-overview)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Trusted Certificates](#trusted-certificates)
+  * [IP Addresses](#ip-addresses)

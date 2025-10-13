@@ -1,0 +1,51 @@
+---
+title: "Conversation Process Data Bank"
+description: "How you can reference slots & outputs of activities."
+---
+
+<Warning>
+  ### This is only applicable to the new Agent Studio > Plugin Workspace
+</Warning>
+
+# `data.<slot_name>`
+
+You can reference slots in your Activities with the notation `data.<slot_name>`
+
+Example:
+
+![](/images/docs/f61c7630204d1b587568836d664effa7743c573d6ecc08d8ace61cbfeb28ba7b-CleanShot_2025-03-25_at_09.56.49.png) ![](/images/docs/02d471103434d6397fdbe8436ee19e63c6aaaef9392b9fd2e8a0d8e39b22c8ca-CleanShot_2025-03-25_at_09.55.47.png)
+
+# `data.<output_key>`
+
+You can reference the outputs of Activities with the notation `data.<output_key>`
+
+Example:
+
+# `meta_info.user`
+
+You can reference user attributes about the current user (ie. the user that triggered the plugin) with the notation `meta_info.user`
+
+See [User Attributes Reference](/docs/user-attribute-reference) for examples.
+
+# `value`
+
+Only applicable to the **Slot Validation Policy** on the Slot config.
+
+You can reference the current slot value when create a validation policy using the keyword `value`
+
+![](/images/docs/0fbe89dffd5b85579b93c775bfc8d1d4c9761fe5539113d6b7d18d9e6d1e5156-CleanShot_2025-03-25_at_09.50.352x.png)
+
+***
+
+[Control Flow](/docs/control-flow)
+
+[Actions](/docs/actions)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [data.\<slot\_name>](#dataslot_name)
+  * [data.\<output\_key>](#dataoutput_key)
+  * [meta\_info.user](#meta_infouser)
+  * [value](#value)

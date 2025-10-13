@@ -1,0 +1,375 @@
+---
+title: "Listener Configuration"
+---
+
+<Warning>
+  **Limited Preview: Webhook Triggers & Listener**
+
+  Webhook Triggers and the Webhook Listener are currently in Limited Preview and may change without notice. Access is invite-only. Self-nomination form is [here](https://community.moveworks.com/p/webhook-triggers-limited-preview). Production use is approved but may be subject to interruptions or breaking changes.
+</Warning>
+
+# Overview
+
+A **Listener** serves as Moveworks' receiver for incoming webhook requests from external systems. It validates these requests, transforms them into events, and triggers associated **plugins** to execute automations. Each listener generates a unique **Webhook URL**, which you configure in the provider system (e.g., GitHub, Workday, or DocuSign) to send events.
+
+For an end-to-end setup, including creating a listener, refer to the [Webhook Triggers Quickstart Guide](/docs/webhook-triggers-quickstart-guide).
+
+# Security and Verification
+
+Secure your listener to ensure only authorized providers can send requests, preventing unauthorized access and enabling higher rate limits for production use.
+
+#### Why Secure Listeners Matter:
+
+* Unsecured listeners are vulnerable to abuse and subject to strict rate limits (1 request per 10 seconds).
+* Secured listeners support higher throughput (up to 5 requests per second) and protect your workflows.
+
+## Verification Options
+
+Moveworks supports multiple methods to verify incoming requests:
+
+* **Signature Verification (HMAC):** Recommended for verifying request origin and integrity using a shared secret. For setup guidance, see [Webhook Signature Verification](/docs/webhook-signature-verification).
+* **One-Time Verification Challenges**: Some providers require a one-time challenge response during webhook setup to confirm the endpoint. For details and configuration, see [Webhook Verification Challenge](/docs/webhook-verification-challenge).
+* **Credential Verification:** Require an API key or OAuth 2.0 token in every request. Enable this in the listener settings and use Moveworks-generated credentials (details below).
+* **Verification Rules**: Define DSL rules to validate request fields or headers. *This does not count as a secured listener and listeners configured with this verification option will be subject to higher rate limits*
+
+<Info>
+  *If verification fails, Moveworks rejects the request with a 401 Unauthorized response and logs an `ErrorSignatureVerificationFailed` error.*
+</Info>
+
+### Creating and sending Moveworks Credentials
+
+When **Enable Credential Verification** is selected, every webhook request to a Moveworks listener **must include authentication**. You can authenticate using either an **API Key** or an **OAuth2 Client Credentials token** generated in **Moveworks Setup → Credentials → Create.**
+
+![](/images/docs/b79a5db17d6625ba72d84e4f64f59dfbd34a02d7437d05653b06d3218ac10935-Screenshot_2025-09-22_at_9.57.27_AM.png)
+
+**API Key Credentials**
+
+Include your **Moveworks API key** as a **Bearer token** in the Authorization header of your webhook request:
+
+```
+Authorization: Bearer <YOUR_API_KEY>
+```
+
+**Example (curl):**
+
+```
+curl -X POST "https://api.moveworks.ai/webhooks/v1/listeners/{LISTENER_ID}/notify" \
+  -H "Authorization: Bearer <YOUR_API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{"example":"payload"}'
+```
+
+**OAuth2 Client Credentials**
+
+Obtain an access token by making a request to the Token URL with your Client ID and Client Secret:
+
+* Token URL: [https://api.moveworks.ai/oauth/v1/token](https://api.moveworks.ai/oauth/v1/token)
+* Client ID: The client ID you generated in Moveworks Setup.
+* Client Secret: The client secret you generated in Moveworks Setup.
+* Grant Type: `client_credentials`
+
+**Request (curl):**
+
+<CodeGroup>
+  ```bash bash
+  curl -X POST "https://api.moveworks.ai/oauth/v1/token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "grant_type=client_credentials" \
+    -d "client_id=<YOUR_CLIENT_ID>" \
+    -d "client_secret=<YOUR_CLIENT_SECRET>"
+  ```
+</CodeGroup>
+
+**Response:**
+
+<CodeGroup>
+  ```bash bash
+  {
+    "access_token": "<ACCESS_TOKEN>",
+    "token_type": "Bearer",
+    "expires_in": 3600
+  }
+  ```
+</CodeGroup>
+
+Use the returned **access\_token** as a **Bearer token** in the Authorization header when calling your listener:
+
+<CodeGroup>
+  ```bash bash
+  curl -X POST "https://api.moveworks.ai/webhooks/v1/listeners/{LISTENER_ID}/notify" \
+    -H "Authorization: Bearer <ACCESS_TOKEN>" \
+    -H "Content-Type: application/json" \
+    -d '{"example":"payload"}'
+  ```
+</CodeGroup>
+
+### Example: Rule-based validation (non-cryptographic)
+
+Use Rule-based checks to assert properties about the incoming request. These are great as additional guardrails (e.g., anti-replay, header presence, content-type) and as a fallback for providers that don’t sign payloads. Rule-based checks do not replace signature verification.
+
+**In the Moveworks Listener UI:** Verification card → Add New → Validation Type: Rule-based → paste one of the expressions below. Add multiple rules with Add New; all rules must pass.
+
+1. Anti-replay window (Slack/Stripe-style timestamp). Reject requests older than 5 minutes.
+   1. `$TIME() - $INTEGER(headers["x-slack-request-timestamp"]) <= 60 * 5`
+      1. Change the header name to your provider’s timestamp header (e.g., t from Stripe-Signature).
+2. Require JSON content type. Only accept JSON bodies.
+   1. `$LOWERCASE(headers["content-type"]) == "application/json"`
+3. Require signature header to be present and well-formed. Fail fast if the expected signature header is missing or empty.
+
+```
+headers["x-hub-signature-256"] != null
+AND "sha256=" IN $LOWERCASE(headers["x-hub-signature-256"])
+```
+
+# Advanced settings
+
+## Event Filtering
+
+Apply listener-level filters to drop irrelevant events (e.g., process only `issues.opened` events). Filters evaluate headers, query parameters, or payload fields to accept or reject requests before event creation.
+
+To understand how to use the DSL filters here let's start with an example payload. Suppose we’re listening to a **Jira webhook** for newly created issues. The log might look like this for an incoming request:
+
+<CodeGroup>
+  ```bash bash
+  {
+    "error_message": "",
+    "headers": {
+      "map": {
+        "X-Jira-Event": "issue_created",
+        "X-Jira-Delivery": "def456",
+        "Content-Type": "application/json",
+        "User-Agent": "Atlassian-Jira-Hookshot/7.0"
+      }
+    },
+    "http_method": "POST",
+    "listener_metadata": {
+      "request_id": "aaaaa-bbbbb-cccc",
+      "listener_id": "xxxxx-yyyyy-zzzzz",
+      "listener_name": "My_Jira_Issue_Listener"
+    },
+    "parsed_body": {
+      "event_type": "issue_created",
+      "issue": {
+        "id": "JIRA-1234",
+        "summary": "Critical bug in login flow",
+        "priority": "High",
+        "status": "Open",
+        "assignee": "jdoe",
+        "created_at": "2025-08-17T12:30:00Z"
+      },
+      "project": {
+        "key": "ENG",
+        "name": "Engineering"
+      },
+      "user": {
+        "id": "56789",
+        "name": "Jane Doe",
+        "email": "[email protected]"
+      }
+    },
+    "query_params": {},
+    "raw_body": "<RAW_WEBHOOK_PAYLOAD>",
+    "received_at": "2025-08-17T12:30:00Z"
+  }
+  ```
+</CodeGroup>
+
+### Paths in the event model
+
+Moveworks represents the **entire incoming HTTP request** as a structured object. Given that, that the DSL paths you’ll reference:
+
+* `parsed_body` → the parsed JSON payload (most typical)
+* `headers` → all HTTP headers
+* `query_params` → any query string values
+* `raw_body` → the unparsed body string (you likely will not use this)
+
+<Info>
+  Below are some specific event filter examples but see our full [DSL Reference](/docs/moveworks-dsl-reference#/) for more details on the syntax for MW DSL and other [common examples](/docs/moveworks-common-examples#/).
+</Info>
+
+### Example filters on `parsed_body`
+
+**Only process newly created issues**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.event_type == "issue_created"
+  ```
+</CodeGroup>
+
+**Only open issues**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.issue.status == "Open"
+  ```
+</CodeGroup>
+
+**High-priority tickets only**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.issue.priority == "High"
+  ```
+</CodeGroup>
+
+**Tickets assigned to a specific user**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.issue.assignee == "jdoe"
+  ```
+</CodeGroup>
+
+**Only tickets from the Engineering project**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.project.key == "ENG"
+  ```
+</CodeGroup>
+
+**Filter by creation date (last 7 days)**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.issue.created_at.$PARSE_TIME() > $TIME().$ADD_DATE(0, 0, -7)
+  ```
+</CodeGroup>
+
+### Example Filters on `headers`
+
+**Why use headers?**
+
+* Some providers encode **event type**, **signatures**, or **content-type** in headers.
+* Good for coarse routing before parsing payloads (or to enforce security checks).
+
+**Require a Jira delivery ID for traceability**
+
+<CodeGroup>
+  ```bash bash
+  headers.["X-Jira-Delivery"] != null
+  ```
+</CodeGroup>
+
+**Block specific sender agent**
+
+<CodeGroup>
+  ```bash bash
+  "hookshot" NOT IN $LOWERCASE(headers.["User-Agent"])
+  ```
+</CodeGroup>
+
+### Complex Examples
+
+**High-priority, open issues in ENG project only**
+
+<CodeGroup>
+  ```bash bash
+  parsed_body.issue.priority == "High" AND parsed_body.issue.status == "Open" AND parsed_body.project.key == "ENG"
+  ```
+</CodeGroup>
+
+**Env = prod AND summary contains “security”**
+
+<CodeGroup>
+  ```bash bash
+  query_params.env == "prod" AND "security" IN $LOWERCASE(parsed_body.issue.summary)
+  ```
+</CodeGroup>
+
+<Info>
+  **Why filter at the Moveworks listener-level at all?** Some webhook providers can’t pre-filter events. If that is the case, listener event filters in Moveworks eliminate noise and keep downstream config simple.
+</Info>
+
+## Redaction (Logs)
+
+Redact secrets and PII from webhook logs. Use this to hide auth headers or sensitive fields while retaining enough context to debug
+
+## Deduplication
+
+Prevent retries or duplicate sends from triggering the same workflows.
+
+**How it works** You choose one or more **Key Paths**. For each request, Moveworks reads those fields from the incoming payload (in order), concatenates the values, and hashes them to form a **dedup key**. If the same key is seen again **within the configured window**, the request is dropped as a duplicate.
+
+> Use deduplication **with** Verification (HMAC + optional timestamp rule). HMAC proves origin/integrity; dedup protects against provider retries and benign replays.
+
+### Mapping to the UI
+
+* **Deduplication key(s) → Key Paths** Add 1–N JSON paths (relative to the request payload’s `parsed_body`). Choose fields that uniquely and **stably** identify the event across retries.
+* **Deduplication Window** Choose how long Moveworks should remember a seen key (e.g., 5 mins, 10 mins, 30 mins, 1 hour).
+
+![](https://files.readme.io/0b8fd2e400b20d7b1c98e6a86c7d9ec3-CleanShot_2025-09-04_at_09.49.19.png)
+
+> Tip: Prefer a single provider-supplied **event ID** (or **delivery ID**) if available. If the provider does not supply one, combine a small set of fields that together make the event unique (e.g., `action` + `issue.id` + `repository.full_name`).
+
+### Good key choice examples (by webhook provider)
+
+Below, enter the **Key Paths** exactly as shown (one per row). Then pick a sensible **Window**.
+
+**Slack (Events API)**
+
+```
+event_id
+```
+
+* **Window:** 5 - 10 mins.
+* Slack includes `event_id` at the top level of the Events API payload.
+* I only care if there was a message in the slack channel in the last 10 minutes. More frequently I don't care about.
+
+**ServiceNow (example: Incident updates)**
+
+```
+event
+data.sys_id
+```
+
+* **Window:** 5 - 10 mins.
+* Use the record `sys_id` with the event type you’re subscribing to.
+
+**Zoom (Event Notifications)**
+
+```
+event
+event_ts
+payload.object.id
+```
+
+* **Window:** 5 - 10 mins.
+* Zoom includes an event type and timestamp; include a stable object ID for uniqueness.
+
+#### Do / Don’t
+
+**Do**
+
+* Prefer a single, provider-assigned **event ID** or **delivery ID** when available.
+* Keep the key minimal but unique; 1–3 fields is typical.
+* Set a window that comfortably covers the provider’s retry schedule (10–30 mins is a safe default).
+
+**Don’t**
+
+* Don’t include fields that **change on retry** (e.g., “received\_at”, request UUIDs assigned by intermediaries).
+* Don’t use short windows (e.g., 30s) unless you’re sure retries won’t extend past it.
+* Don’t rely on large free-form objects (e.g., full body) unless necessary.
+
+***
+
+[Webhooks Triggers](/docs/webhook-triggers-limited-preview)
+
+[Webhook Verification Challenge](/docs/webhook-verification-challenge)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Overview](#overview)
+
+  * [Security and Verification](#security-and-verification)
+
+  * * [Verification Options](#verification-options)
+
+  * [Advanced settings](#advanced-settings)
+
+  * * [Event Filtering](#event-filtering)
+    * [Redaction (Logs)](#redaction-logs)
+    * [Deduplication](#deduplication)

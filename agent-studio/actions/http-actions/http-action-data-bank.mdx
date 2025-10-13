@@ -1,0 +1,46 @@
+---
+title: "HTTP Action Data Bank"
+description: "When you're building your HTTP action, you can reference additional variables which will be provided by Moveworks when the HTTP action executes. This is the HTTP Action Data Bank."
+---
+
+# `meta_info`
+
+<CodeGroup>
+  ```bash bash
+  {			
+  	"meta_info": {
+  		"user": {
+  			...
+  		},
+  		"action_instance_id": "{{uuid}}"
+  	}
+  }
+  ```
+</CodeGroup>
+
+## `meta_info.user`
+
+We can access the user attributes of the user who triggered the action (via a Plugin) with the following notation **`meta_info.user.<attribute>`**. [View all of the available user attributes here.](/docs/user-attribute-reference)
+
+For example, if you wanted to use the current user's email, you would reference it like `{{meta_info.user.email_addr}}`
+
+![](/images/docs/0fe6954967fade090576b79ba8f7f4031d139a5429d75d452b62e4b7b7601e19-CleanShot_2024-12-12_at_16.23.342x.png)
+
+## `meta_info.action_instance_id`
+
+This is a unique ID provided when the AI agent attempts to execute this HTTP action. You can use it as an idempotency key (deduplicate retry calls).
+
+***
+
+[HTTP Actions](/docs/http-actions)
+
+[HTTP Action Troubleshooting](/docs/http-action-troubleshooting)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [meta\_info](#meta_info)
+
+  * * [meta\_info.user](#meta_infouser)
+    * [meta\_info.action\_instance\_id](#meta_infoaction_instance_id)

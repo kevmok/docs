@@ -1,0 +1,182 @@
+---
+title: "Quickstart #4: Structured Data Analysis (SDA)"
+---
+
+# Background & Objectives
+
+This guide will walk you through how to build Agent Studio plugins that **return large volumes of data** to the AI Assistant.
+
+In this quickstart guide, you will
+
+* Build a plugin that fetches 500 accounts from a mock CRM
+* Set up the plugin to work alongside our [Code Interpreter plugin](/docs/code-interpreter)
+
+At the end, your AI Assistant will be able to handle requests like this
+
+![](/images/docs/5805b698892baee037d7f8a2f87c8b830d7f0fe6a21a0d73be61900012b31b1c-image.png)
+
+# Prerequisites
+
+* Access to Agent Studio
+* Access to [Structured Data Analysis](https://community.moveworks.com/ideas/structured-data-analysis-2130).
+* No system APIs needed!
+
+# Define your plugin
+
+1. Go to **Agent Studio**. In the **Plugins** tab, select **Create**
+
+2. Define your plugin.
+
+   <Info>
+     ### SDA Tip!
+
+     It's important to be descriptive about the data that an SDA plugin returns.
+   </Info>
+
+   | Attribute          | Value                                                                                                                                                                                                                                                       |
+   | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | Plugin Title       | Fetch Accounts                                                                                                                                                                                                                                              |
+   | Plugin Description | Returns all Accounts with ID, name, industry, territory, created/modified, last contact & renewal, ARR & MRR, employee count, opportunities (total/open/won/lost), avg deal size, churn rate, NPS, tickets, offices, market share %, growth rate & funding. |
+
+# Create a trigger
+
+1. In the Plugin Editor, add a **Conversational Trigger** and fill it out
+
+   ![](/images/docs/a8a55337e336f410bd3ef93a36ba3ab5f3d47bb3490f218659235dad5e361a06-CleanShot_2025-06-11_at_19.31.442x.png)
+
+# Build your process
+
+## Connect to the mock CRM
+
+We need an HTTP action that will fetch the large volume of data from the external system.
+
+1. Click **⊕** in the tab bar and create a new HTTP Action
+
+2. Select the **Import** option (next to the **Test** button)
+
+3. Import the following API call
+
+   <CodeGroup>
+     ```bash bash
+     curl --location 'https://marketplace.moveworks.com/api/purple-suite/crm/accounts?count=500'
+     ```
+   </CodeGroup>
+
+4. Hit **Test**
+
+5. Name your HTTP Action. It should look something like this.
+
+   ![](/images/docs/adc9138c37e9a71385cc63b6d2f573a97df0825ac2462258c6414099c4ae478c-image.png)
+
+6. Save your HTTP action
+
+## Attach a Conversational Process
+
+Now let's connect the HTTP action to your plugin & prepare it for analysis
+
+1. In the Plugin Editor, add a **Conversational Process** & create a new one.
+
+2. In the **Conversational Process Editor** add an action-based activity.
+
+3. Choose the HTTP Action you just built.
+
+4. In the activity configuration, under **Output Mapper**, we will rename the fields to make them more friendly for SDA.
+
+   <Info>
+     ### SDA Tip!
+
+     It's important to name fields succinctly & clearly to maximize the performance of SDA against various queries.
+   </Info>
+
+   <CodeGroup>
+     ```bash bash
+     MAP():
+       items: response.accounts
+       converter:
+         AccountID: item.Id
+         AccountName: item.Name
+         AnnualRecurringRevenue: item.ARR__c
+         AverageDealSize: item.AverageDealSize__c
+         ChurnRate: item.ChurnRate__c
+         ClosedLostOpportunities: item.ClosedLostOpportunities__c
+         ClosedWonOpportunities: item.ClosedWonOpportunities__c
+         DateCreated: item.CreatedDate
+         DateLastModified: item.LastModifiedDate
+         Employees: item.NumberOfEmployees
+         FundingAmount: item.FundingAmount__c
+         GrowthRate: item.GrowthRate__c
+         Industry: item.Industry
+         LastContactDate: item.LastContactDate__c
+         MarketShare: item.MarketSharePct__c
+         MonthlyRecurringRevenue: item.MRR__c
+         NetPromoterScore: item.NPS_Score__c
+         NextRenewalDate: item.NextRenewalDate__c
+         OfficeCount: item.OfficesCount__c
+         OpenOpportunities: item.OpenOpportunities__c
+         SupportTickets: item.SupportTickets__c
+         Territory: item.Territory__c
+         TotalOpportunities: item.TotalOpportunities__c
+     ```
+   </CodeGroup>
+
+# Launch it
+
+Under **Audience Settings** you can launch it to yourself for testing.
+
+![](/images/docs/b124cd8f6b8146464280b0a1b5ad572b5aece4c10edee322b90f21a80c0b9b5c-CleanShot_2025-06-11_at_19.52.472x.png)
+
+# Test it!
+
+Try it out! You should see something like the following.
+
+![](/images/docs/5805b698892baee037d7f8a2f87c8b830d7f0fe6a21a0d73be61900012b31b1c-image.png)
+
+<Warning>
+  ### Not seeing the right results?
+
+  Verify that SDA is running by checking for the **Running analysis** progress update
+
+  ![](/images/docs/7328853acf8c2e37533418602fd66bf46d7be6863cab841358e9be8b4f8dfc58-image.png)
+</Warning>
+
+Here are some other questions you could try:
+
+* What's the total ARR of customers in the Tech industry?
+* Which industry is performing best in Europe?
+* Which accounts have the most support tickets are are up for renewal soon?
+
+# Next Steps
+
+Start building your own plugins for Structured Data Analysis!
+
+* [Learn more about Code Interpreter!](/docs/code-interpreter)
+* [FAQs & Best Practices for Structured Data Analysis](/docs/response-sizes)
+
+***
+
+[Quickstart #3: Basic Process Agent](/docs/quickstart-basic-process-agent)
+
+[Quickstart #5: Notification Ambient Agent](/docs/webhook-triggers-quickstart-guide)
+
+Ask AI
+
+* [Table of Contents](#)
+
+* * [Background & Objectives](#background--objectives)
+
+  * [Prerequisites](#prerequisites)
+
+  * [Define your plugin](#define-your-plugin)
+
+  * [Create a trigger](#create-a-trigger)
+
+  * [Build your process](#build-your-process)
+
+  * * [Connect to the mock CRM](#connect-to-the-mock-crm)
+    * [Attach a Conversational Process](#attach-a-conversational-process)
+
+  * [Launch it](#launch-it)
+
+  * [Test it!](#test-it)
+
+  * [Next Steps](#next-steps)
