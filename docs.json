@@ -1,98 +1,41 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "palm",
+  "theme": "willow",
   "name": "Moveworks",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#974bd0",
+    "light": "#c57ff6",
+    "dark": "#45007e"
   },
   "interaction": {
     "drilldown": true
   },
   "favicon": "/favicon.svg",
+  "styling": {
+    "codeblocks": {
+      "theme": "catppuccin-mocha"
+    },
+    "eyebrows": "breadcrumbs"
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Docs",
         "groups": [
           {
-            "group": "Getting started",
-            "icon": "play",
-            "expanded": false,
+            "group": "Get Started",
             "pages": [
-              "index",
-              "quickstart",
-              "development",
+              "agent-studio/agent-studio-overview",
               {
-                "group": "Test",
-                "pages": ["docs/action"]
-              }
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": ["essentials/settings", "essentials/navigation"]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": ["api-reference/introduction"]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Agent Studio",
-        "icon": "robot",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": ["agent-studio/agent-studio-overview"]
-          },
-          {
-            "group": "Quickstarts",
-            "pages": [
-              "agent-studio/quickstarts/quickstart-guide",
-              {
-                "group": "All Quickstarts",
+                "group": "Quickstarts",
                 "pages": [
                   "agent-studio/quickstarts/quickstart-basic-task-agent",
-                  "agent-studio/quickstarts/quickstart-basic-process-agent",
                   "agent-studio/quickstarts/quickstart-2-slots-resolvers-copy",
+                  "agent-studio/quickstarts/quickstart-basic-process-agent",
                   "agent-studio/quickstarts/quickstart-4-structured-data-analysis-sda",
+                  "agent-studio/quickstarts/webhook-triggers-quickstart-guide",
                   "agent-studio/quickstarts/quickstart-6-expense-approval-ambient-agent",
                   "agent-studio/quickstarts/quickstart-7-scheduled-trigger-ambient-agent",
-                  "agent-studio/quickstarts/webhook-triggers-quickstart-guide",
                   "agent-studio/quickstarts/hackathon-access-guide",
                   "agent-studio/quickstarts/purple-api-tool"
                 ]
@@ -105,7 +48,7 @@
               {
                 "group": "Assistants, Agents & Plugins",
                 "pages": [
-                  "agent-studio/core-concepts/assistants-agents-plugins/assistants-agents-plugins",
+                  "agent-studio/core-concepts/assistants-agents-plugins/overview",
                   "agent-studio/core-concepts/assistants-agents-plugins/plugin-responses",
                   "agent-studio/core-concepts/assistants-agents-plugins/reasoning-instructions",
                   "agent-studio/core-concepts/assistants-agents-plugins/response-sizes"
@@ -241,6 +184,64 @@
               "agent-studio/cookbooks/ambient-agents-cookbook",
               "agent-studio/cookbooks/connect-to-other-ai-agents-applications",
               "agent-studio/cookbooks/mirroring-approvals"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting started",
+            "icon": "play",
+            "expanded": false,
+            "pages": [
+              "index",
+              "quickstart",
+              "development",
+              {
+                "group": "Test",
+                "pages": ["docs/action"]
+              }
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": ["essentials/settings", "essentials/navigation"]
+          },
+          {
+            "group": "Writing content",
+            "pages": [
+              "essentials/markdown",
+              "essentials/code",
+              "essentials/images",
+              "essentials/reusable-snippets"
+            ]
+          },
+          {
+            "group": "AI tools",
+            "pages": [
+              "ai-tools/cursor",
+              "ai-tools/claude-code",
+              "ai-tools/windsurf"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "API documentation",
+            "pages": ["api-reference/introduction"]
+          },
+          {
+            "group": "Endpoint examples",
+            "pages": [
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/create",
+              "api-reference/endpoint/delete",
+              "api-reference/endpoint/webhook"
             ]
           }
         ]
