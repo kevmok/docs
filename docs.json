@@ -1,11 +1,14 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "willow",
+  "theme": "palm",
   "name": "Moveworks",
   "colors": {
     "primary": "#974bd0",
     "light": "#c57ff6",
     "dark": "#45007e"
+  },
+  "icons": {
+    "library": "lucide"
   },
   "interaction": {
     "drilldown": true
