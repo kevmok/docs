@@ -33,21 +33,25 @@
         "product": "Agent Studio",
         "description": "Build AI agents and automations",
         "icon": "wand",
-        "groups": [
+        "tabs": [
           {
-            "group": "Get Started",
-            "expanded": false,
-            "pages": [
-              "agent-studio/agent-studio-overview",
+            "tab": "Documentation",
+            "icon": "book-open",
+            "groups": [
               {
-                "group": "Quickstarts",
+                "group": "Get Started",
                 "expanded": false,
                 "pages": [
-                  "agent-studio/quickstarts/quickstart-guide",
-                  "agent-studio/quickstarts/quickstart-basic-task-agent",
-                  "agent-studio/quickstarts/quickstart-basic-task-agent-deprecated",
-                  "agent-studio/quickstarts/quickstart-2-slots-resolvers-copy",
-                  "agent-studio/quickstarts/quickstart-basic-process-agent",
+                  "agent-studio/agent-studio-overview",
+                  {
+                    "group": "Quickstarts",
+                    "expanded": false,
+                    "pages": [
+                      "agent-studio/quickstarts/quickstart-guide",
+                      "agent-studio/quickstarts/quickstart-basic-task-agent",
+                      "agent-studio/quickstarts/quickstart-basic-task-agent-deprecated",
+                      "agent-studio/quickstarts/quickstart-2-slots-resolvers-copy",
+                      "agent-studio/quickstarts/quickstart-basic-process-agent",
                   "agent-studio/quickstarts/quickstart-4-structured-data-analysis-sda",
                   "agent-studio/quickstarts/webhook-triggers-quickstart-guide",
                   "agent-studio/quickstarts/quickstart-6-expense-approval-ambient-agent",
@@ -323,13 +327,20 @@
               "agent-studio/agentic-automation/ai-agent-marketplace-installation"
             ]
           },
-          {
-            "group": "Reference",
-            "expanded": false,
-            "pages": [
-              "agent-studio/migrating-from-classic-runbook",
-              "agent-studio/tools"
+              {
+                "group": "Reference",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/migrating-from-classic-runbook",
+                  "agent-studio/tools"
+                ]
+              }
             ]
+          },
+          {
+            "tab": "Changelog",
+            "icon": "newspaper",
+            "pages": ["agent-studio/changelog"]
           }
         ]
       },
