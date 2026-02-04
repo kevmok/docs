@@ -1,0 +1,56 @@
+---
+title: "Changelog"
+description: "Agent Studio product updates and announcements"
+---
+
+# Agent Studio Changelog
+
+Stay up to date with the latest Agent Studio features, improvements, and fixes.
+
+<Update label="February 2025" description="v2.5.0" tags={["compound-actions", "new-feature"]}>
+  ## Enhanced Compound Actions
+
+  Introducing enhanced Compound Actions with parallel execution support.
+
+  **What's new:**
+  - **Parallel Execution**: Run multiple actions simultaneously using the new `parallel` block
+  - **Progress Updates**: Real-time progress notifications during long-running workflows
+  - **Error Handling**: Improved try-catch-raise patterns for robust error management
+
+  **Improvements:**
+  - Faster action execution with optimized orchestration
+  - Better logging and debugging capabilities
+  - Enhanced DSL playground with live preview
+</Update>
+
+<Update label="January 2025" description="v2.4.0" tags={["connectors", "oauth"]}>
+  ## OAuth 2.0 Enhancements
+
+  New OAuth 2.0 authentication options and connector improvements.
+
+  **What's new:**
+  - **JWKS Auth**: Support for JSON Web Key Sets authentication
+  - **OAuth 2.0 Refresh Token**: Automatic token refresh for long-running integrations
+  - **Password Credentials Flow**: Added OAuth 2.0 password credentials grant type
+
+  **Bug fixes:**
+  - Fixed token expiration handling in OAuth connectors
+  - Resolved race condition in concurrent API calls
+  - Improved error messages for authentication failures
+</Update>
+
+<Update label="December 2024" description="v2.3.0" tags={["ambient-agents", "triggers"]}>
+  ## Ambient Agent Triggers
+
+  Ambient Agents now support scheduled triggers for automated workflows.
+
+  **What's new:**
+  - **Scheduled Triggers**: Run ambient agents on a cron schedule
+  - **Webhook Triggers**: React to external system events in real-time
+  - **Trigger Chaining**: Connect ambient agents to conversational agents
+
+  **Documentation:**
+  - Added comprehensive cookbooks for ambient agent patterns
+  - New quickstart guide for scheduled trigger setup
+  - Updated troubleshooting guide with common trigger issues
+</Update>
