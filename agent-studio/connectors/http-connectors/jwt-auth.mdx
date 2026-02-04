@@ -1,0 +1,113 @@
+---
+title: OAuth 2.0 - JWT Bearer Auth
+excerpt: ''
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+# OAuth 2.0 with JWT Bearer Auth
+
+The OAuth 2.0 JWT Bearer authentication method allows you to obtain an Access Token using a JWT (JSON Web Token). This JWT represents the user's identity and permissions and replaces traditional username-password authentication.
+
+Once obtained, the Access Token is used to authenticate API requests as a Bearer Token. When it expires, you can use a new JWT to request a fresh Access Token, maintaining secure access without re-authentication.
+
+## Authentication Options
+
+### Two-Step Authentication Process
+
+OAuth 2.0 with JWT Bearer authentication follows a two-step process:
+
+1. **Generate a JWT from the provided configuration parameters** - We construct a JWT using the issuer, audience, subject, expiry, and additional claims configured by the user.
+2. **Exchange the JWT for an Access Token (if applicable)** - If a token request URL is provided, the JWT is sent to the authorization server to obtain an Access Token. If no URL is provided, the JWT itself is used as the Bearer Token in API requests.
+
+### Step 1: How We Generate the JWT
+
+We generate the JWT based on the configured values in the authentication setup:
+
+```python
+import jwt
+import time
+
+# Example of how the system constructs the JWT
+private_key = config["Jwt Auth Private Key"]
+algorithm = config["Jwt Auth Algorithm"]
+
+payload = {
+    "iss": config["Jwt Auth Claims Issuer"],
+    "sub": config["Jwt Auth Claims Subject"],
+    "aud": config["Jwt Auth Claims Audience"],
+    "iat": int(time.time()),
+    "exp": int(time.time()) + int(config["Jwt Auth Claims Expiry Seconds"]),
+    **config.get("Jwt Auth Additional Claims", {})  # Merging any extra claims
+}
+
+headers = config.get("Jwt Auth Headers", {})
+
+jwt_token = jwt.encode(payload, private_key, algorithm=algorithm, headers=headers)
+```
+
+### Step 2: Exchange JWT for an Access Token (if applicable)
+
+If a token request URL is provided, the system will send the JWT to the authorization server and extract the Access Token from the response:
+
+```shell
+curl -X POST "$(config['Jwt Auth OAuth2 Access Token Request URL'])" \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer" \
+     -d "assertion=$jwt_token"
+```
+
+A successful response might look like this:
+
+```json
+{
+    "access_token": "YOUR_ACCESS_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 3600
+}
+```
+
+The system will extract `access_token` from this response and use it for subsequent API requests.
+
+If no token request URL is provided, the system will use the JWT itself as the Bearer Token.
+
+### Step 3: Use the Access Token in API Requests
+
+Once the Access Token is determined, it is included in API requests:
+
+```shell
+curl -X GET "https://api.example.com/data" \
+     -H "Authorization: Bearer $ACCESS_TOKEN"
+```
+
+Where `$ACCESS_TOKEN` is either:
+
+* The JWT itself (if no token request URL was provided)
+* The extracted access token from the authorization server’s response
+
+### Configuration Fields
+
+To set this up:
+
+1. Select **JWT Auth** from the **Auth Config** dropdown.
+2. Fill in the required fields:
+
+   | Field Name                                              | Field Value                                                                                             |
+   | :------------------------------------------------------ | :------------------------------------------------------------------------------------------------------ |
+   | Jwt Auth Private Key                                    | Upload your Private Key or 256-bit secret. See [JWT.io](https://jwt.io/) for formatting details.        |
+   | Jwt Auth Algorithm                                      | Select from HS256, RS256, or ES256, as specified by the system you are integrating with.                |
+   | Jwt Auth Claims Expiry Seconds                          | Set the expiration time in seconds (e.g., `3600`). The `exp` claim is calculated as `iat` + this value. |
+   | Jwt Auth Claims Issuer                                  | The `iss` claim value.                                                                                  |
+   | Jwt Auth Claims Audience                                | The `aud` claim value.                                                                                  |
+   | Jwt Auth Claims Subject                                 | The `sub` claim value.                                                                                  |
+   | Jwt Auth Headers                                        | Any additional header claims, such as `alg`, `typ`, or `kid`.                                           |
+   | Jwt Auth Additional Claims                              | Any extra payload claims, such as `scope` or `name`.                                                    |
+   | Jwt Auth OAuth2 Access Token Request URL                | The **full** token request URL. If provided, the JWT is sent to this URL to obtain an Access Token.     |
+   | Jwt Auth Custom OAuth Request Options Custom Grant Type | Optionally override the default grant type (`urn:ietf:params:oauth:grant-type:jwt-bearer`).             |
+
+For testing and validation, you can use [JWT.io](https://jwt.io/). The `iat` and `exp` claims are automatically generated and do not need to be manually specified in the configuration.

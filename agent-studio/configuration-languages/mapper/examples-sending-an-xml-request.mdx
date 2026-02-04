@@ -1,0 +1,86 @@
+---
+title: 'Examples: Sending an XML Request'
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+<Callout icon="🗣️">
+  **Scenario**: An API returns data in XML format, which Moveworks automatically parses into JSON. You need to modify one of the objects in that API by constructing and sending an XML request payload.
+</Callout>
+
+You receive a JSON payload like:
+
+```json json
+{
+  "data": {
+    "side_dishes": [
+      { "display_name": "corn", "value": "corn" },
+      { "display_name": "fries", "value": "fries" }
+    ]
+  }
+}
+```
+
+You want to generate this XML to send as a payload to a subsequent call
+
+```xml
+<sides><side>corn</side><side>fries</side></sides>
+```
+
+## **Option 1: Build an XML string with DSL**
+
+Using DSL you can construct your payload as needed into a single string to send as an XML body.
+
+```
+xml_body: >
+  $CONCAT([
+    "<sides>",
+    data.side_dishes
+      .$MAP((val) => $CONCAT(["<side>", $TEXT(val.value), "</side>"]))
+      .$CONCAT(""),
+    "</sides>"
+  ])
+```
+
+<br />
+
+***
+
+## &#x20;Option 2: Build an XML string with Python Scripts
+
+Create a **[Script Action](https://help.moveworks.com/docs/script-actions)** (standalone or inside a Compound Action) and configure:
+
+* **output_key**: where the script result will be stored
+* **input_args**:`side_dishes: data.side_dishes`
+* **code**: the python code that returns the XML string
+
+**Python code: JSON → XML (stdlib-only)**
+
+Paste the following into the Script Action **code** field.
+
+```python
+from xml.etree import ElementTree as ET
+
+
+def build_sides_xml(side_dishes):
+    root = ET.Element("sides")
+
+    for dish in side_dishes or []:
+        side = ET.SubElement(root, "side")
+        side.text = str(dish.get("value", ""))
+
+    return ET.tostring(root, encoding="unicode")
+
+
+# -------------------------
+# Main logic (returned value)
+# -------------------------
+
+xml_output = build_sides_xml(side_dishes)
+xml_output
+```
+
+<br />
+
+<br />

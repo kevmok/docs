@@ -1,0 +1,114 @@
+---
+title: OAuth 2.0 - Authorization Code
+excerpt: ''
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+# OAuth 2.0 with Authorization Code Grant
+
+The OAuth 2.0 Authorization Code Grant is a secure authentication method designed for applications that require delegated access to user resources. This flow is commonly used by web and mobile applications that need to authenticate users and obtain an access token to act on their behalf.
+
+<Image align="center" border={false} src="https://files.readme.io/79f7956b769784ce537c2eed3d412bc91744b964dd9fb25ea18e07e22fcaf6d6-hackathon-demo-asana-v02-loop.gif" />
+
+In this flow, the user is redirected to the authorization server (your application) to grant permissions. Once authorized, the server provides an authorization code, which the application exchanges for an access token.
+
+After obtaining the access token, the application can use it to authenticate API requests on behalf of the user. If the access token expires, the application may use a refresh token (if provided) to obtain a new one, avoiding the need for re-authentication.
+
+> 📘 Helpful Information:
+>
+> Callback URL: https://\<org>.moveworks.com/auth/oauthCallback
+>
+> * I.e.: [https://acme.moveworks.com/auth/oauthCallback](https://acme.moveworks.com/auth/oauthCallback)
+> * To find your org information:
+>   1. Go to Agent Studio
+>   2. Copy the base url.
+>      1. I.e. if your url is: [https://acme.moveworks.com/agent-studio/plugin-workspace/plugins/home/plugin](https://acme.moveworks.com/agent-studio/plugin-workspace/plugins/home/plugin)
+>      2. Then the base url is: [https://acme.moveworks.com](https://acme.moveworks.com)
+>   3. Add /auth/oauthCallback to the end
+>
+> Moveworks automatically uses your org-specific redirect URI during the authorization request. You should not provide a custom `redirect_uri` query parameter unless explicitly instructed by Moveworks.
+
+<br />
+
+# Configuration Steps
+
+1. Within Moveworks, go to HTTP Connectors
+
+   <Image border={false} src="https://files.readme.io/56360d974404f7631f476f1713afd138a54328b99b1b13872147e187f6b24b57-CleanShot_2025-09-25_at_10.39.212x.png" />
+
+   <br />
+2. Create a new connector
+
+   <Image border={false} src="https://files.readme.io/27362415f5db9914d31fb8d1d9184fcbfd1eacb6a7ace1a8c720d147dd7c1d59-CleanShot_2025-09-25_at_10.40.392x.png" />
+
+   <br />
+3. Enter the: **Name**, **Display Name**, and **Display Description**:
+   1. Name: the internal name for this connector.
+   2. Display Name: End user facing name for this integration. All end users will see this name so pick an appropriate name. We recommend the system name itself (i.e. Workday, Salesforce, etc.).
+   3. Display Description: End user facing description for this integration. All end users will see this description so pick an appropriate description. We recommend being as clear as possible on what this integration unlocks.
+      1. I.e.: "This integration allows Moveworks/ (or assistant name) to look up and edit data within Salesforce.
+4. Select `Oauth2` from the **Auth Config ** dropdown list.
+5. Then select, `Authorization Code Grant`from the **Oauth2 Grant Type** drop down.
+
+   <Image border={false} src="https://files.readme.io/a0838d73f02d31ccb50ccfd0370fa3c522b9f575a7781fae6d5e0b329077ad16-CleanShot_2025-09-25_at_10.41.412x.png" />
+
+   <br />
+6. Enter the following required fields:
+
+   1. `Authorization URL`: The authorization endpoint for the third-party system. This is obtained from the third-party system's API documentation
+   2. `Client ID`: The Client ID generated from the third-party OAuth application.
+   3. `Client Secret`: The Client Secret generated from the third-party OAuth application.
+   4. `Authorization Code Grant Scope`: The scopes that you wish this connector to have access to. This is obtained from the third-party system's API documentation.
+   5. `Oauth2 Token Url`: The token endpoint for the third-party system. This is obtained from the third-party system's API documentation.
+
+   <Callout icon="📘" theme="info">
+     **Parameters Automatically Added by Moveworks**
+
+     Moveworks automatically includes several required OAuth parameters when initiating the authorization request. These must not be configured manually in the connector.
+
+     Moveworks automatically sets:
+
+     * `response_type=code`
+     * `redirect_uri` (your org-specific callback URL)
+     * `access_type=offline`
+     * `state `(a randomly generated value used for CSRF protection)
+
+     Do not add these parameters under Additional Request Data or Query Params. Only configure third-party-specific parameters such as `audience` or `prompt` if required by the provider’s documentation.
+   </Callout>
+7. Recommended Info:
+   1. `Revoke URL`: The revocation endpoint for the third-party system. This will allow end-users to revoke their tokens. This is obtained from the third-party system's API documentation and is highly recommended.
+   2. `Instructions URL (Optional)`: This URL will be shown to end-users in the case of revocation failing. We recommend putting instructions for end-users to revoke tokens inside of the third-party itself here.
+   3. `Authorization Code Grant Revoke Access Token Options Revoke Access Token Authentication`
+   4. `Revocation token key`: The name of the key that the revocation endpoint would use when sending the access token. We use 'token' by default.
+   5. If needed, you can leverage Oauth2 Custom Oauth Request Options Additional Request Data to send additional body data required by the third-party system. Data is sent in x-www-form-urlencoded format in the body.
+      Do not include OAuth parameters that Moveworks already generates (`state`, `response_type`, `redirect_uri`, or `access_type`). Only include third-party-specific parameters (e.g., `audience`, `prompt`) when required.
+
+<br />
+
+# End User Experience
+
+This auth type does require end users to give access to the 3rd party system. The end user experience is as follows:
+
+1. If they have previously given consent and they have a valid token: their plugin will proceed like any other plugin.
+2. If they have an invalid token (expired, wrong scopes, etc.) or have never given consent before: they will be asked to give consent with a message like (LLM may summarize differently):
+   1. I do not have access to [System Display Name]. To proceed, please go to the connections page [hyperlinked] and give access to [System Display Name]. Once you have given access, please say “retry” if to retry your use case.
+3. The user would then click on the link and be taken to the 3rd party authentication page:
+   1. <Image border={false} src="https://files.readme.io/93d7ee96e37047db521120bbad6edb6a6acd0fe161edc85fb1778dc16cf397fb-image.png" />
+   <br />
+4. The user would then follow the steps to give access. Then they will return to the assistant and say "retry" to continue their use case.
+
+# MyMoveworks SSO
+
+Customers who wish to use this feature must add all their end users to the My Moveworks SSO. This step is essential because it grants end users access to the connections page, where they can provide consent to connect with third-party systems and subsequently utilize plugins. This setup is necessary to ensure a secure implementation of OAuth 2 using the Authorization Code grant type.
+
+End users with access to My Moveworks SSO will not have visibility into developer or admin-facing products unless they have the appropriate roles or permissions. For detailed instructions on adding users to the MyMoveworks SSO, please refer to our SSO documentation: [https://help.moveworks.com/docs/sso#/](https://help.moveworks.com/docs/sso#/)
+
+<br />
+
+<br />

@@ -1,0 +1,25 @@
+---
+title: Conversation Timeouts
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+To ensure reliable performance and prevent indefinite waits, Moveworks enforces strict timeouts on plugin executions. These limits apply to **synchronous HTTP actions** (the most common type in plugins) and are designed to protect both your users and the platform.
+
+# Key Timeout Limits 
+
+| Scope                         | Time Limit  | What Happens If Exceeded                                       |
+| :---------------------------- | :---------- | :------------------------------------------------------------- |
+| **Single plugin action step** | 30 seconds  | Likely timeout – safest target for any individual HTTP request |
+| **Determined execution plan** | 45 seconds  | Certain timeout                                                |
+| **Entire request lifecycle**  | 160 seconds | Certain timeout                                                |
+
+<Callout icon="📘" theme="info">
+  _**Note**: A determined execution plan is the sequence of steps the system settles on to fulfill a user request. Multiple plans may be evaluated during processing, but only one is executed_
+</Callout>
+
+# Recommendations
+
+* **Target \< 30 seconds per action**: Design every synchronous HTTP call to complete well under 30 seconds. This is the most reliable guardrail, even if multiple actions run sequentially within the same step.
+* **Use asynchronous patterns when needed**: For operations that may exceed 30 seconds, leverage compound actions, which are asynchronous by design.

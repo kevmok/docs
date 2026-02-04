@@ -1,0 +1,46 @@
+---
+title: Progress Updates
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+next:
+  pages:
+    - slug: action
+      title: Action
+      type: basic
+---
+Progress updates let developers send real-time status messages to users during [Action](/docs/action) execution, improving transparency in conversational flows. Each Action supports an optional `progress_updates` map with two fields:
+
+* `on_pending`: Message shown when the action starts (e.g., "Fetching your data...").
+* `on_complete`: Message shown when the action finishes (e.g., "Data fetched successfully.").
+
+These fields are **optional**. When you provide it, messages appear in the chat only if the Action runs in a **conversational agent**.
+
+# How it Works 
+
+```yaml
+action:
+  action_name: fetch_user_details
+  output_key: user_data
+  input_args:
+    user_id: input.user_id
+  progress_updates:
+    on_pending: "Looking up your profile..."
+    on_complete: "Profile loaded!"
+```
+
+* **Conversational Agents**: Users see both messages in the chat stream.
+* **Ambient Agents (system-level)**: No messages are shown, even if configured—progress updates are ignored.
+
+# When to Use
+
+Use progress updates for long-running or user-visible actions (e.g., API calls, file processing) in conversational bots to reduce perceived wait time. Skip them in backend-only or fast operations to avoid clutter.
+
+<Callout icon="📘" theme="info">
+  _Tip: Keep messages concise and action-oriented. Use templating for dynamic content:_ 
+
+  ```yaml
+  on_pending: "Downloading {{input.file_count}} files..."
+  ```
+</Callout>

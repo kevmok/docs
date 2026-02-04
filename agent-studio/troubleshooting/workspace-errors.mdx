@@ -1,0 +1,138 @@
+---
+title: Workspace Errors
+deprecated: false
+hidden: true
+metadata:
+  robots: index
+---
+Here, you can find troubleshooting instructions for all errors that happen inside the Agent Studio workspaces.
+
+# Error Code: 1, 4, 101, 201, 11500, 13000, 13100, 13200
+
+### Error Message: Sorry we cannot process your request this time.
+
+This is considered an unknown error. We recommend contacting Support if you encounter this error.
+
+# Error Code: 10107
+
+### Error Message: Authorization failed
+
+This error message is typically surfaced when the Connector tied to your API is using a 2-step Auth method and needs to hit a endpoint before making the primary request. This error message forwards the response of the original authentication (e.g. `/token` ) Request.
+For example, In OAuth 2.0 Client Credentials, we first make a request to a /token endpoint in order to get an Access Token. We then use that Access Token to make the primary request.
+We recommend setting this Endpoint up in Postman or a similar API testing tool before configuring in Agent Studio. Once you have this working, make sure to recreate your API Request in Agent Studio with all of the Query Params, Headers, & Request Body details that you had working in Postman.
+
+# Error Code: 10111
+
+### Error Message: Failed to construct request. Please make sure that all variables denoted by `{{}}` have corresponding example values
+
+### Possible Cause 1: Missing Variable
+
+In your error message, you may a detail that says `“missing variable \”okta\”` or some other variable. This means that variable was never defined:
+
+1. In Paths Workspace, you need to create a new Question with the label `{{variable name}}` (e.g “okta”) in order to resolve.
+2. In Queries Workspace, you can only use the `{{query}}` variable & [user attributes](https://help.moveworks.com/docs/user-attribute-reference) . Creating additional variables is not allowed.
+
+### Possible Cause 2: Incorrect `{{}}` Syntax
+
+Make sure all of your variables are wrapped in `{{}}`
+
+# Error Code: 10113
+
+### Error Message:  **Failed to make API request**
+
+This error message forwards the response of the original API Request.
+We recommend setting this Endpoint up in Postman or a similar API testing tool before configuring in Agent Studio. Once you have this working, make sure to recreate your API Request in Agent Studio with all of the Query Params, Headers, & Request Body details that you had working in Postman.
+
+# Error Code: 10118
+
+### Error Message: Invalid host name:
+
+Check if the base URL in your connector starts with `https://` or `http://`
+
+### Error Message: Unable to resolve host name:
+
+1. The hostname may not exist. Double check your base URL is configured properly
+2. The hostname may be private. You can check if a DNS Record is found by [copy & pasting your base URL on mxtoolbox.com](https://mxtoolbox.com/DnsLookup.aspx)
+
+# Error Code: 12911
+
+### Error Message: **The item you are trying to delete is still used elsewhere. Please remove all usage(s) and try again.**
+
+If you are trying to delete a connector and are seeing this message, it means that connector is actively used in one or more use cases.
+We plan on providing better support for this error message in the future. In the mean time, you should contact Support if you see this issue.
+
+# Error Code: 13102
+
+### Error Message: Please return to “Triggering and parameters” step
+
+### 1. Possible Cause: Make sure to provide the slots in all example queries
+
+In order to resolve this issue, you need to add slot examples for all example utterances.
+**Incorrect**
+![](https://files.readme.io/57ea1019906fa37099887915585b758d1333667de063e57484d7e67fa6fd5d46-Untitled.png)
+**Correct**
+![](https://files.readme.io/55fa7b634f17b52a4a07cc354fe275f89577394621e58cc7e0fd22be307a8a91-Untitled_1.png)
+
+### 2. Possible Cause: Make sure to provide example value for slot for all utterances (for 1 slot Query) OR remove all example values (for 0 slot Query)
+
+For Queries with 1 slot, you need to add Slots to each example user utterance in the triggering step.
+For Queries with 0 slots, you need to remove all Slots in the triggering step.
+**Incorrect**
+![](https://files.readme.io/62f62b1e44426b76db5bfdd70484dbcf98bb15921aa37a310ae3904876ac2460-Untitled_2.png)
+**Correct**
+![](https://files.readme.io/5539eb7b95d3c18c40bcbcde9378d3066a5e40125611183b5285685bd1b85edc-Untitled_3.png)
+
+### 3. Possible Cause: Make sure the slot value example provided is a part of user utterance example
+
+You have a slot example value defined but it’s not a part of the user utterance that slot is attached to.
+**Incorrect**
+![](https://files.readme.io/435e55f078246c349be4e038ad3d1f29fd9226d934dfd3ab652ff058b3d60ff0-Untitled_4.png)
+**Correct**
+![](https://files.readme.io/d3ee027c1aeb0dc0f41f0fc4e010c44f4d6ef96676ab90bca972660743a1f3e9-Untitled_5.png)
+
+# Error Code: 13107
+
+### Error Message: There are syntax errors in the rules provided in “Launch to the users matching the rule” step
+
+### 1. Possible Cause: token recognition error at ‘=’
+
+This means that you are using an incorrect operator.
+Check our [Launch Rules reference](https://help.moveworks.com/docs/launch-configuration#/)   for a list of supported operators
+
+### 2. Possible Cause: extraneous input '=='
+
+This means you are using an extra operator that doesn’t need to be included
+e.g. `user.role == "Engineering" ==`  — In this case, the last set of `==` is “extraneous” and not needed.
+
+# Error Code: 13120
+
+### Error Message: There are validation errors in the email allow list. Please ensure all emails are formatted properly and there are no duplicates
+
+### 1. Possible Cause: Duplicate Emails
+
+We recommend checking & removing duplicate emails.
+
+For small email lists ( \< 20) you can `ctrl + f` or `cmd + f` and copy & paste each email into the search bar.
+
+For larger lists (\>20), you can dump your emails into Google Sheets or Excel and remove duplicates.
+
+# Error Code: 13204
+
+### Error Message: "missing variable"
+
+This means the variable that is referenced in the error message does not exist anywhere else.
+
+* In Queries Workspace, you can only use `{{query}}`
+* In Paths Workspace, you can only use the titles of the questions you've created prior to that API
+* You can always use User Attributes
+
+## Issue: NLU trigger examples are not populating
+
+### Possible Cause: Poor plugin description
+
+If you set up your Plugin basic info (title & short description) with confusing or gibberish values, it can cause recommended triggering utterances to fail.
+**To fix:** ✅ Rephrase your description to be specific.
+**Incorrect**
+![](https://files.readme.io/b86cfa25f5eccb5019b3cf260eb0fd6936d6fcbbfd0fd51d2c1faa7679c68dfc-troubleshooting_2.png)
+**Correct**
+![](https://files.readme.io/9e772a8e23a2975ab813b3461be0f98a085f80d7614277a0b3d0986b68583388-troubleshooting_3.png)

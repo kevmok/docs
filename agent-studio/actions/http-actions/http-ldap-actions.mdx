@@ -1,0 +1,385 @@
+---
+title: HTTP -> LDAP Actions
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+# LDAP (Active Directory) Connector
+
+The **LDAP Connector** enables Agent Studio plugins to securely query and update **on-premise LDAP and Active Directory** systems using standard LDAP operations.
+
+This connector is designed for advanced identity and directory use cases harnessing existing Moveworks on premise agent.
+
+<Callout icon="⚠️" theme="warn">
+  **Prerequisite:** An existing Active Directory Built-In Connector must be configured before using the LDAP connector.
+</Callout>
+
+***
+
+## What You Can Do
+
+With the LDAP connector, you can:
+
+* Search for users, groups, and organizational units
+* Retrieve directory attributes (email, manager, DN, group membership)
+* Create LDAP objects (for example, groups)
+* Modify existing objects (add/remove members, update attributes)
+
+All LDAP operations are exposed as **HTTP actions** in Agent Studio using a REST abstraction over the LDAP protocol.
+
+***
+
+**Prerequisites**
+
+Before using this connector, ensure:
+
+1. An [**Active Directory Built-In Connector**](https://help.moveworks.com/docs/active-directory-ldap-access-requirements) is configured
+2. Network access to the on-prem LDAP server is established
+3. The service account has sufficient LDAP permissions
+4. You have configured Moveworks to [allow Built In connectors to be used in agent studio](https://help.moveworks.com/docs/system-connectors#how-to-leverage-system-connectors-for-agent-studio)
+
+***
+
+## Connector Configuration
+
+**Step 1: Configure the Active Directory Connector**
+
+Create a **Built-In Active Directory Connector** in **Moveworks Setup** → **Built-in Connectors** or use an existing configured connector.
+
+This connector handles authentication, network routing, and secure communication with the LDAP server.
+
+<Image border={false} src="https://files.readme.io/5ddb4fd7a5e7878f0d6afadecd7c2be553b287db4daf811bd7f8829182e07a86-image.png" />
+
+<br />
+
+***
+
+**Step 2: Create an HTTP Action in Agent Studio**
+
+When creating an **HTTP Action** in Agent Studio:
+
+* Select Inherit from existing connector and in the dropdown use the configured **Active Directory connector**
+
+<Image border={false} src="https://files.readme.io/62befa40de96309451d7c0e4b8633c90a922c6e1753bfa2b64bc43c63d87ad5d-Screenshot_2026-01-09_at_11.26.08AM.png" />
+
+<br />
+
+* The action will default to the following **base URL** :
+
+```
+https://ldap-service.moveworks.int
+```
+
+<Callout icon="ℹ️" theme="info">
+  This URL is not publicly accessible. The Moveworks platform intercepts the request and forwards it directly to the the connector's LDAP infrastructure via the Moveworks On-Prem Agent.
+</Callout>
+
+***
+
+## LDAP Actions (Endpoints)
+
+| Operation | Endpoint               |
+| --------- | ---------------------- |
+| Search    | `POST /ldap/v1/search` |
+| Add       | `POST /ldap/v1/add`    |
+| Modify    | `PUT /ldap/v1/modify`  |
+
+***
+
+### Status Codes
+
+| Status                         | Meaning                                                                           |
+| ------------------------------ | --------------------------------------------------------------------------------- |
+| `200 OK`                       | Operation succeeded                                                               |
+| `201 Created`                  | Entry created or modified                                                         |
+| `204 No Content`               | The request succeeded, but there’s nothing to return                              |
+| `400 Bad Request`              | Malformed request, invalid parameters, schema violations, or bad syntax.          |
+| `401 Unauthorized`             | Bad credentials or stronger authentication required.                              |
+| `403 Forbidden`                | User/service lacks permission to perform this action.                             |
+| `404 Not Found`                | Object, operation, or endpoint can’t be found.                                    |
+| `409 Conflict`                 | Resource already exists or duplicate values.                                      |
+| `413 Request Entity Too Large` | Too many results or server/admin size limits exceeded.                            |
+| `424 Failed Dependency`        | Failed Dependency (upstream/LDAP dependency failed)                               |
+| `429 Too Many Requests`        | Server is overloaded or throttling.                                               |
+| `500 Internal Server Error`    | Platform error, misconfiguration, ambiguous response, or unmapped LDAP condition. |
+| `501 Not Implemented`          | Operation, control, or extension isn’t implemented by the server.                 |
+| `502 Bad Gateway`              | Couldn’t connect to or got a bad response from LDAP.                              |
+| `503 Service Unavailable`      | LDAP server unavailable or offline.                                               |
+| `504 Gateway Timeout`          | LDAP did not respond in time.                                                     |
+| `507 Insufficient Storage`     | Out of memory or storage while processing the request.                            |
+| `508 Loop Detected`            | Referral loops or repeated redirects detected.                                    |
+
+***
+
+# Using Moveworks Data Mapper for Dynamic LDAP Filters
+
+LDAP filters often need to incorporate **dynamic user input** (for example, searching by username or email). However, directly embedding user input into LDAP filter strings can introduce **LDAP injection vulnerabilities** and can also conflict with Agent Studio’s HTTP request rendering behavior.
+
+To address this, the LDAP connector supports a **filter template + filter arguments** pattern that must be configured using the **Moveworks Data Mapper** functionality in the http body.
+
+<Callout icon="🚧" theme="warn">
+  The Data Mapper for HTTP actions is currently in Limited Preview. You can continue using the raw body configuration, but may encounter the limitations described below until the feature is generally available. Please reach out to your Customer Success team for access to this feature.
+</Callout>
+
+***
+
+## Why Data Mapper Is Recommended
+
+1. **Prevent LDAP Injection**
+
+All dynamic user inputs must be provided through `filter_args`. These values are:
+
+* Escaped and sanitized by the platform
+* Safely inserted into the LDAP filter template
+* Protected against malicious input
+
+This prevents attackers from modifying the structure of the LDAP filter.
+
+***
+
+2. **Avoid HTTP Action Auto-Rendering Issues**
+
+Agent Studio’s HTTP request builder automatically renders template expressions such as `{{variable}}`.
+
+If these expressions appear directly inside an LDAP filter string, they may be **evaluated incorrectly**, producing invalid LDAP syntax.
+
+Using **Data mapper** avoids this issue by:
+
+* Treating the LDAP request body as structured data
+* Ensuring filter templates are passed through unchanged
+* Allowing controlled substitution only inside the adapter
+
+<Image border={false} src="https://files.readme.io/52400d246cdfeba80d1dda7415eb1ff8419b7cb81d69e22886a65037c9cb8dc2-image.png" />
+
+<br />
+
+# Search LDAP Entries
+
+`POST /ldap/v1/search`
+
+Searches for LDAP objects using standard LDAP filters.
+
+***
+
+**Data Mapper**
+
+```yaml
+base_object: '"OU=Users,OU=Example,DC=company,DC=com"'
+filter: '"(&(objectClass=user)(objectCategory=Person)(mail=*))"'
+attributes:
+  - '"distinguishedName"'
+  - '"mail"'
+  - '"givenName"'
+  - '"manager"'
+
+```
+
+This example uses a **static filter**, which is safe and does not require `filter_args`.
+
+***
+
+## Example with Dynamic User Input (Recommended)
+
+If you want to search for a **specific user**, use `filter_args` and map the input using Data Mapper. Given the action accepts an input arg titled `username`
+
+**Data Mapper**
+
+```yaml
+base_object: '"OU=Users,OU=Example,DC=company,DC=com"'
+filter: '"(sAMAccountName={{user_name}})"'
+filter_args:
+  user_name: username
+attributes:
+  - '"distinguishedName"'
+  - '"mail"'
+  - '"givenName"'
+  - '"manager"'
+
+```
+
+**How This Works**
+
+* `filter` is treated as a **template**, not rendered by the HTTP builder
+* `username` is passed as raw user input
+* The LDAP adapter:
+  * Escapes the value
+  * Safely inserts it into the filter
+  * Executes the search
+
+***
+
+**Best Practices**
+
+* Always use `filter_args` when user input is involved
+* Keep filters minimal and explicit
+
+***
+
+**Request Body**
+
+```yaml
+base_object: string # Required
+filter: string # Required
+filter_args: object # Optional
+attributes: []string # Default: ["*"]
+size_limit: integer # Default: 0 (no limit)
+
+scope:
+  enum:
+    - 0 | BASE_OBJECT
+    - 1 | SINGLE_LEVEL
+    - 2 | WHOLE_SUBTREE # Default
+
+```
+
+***
+
+**Example body : Search for Users with Email Addresses**
+
+This example action BODY retrieves all users under a given organizational unit who have an email address.
+
+```json
+base_object: '"OU=Users,OU=Example,DC=company,DC=com"'
+filter: '"(&(objectClass=user)(objectCategory=Person)(mail=*))"'
+attributes:
+  - '"distinguishedName"'
+  - '"mail"'
+  - '"givenName"'
+  - '"manager"'
+```
+
+***
+
+**Response**
+
+```json
+{
+  "entries": [
+    {
+      "givenName": ["John"],
+      "distinguishedName": [
+        "CN=Smith\\, John,OU=Users,OU=Example,DC=company,DC=com"
+      ],
+      "mail": ["john.smith@company.com"],
+      "manager": [
+        "CN=Snow\\, John,OU=Users,OU=Example,DC=company,DC=com"
+      ]
+    },
+    {
+      "givenName": ["John"],
+      "distinguishedName": [
+        "CN=Snow\\, John,OU=Users,OU=Example,DC=company,DC=com"
+      ],
+      "mail": ["john.snow@company.com"]
+    }
+  ]
+}
+
+```
+
+<Image border={false} src="https://files.readme.io/6a6711723220f6ccac199cc4f7f2834205a63c18b5c28d361f84a04cda03b22f-image.png" />
+
+**Notes**
+
+* Attribute values are always returned as arrays
+* Distinguished Names are escaped per LDAP specification
+* Include `distinguishedName` explicitly if you need it in downstream actions
+
+***
+
+## Using Dynamic Filters Safely
+
+When user input is required, use `filter_args` instead of injecting values directly into the filter.
+
+Given the action accepts an input arg titled `username`
+
+```json
+base_object: '"OU=Users,OU=Example,DC=company,DC=com"'
+filter: '"(sAMAccountName={{user_name}})"'
+filter_args:
+  user_name: username
+attributes:
+  - '"distinguishedName'"
+  - '"mail"'
+  - '"givenName"'
+  - '"manager"'
+
+```
+
+This ensures:
+
+* Input values are escaped
+* LDAP injection attacks are prevented
+* Conversational workflows remain safe
+
+***
+
+# Add LDAP Entry
+
+`POST /ldap/v1/add`
+
+**Creates a new LDAP object.**
+
+**Request Body**
+
+```yaml
+entry: string # Distinguished Name
+attributes: object # Required
+
+```
+
+***
+
+**Example body: Create a Group**
+
+```json
+entry: `"CN=Engineering Team,OU=Groups,DC=company,DC=com"`
+attributes:
+  objectClass:
+    - '"top"'
+    - '"group"'
+  displayName: `"Engineering Team"`
+  mail: `"engineering@company.com"`
+  groupType: 8
+  description: `"Engineering distribution group"`
+
+```
+
+**Response:** `201 Created`
+
+***
+
+# Modify LDAP Entry
+
+`PUT /ldap/v1/modify`
+
+Modifies an existing LDAP entry. All changes are applied atomically.
+
+`add`, `delete`, and `replace` are individually optional, but at least one is required.
+
+**Request Body**
+
+```yaml
+entry: string # Required
+
+add: object # Optional
+delete: object # Optional
+replace: object # Optional
+
+```
+
+***
+
+**Example body: Add a User to a Group**
+
+```json
+entry: '"CN=Engineering Team,OU=Groups,DC=company,DC=com"'
+add:
+  member: '"CN=Casey Crawford,OU=Users,DC=company,DC=com"'
+ 
+```
+
+**Response:** `204 No Content`
+
+***

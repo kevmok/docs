@@ -1,0 +1,82 @@
+---
+title: Recreating Built-in Agents
+excerpt: ''
+deprecated: false
+hidden: true
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+If you're looking to rebuild some of our built-in AI agents (either for a custom system, or to customize the AI agent behavior beyond its current customization options), this page outlines how to recreate those capabilities.
+
+# Provision Agent (replaces Provision Management)
+
+## Required Steps
+
+* [Access Software](https://help.moveworks.com/docs/access-software-copilot)
+  * **Grant Access to Software**: Create an Agent Studio Plugin for each application. You can also collect role information or software configurations as slots and use approvals in your compound action.
+* [Access Group](https://help.moveworks.com/docs/access-groups-copilot)
+  * **Create DL**: Create an Agent Studio Plugin that requires DL name (`string`) & initial members (`List[User]`). Then add an action which creates the DL & adds the members.
+  * **Add User to DL**: Create an Agent Studio Plugin that requires DL object (`u_CustomGroupDataType`) and members to add (`List[User]`). Then add an action which adds the members.
+  * **Remove Users from DL**: Create an Agent Studio Plugin that requires DL object (`u_CustomGroupDataType`) and members to remove (`List[User]`). Then add an action which removes the specified users from the DL.
+  * **Removal Notification**: Send a notification via our [Events API](https://help.moveworks.com/reference/sendmessageforevent)
+  * **Check Group Owner**: Create an Agent Studio Plugin that requires DL object (`u_CustomGroupDataType`). Then add an action which returns the owner (`User`) of the DL.
+  * **Check Group Membership**: Create an Agent Studio Plugin that requires DL object (`u_CustomGroupDataType`) and target user (`User`). Then add an action which returns a boolean indicating whether the user is a member of the DL.
+* [Access Account](https://help.moveworks.com/docs/account-access-copilot)
+  * **Unlock Account**: Create an Agent Studio Plugin that executes an action to unlock the current user's account.
+  * **Account Lockout Notification**: Send a notification via our [Events API](https://help.moveworks.com/reference/sendmessageforevent). Tell the user they can trigger the Unlock Account plugin if they ask.
+  * **Reset Password**: Create an Agent Studio Plugin that executes an action to reset the user's password & send them a reset link via email. Alternatively, you can provide a content activity & provide instructions.
+  * **Password Expiry Notification**: Send a notification via our [Events API](https://help.moveworks.com/reference/sendmessageforevent). Tell the user they can trigger the Unlock Account plugin if they ask.
+  * **MFA Reset**: Create an Agent Studio Plugin that executes an action to reset the user's MFA & send them a reset link via email. Alternatively, you can provide a content activity & provide instructions.
+
+## Caveats
+
+> 🚧
+>
+> There may be more nuances depending on the system you use.
+
+1. Moveworks only indexes software & DL groups from built-in provisioning integrations, so Agent Studio plugins for your custom provisioning system will be prone to misspellings (e.g. "Add me to slaes-ops" might not be corrected to "[sales-ops@acme.com](mailto:sales-ops@acme.com)")
+2. If you want a ticket log of your provisioning actions, you'll need to add a "File Ticket" action to your plugins. You can use our built-in ticketing connector, but you will need to create a new HTTP action and use it in your provisioning plugin.
+3. Agent Studio plugins aren't available for [ticket interception](https://help.moveworks.com/docs/ticket-interception) or channel resolver.
+4. Agent Studio can't execute Sharepoint Powershell or On-Prem Active Directory LDAP commands.
+
+# Ticketing Agent (replaces Service Management)
+
+## Required Steps
+
+* [Core Ticketing & Concierge](https://help.moveworks.com/docs/concierge-copilot)
+  * **Query Ticket**: Create an Agent Studio Plugin with optional slots for various query filters (e.g. by ticket number, by ticket status, by assignee).
+    * You should also attach these underlying actions to a `u_CustomTicket` data type as a [resolver strategy](https://help.moveworks.com/docs/resolver-strategies).
+  * **Create Ticket**: Create an Agent Studio Plugin that collects your base requirements (e.g. priority, short description) & creates a ticket in your ticketing system.
+  * **Update Ticket with Comment**: Create an Agent Studio Plugin with a `u_CustomTicket` slot, along with a comment. Execute an action to update the ticket, changing the state if needed.
+  * **Resolve Ticket**: Create an Agent Studio Plugin with a `u_CustomTicket` slot. Execute an action to mark the ticket as resolved.
+  * **Update Smart Handoff**: Set the [Smart Handoff](https://help.moveworks.com/docs/smart-handoff-copilot) configuration for the ticketing system's domain to inform the user to ask their assistant to file a ticket.
+    * Note: the user will need to return to chat from the handoff screen to continue filing the ticket through your Create Ticket Plugin.
+  * **Ticket Update Notifications**: Send a notification via our [Events API](https://help.moveworks.com/reference/sendmessageforevent). Inform them about actions they can do on that ticket (add comment, resolve, etc.)
+* [Forms](https://help.moveworks.com/docs/forms-copilot)
+  * You should sync forms via our [Forms Gateway](https://help.moveworks.com/reference/legacy-gateways). 
+* [Approval Mirroring](https://help.moveworks.com/docs/approval-mirroring)
+  * **Approval Notification**: Send a notification via our [Events API](https://help.moveworks.com/reference/sendmessageforevent). Inform them about actions they can do on that ticket (approve, deny, etc.)
+  * **Approval Action**: Create an Agent Studio Plugin with a `u_CustomApproval` slot & an answer (approved/denied). Then add an action to change the approval.
+  * **Approval Lookup**: Create an Agent Studio Plugin that returns all the user's current approvals.
+* [Live Agent Chat](https://help.moveworks.com/docs/moveworks-setup-live-agent-settings)
+  * URL & Channel handoff can be configured as is
+  * API Handoff should be configured as an Agent Studio Plugin to add the current user into your chat system. It can return the URL.
+
+## Caveats
+
+> 🚧
+>
+> There may be more nuances depending on the system you use.
+
+1. The remaining Service Management capabilities (Ticket Interception, Message Brokering, Triage) can not be replicated.
+2. All **Provision Management** capabilities will need to be rebuilt since they rely on our [built-in ticketing integrations](https://help.moveworks.com/docs/ticketing-systems-and-itsms).
+3. Our Forms Gateway is a subset of what's necessary to fully mirror ServiceNow forms.
+4. Tickets will not be made available for analysis in [Employee Experience Insights](https://help.moveworks.com/docs/employee-experience-insights)
+5. Tickets can not be used for grounding in [Knowledge Studio](https://help.moveworks.com/docs/knowledge-studio)
+6. [Channel Resolver](https://help.moveworks.com/docs/channel-resolver-copilot) can not support ticket-thread syncing.
+7. Aspects of our customer success engagement (e.g. Joint Success Plans & Quarterly Impact Reviews) will not have ticket-based recommendations or analytics.
+8. Attachments can't currently be uploaded. You can follow the [roadmap item in our community](https://community.moveworks.com/ideas/slot-resolvers-files-1842).

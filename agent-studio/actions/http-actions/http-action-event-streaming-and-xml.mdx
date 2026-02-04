@@ -1,0 +1,216 @@
+---
+title: Event streaming (SSE) and XML responses
+excerpt: >-
+  Handle text/event-stream and XML payloads in HTTP Actions. Learn how streams
+  terminate, aggregate data: chunks safely, and parse XML outputs.
+hidden: false
+metadata:
+  robots: index
+---
+HTTP Actions can call APIs that return either streaming Server‑Sent Events (SSE) or XML. This guide explains how SSE responses terminate and how the HTTP Action behaves, how to aggregate `data:` event chunks into a single output, common pitfalls, and simple approaches for XML parsing.
+
+> 📘 XML Support
+>
+> Moveworks converts all XML responses to JSON automatically at the HTTP action layer, so XML responses can be used easily in conversational processes and compound actions.
+>
+> This also allows XML responses from on-prem systems (via the Moveworks Agent) to be used.
+
+### What to expect at runtime
+
+* **Blocking, not live streaming**: HTTP Actions do not surface partial chunks. They buffer the response and return it only after the server closes the connection.
+* **Termination matters**: If the SSE endpoint never closes the connection (e.g., test endpoints that stream forever), the action will remain in "Processing" until a timeout.
+* **Timeouts and limits**:
+  * Requests time out after ~60 seconds of inactivity.
+  * Responses larger than ~200 KB are rejected.
+
+### Server‑Sent Events (text/event-stream)
+
+* **Request setup**:
+  * Add header: `Accept: text/event-stream`.
+  * Configure the HTTP Action normally (no special streaming toggle is required).
+* **Response shape**: The action captures the raw SSE payload as a single text block under your `output_key`. Typical shape:
+
+```text
+data: {"thread_id": "...", "date": "2025-11-11T20:37:49.053856Z"}
+
+data: {"chunk": "..."}
+
+data: {"chunk": "..."}
+```
+
+* **Reserved keys**: Avoid naming your HTTP Action `output_key` as `result` or `data` to prevent collisions. Use something like `action_output`.
+
+#### Aggregate chunked messages into one string
+
+In a Compound Action, set the HTTP Action `output_key` to `action_output`, then map the aggregated text plus any metadata:
+
+```yaml
+steps:
+  - action:
+      action_name: chat_stream
+      output_key: action_output
+      headers:
+        Accept: text/event-stream
+  - return:
+      output_mapper:
+        thread_id: >
+          data.action_output
+            .$TRIM()
+            .$SPLIT("\n\n")[0]
+            .$REPLACE("^data: ", "")
+            .$PARSE_JSON()
+            .thread_id
+        date: >
+          data.action_output
+            .$TRIM()
+            .$SPLIT("\n\n")[0]
+            .$REPLACE("^data: ", "")
+            .$PARSE_JSON()
+            .date
+        text: >
+          data.action_output
+            .$TRIM()
+            .$SPLIT("\n\n")
+            .$MAP(x => x.$REPLACE("^data: ", "").$PARSE_JSON().chunk)
+            .$CONCAT(" ", true)
+```
+
+Notes:
+
+* SSE frames are delimited by a blank line (`\n\n`).
+* You must strip the `data:` prefix on each frame before parsing JSON (`$REPLACE("^data: ", "")`).
+* Some servers emit heartbeats like `: keep-alive`. Filter them out if present, e.g.:
+
+```yaml
+text: >
+  data.action_output
+    .$TRIM()
+    .$SPLIT("\n\n")
+    .$FILTER(line => !line.$STARTS_WITH(":"))
+    .$MAP(x => x.$REPLACE("^data: ", "").$PARSE_JSON().chunk)
+    .$CONCAT(" ", true)
+```
+
+<br />
+
+The following mapping aggregates SSE frames by converting the raw stream into a JSON array, then parsing once. This is useful when frames are well‑formed JSON objects and delimited by blank lines:
+
+```yaml
+steps:
+  - action:
+      output_key: action_output
+      action_name: test_stream
+  - return:
+      output_mapper:
+        thread_id: >
+          $CONCAT(["[",data.action_output.$REPLACE("data: ", ",").$TRIM()[1:],"]"], "").$PARSE_JSON()[0].thread_id
+        date: >
+          $CONCAT(["[",data.action_output.$REPLACE("data: ", ",").$TRIM()[1:],"]"], "").$PARSE_JSON()[0].date
+        text: 
+          EVAL():
+            expression: $CONCAT(x, " ")
+            args: 
+                x:
+                  MAP():
+                    items: >
+                      $CONCAT(["[",data.action_output.$REPLACE("data: ", ",").$TRIM()[1:],"]"], "").$PARSE_JSON()[1:]
+                    converter: item.chunk
+```
+
+How it works:
+
+* Replaces each `data: ` prefix with a comma, then drops the leading comma via `[1:]`.
+* Wraps the result in brackets to form a JSON array and parses it once.
+* Pulls metadata from the first element and concatenates `chunk` fields from the rest.
+
+#### Troubleshooting SSE
+
+* **Action stuck in Processing**: Your endpoint likely never closes. Test against an endpoint that terminates; many demo SSE servers are intentionally infinite.
+* **Invalid JSON errors**: Parse line‑by‑line. The raw SSE payload is not a single JSON object.
+* **Large responses**: If you concatenate many chunks, you may hit the 200 KB cap—truncate or summarize upstream.
+
+### XML responses
+
+* **Prefer JSON when possible**: If the API supports it, send `Accept: application/json` and/or use a JSON variant of the endpoint.
+* **When XML is unavoidable**:
+  * The HTTP Action stores the raw XML in your `output_key` (e.g., `action_output`).
+  * There is no built‑in XML parser in the output mapper; use either simple string/regex extraction for a few fields or a Script Action for robust parsing.
+
+#### Option A: Simple extraction with DSL (for a few tags)
+
+For basic cases you can extract values using `$MATCH`, `$REPLACE`, etc. Example (extract `<status>`):
+
+```yaml
+status: >
+  data.action_output
+    .$MATCH("<status>.*?</status>", true)[0]
+    .$REPLACE("</?status>", "", true)
+    .$TRIM()
+```
+
+#### Option B: Parse XML in a Script Action (BeautifulSoup)
+
+Use a Python Script Action after the HTTP Action to convert XML to JSON‑like text you can parse back in the mapper.
+
+1. HTTP Action: set `output_key: action_output`.
+
+2. Script Action:
+
+* Input argument `xml_body` mapped from `data.action_output`.
+* Output key `xml_parsed`.
+* Code:
+
+```python
+import json
+from bs4 import BeautifulSoup
+
+# xml_body is the input argument
+soup = BeautifulSoup(xml_body, "xml")
+
+result = {
+    "status": (soup.find("status").get_text(strip=True) if soup.find("status") else None),
+    "id": (soup.find("id").get_text(strip=True) if soup.find("id") else None),
+    "message": (soup.find("message").get_text(strip=True) if soup.find("message") else None),
+}
+
+# Return a JSON string for downstream mapping
+json.dumps(result)
+```
+
+3. Return step: parse the script output and expose fields:
+
+```yaml
+steps:
+  - action:
+      action_name: xml_api
+      output_key: action_output
+      headers:
+        Accept: application/xml
+  - script:
+      language: python
+      input_args:
+        xml_body: data.action_output
+      output_key: xml_parsed
+      code: |
+        import json
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(xml_body, "xml")
+        result = {
+            "status": (soup.find("status").get_text(strip=True) if soup.find("status") else None),
+            "id": (soup.find("id").get_text(strip=True) if soup.find("id") else None),
+            "message": (soup.find("message").get_text(strip=True) if soup.find("message") else None),
+        }
+        json.dumps(result)
+  - return:
+      output_mapper:
+        status: data.xml_parsed.$PARSE_JSON().status
+        id: data.xml_parsed.$PARSE_JSON().id
+        message: data.xml_parsed.$PARSE_JSON().message
+```
+
+### Best practices
+
+* **Use a safe `output_key`**: Avoid `result` and `data`. Prefer `action_output`, `xml_parsed`, etc.
+* **Keep payloads small**: Summarize upstream or stop early to stay under the 200 KB limit.
+* **Validate in Postman first**: Confirm the endpoint closes the stream and returns the expected format before configuring in Agent Studio.
+* **Log and test**: Use the Test button and check logs if mapping fails.

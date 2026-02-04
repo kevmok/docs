@@ -1,0 +1,18 @@
+---
+title: Basic Auth
+excerpt: ''
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+Basic authentication entails sending a validated username and password along with your request.
+
+* The Authorization header sends the API a **Base64 encoded** string that encapsulates your username and password values, preceded by the term 'Basic' in the following format:\
+  `Basic Base64Encoded("<username>:<password>")`
+
+To set this up, choose `Basic Auth` from the **Auth Config** dropdown list. Then, input your API `username` and `password` into their respective fields.

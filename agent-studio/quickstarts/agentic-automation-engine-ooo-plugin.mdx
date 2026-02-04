@@ -1,0 +1,323 @@
+---
+title: 'Quickstart #4: Beginner Compound Actions'
+excerpt: ''
+deprecated: true
+hidden: true
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+# Use Case Overview
+
+This document outlines how to create a plugin to automate setting Out of Office (OOO) status across both Slack and Email systems. The plugin will generate personalized messages for both platforms and use API calls to update the user's status.
+
+<Image align="center" src="https://files.readme.io/32d8dbafec0cf1a6b034a4f5485b897cd8807e1fa6256f95abe2a8d926d5eb6c-purple-chat_2.png" />
+
+## Objectives
+
+* This guide focuses on creating an Out of Office Automation plugin using compound actions, DSL rules, and data mappers. Key objectives include understanding compound actions and when to use them over traditional plugins, learning simple DSL rules and their advantages over Python for logic and data transformations, and mastering data mappers for efficient data transformation. Additionally, you'll explore how to leverage DSL/Bender Playground for testing and refining DSL expressions and data mappings, ensuring a streamlined process for automating Out of Office status updates across Slack and email systems.
+
+## Prerequisites
+
+* Basic understanding of APIs.
+* Basic understanding of prompting a LLM.
+
+# Step-by-Step Guide
+
+1. **Create an HTTP Action:**\
+   To get started, you need to create an [**HTTP Action**](https://help.moveworks.com/docs/http-actions). This action will allow us to communicate with an external system. Navigate to your Agent Studio portal.
+
+   ![](https://files.readme.io/8f3d5b8af7d548c54b7fa23deab62d3c62d3fbc22fea5970f1fff989e1b5722e-1.png)
+
+   1. Click on **Plugins**
+   2. Select **Actions** on the left sidebar
+   3. Click on **Create** to initiate your first action
+2. **Enter API Information**
+
+   <Image align="center" src="https://files.readme.io/0a50f60c5f2c6e55c17ca33219a192e231e68a4f906af5cdb7a7e88603fcb3e1-Screenshot_2025-04-04_at_2.54.36_PM.png" />
+
+   1. Provide the base URL of the API and set the action to POST [`https://us-central1-creator-studio-workflows.cloudfunctions.net`](https://us-central1-creator-studio-workflows.cloudfunctions.net/) 
+   2. Enter the endpoint `/updateEmailStatus`
+   3. Set the Authorization configuration to `No Auth`
+   4. **OPTIONAL**: import this cURL using the **IMPORT CURL** button
+      ```
+      curl -X POST "https://us-central1-creator-studio-workflows.cloudfunctions.net/updateEmailStatus?sessionId={session-id}" \
+           -H "Content-Type: application/json" \
+           -d '{"email_status": "{{email_status}}", "expiration_date": "{{exp_date}}"}'
+      ```
+3. **Create Purple API Session:**\
+   You will need to create a new session id in the [Purple API](https://app.superblocks.com/applications/a23f55f2-4149-4c18-ac98-9dec93c15ff8) and select the **Out of Office** tab.
+
+   <Image align="center" src="https://files.readme.io/1690d69c6c63f5b19b86dc75fb1b2dcea2c072844542e811f80603120c4eebc2-Screenshot_2025-04-04_at_3.01.19_PM.png" />
+
+   1. Click on **Create New Session ID** 
+   2. Select Out of Office tab 
+   3. Copy the Session ID we are going to need it in the next step
+4. **Add a sessionId Parameter:**\
+   You will need to set the session for the user who is making this request, so let's add a **`sessionId`** parameter to the endpoint. For this, click on the **Params** tab.
+
+<Image align="center" src="https://files.readme.io/6620b8ffa4c4034214c88e33c82c91e17aeaffe200d25155dbd66abf01492277-Screenshot_2025-04-04_at_3.09.52_PM.png" />
+
+1. Click on **+ADD** to add a new parameter
+2. In the **Key** field, type `sessionId` 
+3. In the **Value** field type the Session ID you generated in the previous step
+4. **Define Body:**\
+   Head to the **Body** tab, here you will need to define the body of the post request required by the api.
+
+<Image align="center" src="https://files.readme.io/cf639ddfe507c50423346e6466004ae3de4be82a754b1b3a7c2b45f7fb0c3406-Screenshot_2025-04-04_at_3.16.29_PM.png" />
+
+1. Click on the **Body** tab
+2. Paste in the below JSON necessary for this POST request with input variables for the values notated with \{\{}} syntax. You can name the input variables whatever you want, but make sure they're easily understandable.
+3. ```json
+   {
+       "email_status": "{{email_status}}",
+       "expiration_date": "{{exp_date}}"
+   }
+   ```
+   <br />
+4. **Define Input Variables:**\
+   Head to the **Input Variables** tab, here you will need to define the input variables you previously designated as `email_status` and `exp_date` in the **Body**. You will notice that the input variable gets added automatically. In this case you only need to add an example value to test the **Action**.
+
+   <Image align="center" src="https://files.readme.io/f6290e57a25dc12add5bedf8e0f04469f7c84e938e2846df7ff2112f9d28db38-Screenshot_2025-04-04_at_3.20.24_PM.png" />
+
+   1. Enter a status in the **Example value** field
+   2. Enter an exp date in whatever format you want in this case I used mm/dd/yyyy
+   3. Click on the **TEST button** next to the endpoint
+5. **Review API Response:**\
+   Once you press the **TEST** button you will be redirected to the **Response** tab where you will be able to get a response for the API you just defined.
+
+   <Image align="center" src="https://files.readme.io/d78fb4f4382d86d50fe5a52985d234960b7b9fc7dcf9043e40127686f0be2273-Screenshot_2025-04-04_at_3.25.27_PM.png" />
+
+   1. You can see the Response Code
+   2. On the left side box you can see the response for the status being changed and the date 
+   3. On the right box you will see an **Output Schema** box, this output schema will come into play when you create a **Compound Action**, this api doesn't return any JSON just a success message so we don't have to worry about it.
+   4. Click on **SAVE**
+6. **Save Action Details:**\
+   After clicking **SAVE,** a modal titled **Review Connector and API** will appear. Here you will enter information about the **Action** you just created.
+
+   <Image align="center" src="https://files.readme.io/6b101ea44afff2b6b37877d2389841a799e85e13aaad83bbc3e59df32633744e-Screenshot_2025-04-04_at_3.51.28_PM.png" />
+
+   1. Since this is your first time creating an **Action** with this external system, you are prompted to set a name for the connector. Name it **`creator_studio_demo`** so it can be reused in the future.
+   2. The API Name is the name of the **HTTP Action**. Name it **`update_email_ooo_status`**.
+   3. You can also add a description for this API. Adding a description is recommended if your API has nuances or requires further interpretation from the Moveworks AI Assistant.
+   4. Click **SAVE**
+7. **Create another HTTP Action:**\
+    You will need to create a 2nd [**HTTP Action**](https://help.moveworks.com/docs/http-actions). This action will allow us to communicate with the API for Email. 
+
+   ![](https://files.readme.io/8f3d5b8af7d548c54b7fa23deab62d3c62d3fbc22fea5970f1fff989e1b5722e-1.png)
+
+   1. Click on **Plugins**
+   2. Select **Actions** on the left sidebar
+   3. Click on **Create** to initiate your second action
+8. **Enter API Information**\
+   Select the **Use Existing Connector** option then select the connector you made in the previous step
+
+<Image align="center" src="https://files.readme.io/af1c343bf61b742d5ffd6a39c3abb710354ad1b4bf5997141d64916812208d40-Screenshot_2025-04-04_at_3.37.29_PM.png" />
+
+<br />
+
+1. Enter the endpoint `/updateSlackStatus`
+2. **OPTIONAL**: import this cURL using the **IMPORT CURL** button
+
+```
+curl -X POST "https://us-central1-creator-studio-workflows.cloudfunctions.net/updateEmailStatus?sessionId={session-id}" \
+     -H "Content-Type: application/json" \
+     -d '{"email_status": "{{email_status}}", "expiration_date": "{{exp_date}}"}'
+```
+
+<Image align="center" src="https://files.readme.io/8c8ba51c3e7a5fbc12e746fe33e8beb1d2a359d80d878e334460ac3257bbe4bd-Screenshot_2025-04-07_at_3.39.04_PM.png" />
+
+10. **Replicate steps 4- 6 with slight adjustments for slack**
+11. Reuse sessionId in the **Params** tab
+12. Click on the **Body** tab
+13. Paste in the below JSON necessary for this POST request with input variables for the values notated with \{\{}} syntax. You can name the input variables whatever you want, but make sure they're easily understandable.
+14. ```json
+     {  
+               "slack_status": "{{slack_status}}",  
+               "expiration_date": "{{exp_date}}" 
+     }
+      
+    ```
+    Test your api and save it if successful as **update\_slack\_ooo\_status**
+
+<br />
+
+10. **Create a Compound Action**\
+    After saving your action, you will be sent back to the **Plugins** workspace. Now you are ready to create a Compound Action, which will allow us to put our Action into play.
+
+![](https://files.readme.io/577898a7bc191818bf198d98f82b83d80b5951a04d4ad07e77245766b9125789-image.png)
+
+1. Click on **Compound Actions** on the sidebar
+
+2. Click on **Create** to initiate a new Compound Action
+
+3. **Enter Compound Action Details**\
+   Now you need to enter the Compound Action’s information.
+
+   <Image alt="Description: A compound action that allows the user to retrieve their own PTO balance" align="center" src="https://files.readme.io/cec39ee4f4948415b456e7c38c110811419bd3acb93faa4267d26d6d3914f807-Screenshot_2025-04-07_at_3.40.00_PM.png">
+     Description: This creates an out of office message for slack and purple email and updates the status in both
+   </Image>
+
+   1. Provide a name that’s easy to remember and understand, for example, **`update_out_of_office_email_and_slack`**. Note: Action and Compound Action names must be unique.
+   2. Add a description explaining what your Compound Action does. The Moveworks AI Assistant takes these descriptions seriously, so be as thorough as possible!
+   3. Click on **Next** to proceed
+
+4. **Write Compound Action Script:**\
+       You will be greeted by a **Write Compound Action** window that contains two tabs: **Script Editor** and **Input Fields**. In this exercise, you will only need to focus on the Script Editor.
+
+   1. Click on the **Script Editor** tab
+   2. Now you need to write your Compound Action script. Think of a Compound Action as a way to write several Actions and Expressions in harmony, similar to writing a workflow. You combine multiple actions step-by-step and chain them together to get an outcome. For this use case, we are using a built in action of **[mw.generate\_text\_action](https://help.moveworks.com/docs/built-in-actions#generate_text_action)** to generate a distinct ooo message for email and one for slack. We write a distinct prompt string for both LLM actions using the **[RENDER()](https://help.moveworks.com/docs/moveworks-bender-language-reference#render)** data mapper function to pass in all the variables dynamically to the string template. We then send both updates to their respective api endpoints using the actions we created in previous steps. Once complete we use a [**Return**](https://help.moveworks.com/docs/compound-action-syntax-reference#return-return-a-value-to-chat) expression to present the data from the action’s response to the user. Write the following script:
+
+      ```yaml
+        steps:
+          - action:
+              action_name: mw.generate_text_action
+              input_args:
+                system_prompt:
+                  RENDER():
+                    template: '"Generate a short succint ooo message including professional tone
+                      slack emojis with no specific tone of what the ooo is for letting
+                      them know that {{coworker}} is covering for me until {{end_date}}
+                      do not use any special formatting on the text just return simple
+                      raw text"'
+                    args:
+                      end_date: data.end_date
+                      coworker: data.coworker
+                user_input: "' '"
+              output_key: generate_text_action_slack
+          - action:
+              action_name: mw.generate_text_action
+              input_args:
+                system_prompt:
+                  RENDER():
+                    template: '"Generate a short succint ooo email message with no specific tone of
+                      what the ooo is for letting them know that {{coworker}} is
+                      covering for me until {{end_date}} the user going ooo name is
+                      {{user_name}}do not use any special formatting on the text just
+                      return simple raw text "'
+                    args:
+                      end_date: data.end_date
+                      coworker: data.coworker
+                      user_name: meta_info.user.full_name
+                user_input: "' '"
+              output_key: generate_text_action_email
+          - action:
+              action_name: update_slack_ooo_status
+              input_args:
+                exp_date: data.end_date
+                slack_status: data.generate_text_action_slack.openai_chat_completions_response.choices[0].message.content
+              output_key: update_slack_ooo_status_result
+          - action:
+              action_name: update_email_ooo_status
+              input_args:
+                exp_date: data.end_date
+                email_status: data.generate_text_action_email.openai_chat_completions_response.choices[0].message.content
+              output_key: update_email_ooo_status_result
+          - return:
+              output_mapper:
+                message_to_user:
+                  RENDER():
+                    template: '"I have successfully updated your slack ooo status to
+                      {{slack_message}} and your email ooo message to
+                      {{email_message}}"'
+                    args:
+                      email_message: data.generate_text_action_email.openai_chat_completions_response.choices[0].message.content
+                      slack_message: data.generate_text_action_slack.openai_chat_completions_response.choices[0].message.content
+      ```
+
+      <br />
+
+<br />
+
+Next you will need to click the input fields tab and create 2 input variables one for the **end\_date** which is the date you wish the ooo to last until and **coworker** which is the name of the coworker you have covering for you while ooo. Both will be of string type and the descriptions will be
+
+1. end\_date: The end date of the OOO in mm/dd/yyyy format
+2. coworker: The name of the coworker who will be taking over while absent
+
+   <Image align="center" src="https://files.readme.io/373f9b1cead8f01ba11d78a0767456be1dde766bbfebd493dda61da2b9ace2b4-Screenshot_2025-04-07_at_3.42.07_PM.png" />
+3. Press **Submit** at the bottom right!
+4. **In the Next Gen Editor go to Select Bodies -> Conversational Plugin Body -> Create**\
+   We will create the Conversational plugin body for our Plugin.
+
+<Image align="center" src="https://files.readme.io/cc312c0827d6a3659c0535fed007e8c5e3030066e5d2cf0ebf88f55c0d764aca-Screenshot_2025-04-08_at_2.46.31_PM.png" />
+
+8. **Editing the Body**
+   1. Title the body, I chose **update\_ooo\_message**
+   2. Give a description, I chose. **This will take an end date and coworker for coverage then use structure value generation to generate a status message to change it in slack and purple email** This is important to give the LLM context of what this plugin does
+   3. Click on configure slots, you will need to make 2 slots.
+      1. end\_date 
+         1. name: end\_date
+         2. Data type: String
+         3. Slot Description: The date that the user’s out of office status will end. The date should always be in mm/dd/yyyy format.
+         4. Slot Validation: value.$PARSE\_TIME() > $TIME()
+         5. Slot Inference Policy: Infer
+         6. Error: End date must be in the future
+      2. coworker
+         1. name: coworker
+         2. Data type: String
+         3. Slot Description: The name of coworker who will be covering for the user during their ooo. 
+         4. Slot Validation: **N/A**
+         5. Slot Inference Policy: Infer
+         6. Error: **N/A**
+
+<Image align="center" src="https://files.readme.io/82a7100bef566aae8654687497e90dec3c3678e04faf5fccd7c09a7205f92824-Screenshot_2025-04-08_at_2.58.40_PM.png" />
+
+8. **Selecting an Action Activity**
+
+   Next you will select an Action Activity  and set the action to the compound action made in the previous steps **update\_out\_of\_office\_email\_and\_slack** 
+
+   1. Required Slots: end\_date, coworker
+   2. input mapping: 
+
+      1. ```yaml
+          end_date: data.end_date
+          coworker: data.coworker
+         ```
+9. Leave the rest of the action as is 
+
+<Image align="center" src="https://files.readme.io/32414313ce1386f4279838542a01140fa756be5b58743e7e890eeba4c0cb2f12-Screenshot_2025-04-08_at_3.00.19_PM.png" />
+
+11. **Validate and publish your Plugin**
+
+**Creating  the Plugin**
+
+Go back to the **home** screen and select **Plugins** then click on create
+
+<Image align="center" src="https://files.readme.io/d810c3c99028ddd5174bf57c7c8bd3192821abf1ab769725e7dcc104f7c88193-Screenshot_2025-04-08_at_3.07.26_PM.png" />
+
+Reuse the title and description you gave your conversational body
+
+Now you will encounter the **Define Triggering** step. Here you will be asked to enter positive and/or negative utterances that will help the Moveworks AI Assistant understand when to trigger the plugin. Based on the descriptions you set up earlier, suggestions are typically generated for you.\
+You need to enter at least 5 positives utterances to proceed to the next step.
+
+1. i need to change my ooo status until next week
+2. I need to change my out-of-office status until next Friday
+3. update my ooo status until 05-05-2025 with john covering
+4. I need to change my out-of-office status until next Tuesday
+5. I need to change my out-of-office status until next Monday. Could you assist me?
+
+<Image align="center" src="https://files.readme.io/cd0e1558238f26e1e96d566d06f7f4aa1d5b31f6eb9fab88dcfbb0e965cc3380-Screenshot_2025-04-08_at_3.09.14_PM.png" />
+
+Next select your Conversational Body as the **Conversational Plugin Body** you made previously
+
+<Image align="center" src="https://files.readme.io/12c6b1df8e429769c36560767ba9b768d5387173f82a95bf90a9d2e70f1d7590-Screenshot_2025-04-08_at_3.09.23_PM.png" />
+
+Select the **Set Permissions** tab and make sure you have it limited to yourself and other testers or launch to all once you're ready!
+
+<Image align="center" src="https://files.readme.io/530dd9c79fa665d5e9b3b417824328c74d00bc259ed839e17524779aa92122b6-Screenshot_2025-04-08_at_3.13.33_PM.png" />
+
+Validate and publish your plugin and you are all set!
+
+**Ready to test**
+
+1. **Test the Plugin:**\
+   To ensure everything is working correctly, test the plugin by asking the Moveworks AI Assistant: **`Set my ooo until next friday with <coworkers name> covering for me`**
+
+<Image align="center" src="https://files.readme.io/44f6dc05f7c735a07d93833cb846bacd21285bc1ce5155507bf5d1c20d4d373d-Screenshot_2025-04-08_at_3.21.24_PM.png" />
+
+2. Now go check the Purple API to confirm the change happened make sure you fetch the session id of the session ID you generated previously and put in your action.
+
+<Image align="center" src="https://files.readme.io/6a977cf4b7b0cb7d4bceb535bdc7da11395e80c192f6ca64d9bda86266547a26-Screenshot_2025-04-08_at_3.20.21_PM.png" />

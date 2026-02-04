@@ -1,0 +1,144 @@
+---
+title: Integrating External Webhooks
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+# Overview
+
+The goal of this cookbook is to empower you to integrate webhooks from any external service into your application, enabling real-time event handling and automation. This cookbook focuses on foundational principles, teaching you to "fish" by understanding the core setup patterns, verification methods, and integration strategies.
+
+### What you’ll learn
+
+* Set up a secure webhook endpoint.
+* Handle standard verification techniques (e.g., signatures, challenges).
+* Parse payloads, route events, and trigger actions.
+* Debug and secure your implementation.
+
+### Prerequisites
+
+* Familiarity with HTTP concepts like `POST` requests and headers.
+
+# Core Concepts
+
+This section covers shared fundamentals. Use these as building blocks for any webhook integration. We'll reference them in the examples.
+
+| Concept                     | Content                                                                    |
+| :-------------------------- | :------------------------------------------------------------------------- |
+| Webhook Endpoint (Listener) | See [Listener Configuration](/docs/webhooks-listener)                      |
+| Verification Challenge      | See [Webhook Verification Challenge](/docs/webhook-verification-challenge) |
+| Signature Verification      | See [Webhook Signature Verification](/docs/webhook-signature-verification) |
+
+# Service-Specific Recipes
+
+Apply core concepts to configure listeners for specific services. These examples demonstrate patterns for signature verification (GitHub) and verification challenges (Zoom). For each, we explain the rationale behind configurations, how fields interconnect, and how to adapt them based on service docs. This teaches you to analyze new services: Identify their verification type, map request elements to Agent Studio fields, and build responses that align with expectations.
+
+## GitHub
+
+GitHub webhooks notify your endpoint of repository events like pushes or pull requests. They use optional signature verification for security, with no initial challenge. This pattern is common for services prioritizing payload integrity over setup ceremonies.
+
+### Events to Subscribe To
+
+| Event        | Description               | Key Payload Fields   |
+| :----------- | :------------------------ | :------------------- |
+| push         | Code pushed to repository | commits, repository  |
+| pull_request | Pull request actions      | action, pull_request |
+
+### Register the Webhook in GitHub
+
+Registration establishes the shared secret and URL. In GitHub:
+
+1. Navigate to your `repository > Settings > Webhooks > Add webhook`.
+2. Payload URL: Your Agent Studio listener URL (e.g., `https://your-instance.moveworks.ai/webhooks/v1/listeners/your-listener/notify`). This is where GitHub sends POST requests.
+3. Content type: `application/json`.
+4. Generate and enter a strong Secret,this becomes the key for HMAC signing, shared only between GitHub and your listener.
+5. Select individual events (e.g., Push events) to control what triggers notifications.
+6. Add webhook.
+
+Upon saving, GitHub sends a "ping" event (identified by header `x-github-event: ping`). This tests connectivity but doesn't require special handling, treat it as a valid event.
+
+### Configure Verification in Agent Studio
+
+Signature verification ensures authenticity. GitHub signs the raw body with HMAC-SHA256, sending the result in a header. In Agent Studio's Verification panel:
+
+1. Open the Verification panel and add a new rule.
+2. Select Validation Type: `Signature Verification (HMAC)`.
+3. Add a Signature Verification Rule
+4. In Secret Shared by External System, paste the secret from GitHub. This is the symmetric key; mismatches cause verification failures.
+5. Set Signature Verification Hash Mode to `HMAC-SHA256`, matching GitHub's algorithm
+6. For Verification Payloads, type `raw_body`. GitHub signs the unparsed bytes, so this preserves exact content
+7. Verification Received Signature: `headers["x-hub-signature-256"]`. This header includes a `sha256= prefix`, which Agent Studio infers and strips during comparison
+
+These fields interconnect: The payload feeds into HMAC with the secret and mode, producing an expected signature matched against the received one
+
+### Gotchas
+
+* If no secret is set in GitHub, the signature header is absent; configure verification as optional if needed.
+
+### GitHub Documentation
+
+* <Anchor label="Validating webhook deliveries" target="_blank" href="https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries#creating-a-secret-token">Validating webhook deliveries</Anchor>
+* <Anchor label="Creating webhooks" target="_blank" href="https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks">Creating webhooks</Anchor>
+
+## Zoom
+
+Zoom webhooks notify your endpoint of events like meeting starts or ends. They require an initial URL validation challenge and support signature verification for events. This dual pattern teaches handling setup trust (challenge) separately from ongoing security (signature), common in services with periodic re-validation.
+
+| Event           | Description       | Key Payload Fields  |
+| :-------------- | :---------------- | :------------------ |
+| meeting.started | Meeting begins    | meeting.id, host_id |
+| meeting.ended   | Meeting concludes | meeting.id          |
+
+### Register the Webhook in Zoom
+
+Registration triggers the challenge. In Zoom:
+
+1. Go to Zoom Marketplace > Develop > Build Legacy App > Webhook Only.
+2. Add event subscriptions.
+3. Event notification endpoint URL: Your Agent Studio listener URL.
+4. Generate a Secret Token—note it; this serves both challenge signing and event signatures.
+5. Validate the URL (triggers the challenge — do this after setting up your listener below).
+6. Save and subscribe to events.
+
+### Configure Verification in Agent Studio
+
+Zoom uses a challenge for URL validation and signatures for events. Configure both.
+
+#### For Verification Challenge
+
+In the One Time Verification Challenge panel:
+
+1. Set Challenge Detection: `parsed_body.event == "endpoint.url_validation"` using Moveworks DSL.  (detects the validation `POST`).
+2. Choose HTTP Response Status Code: `200 OK`. Zoom expects success codes; mismatches fail validation.
+3. HTTP Response Headers: Leave default or add if required.
+4. HTTP Response Body. This echoes the token and adds the signed version:
+   ```yaml
+   plainToken: parsed_body.payload.plainToken
+   encryptedToken: challenge_token["zoom_token"]
+   ```
+5. Click Add Challenge Token to create the signed value:
+   1. Name: Set to `zoom_token` (or any unique identifier). This name becomes a reference key, use it in the response body as shown above `challenge_token["zoom_token"]` to insert the computed hash dynamically.
+   2. Signing Algorithm: `HMAC-SHA256`
+   3. Signing Secret: Paste the Secret Token from Zoom, the shared key for hashing.
+   4. Signing Payload: `parsed_body.payload.plainToken`
+
+#### For Signature Verification
+
+In the Verification panel:
+
+1. Add a new rule.
+2. Select Validation Type: Signature Verification.
+3. Secret Shared by External System: Same Secret Token from Zoom.
+4. Signature Verification Hash Mode: `HMAC-SHA256`.
+5. Verification Payloads: Concatenate using DSL: `$CONCAT([headers["x-zm-request-timestamp"],":",raw_body],"")`. This builds the exact string Zoom signs.
+6. Verification Received Signature: `headers["x-zm-signature"]`.
+
+### Zoom Documentation
+
+* <Anchor label="Using Webhooks" target="_blank" href="https://developers.zoom.us/docs/api/webhooks/">Using Webhooks</Anchor>
+
+# Testing & Debugging
+
+* Some external systems will allow you to send sample webhooks.
+* Check Agent Studio logs for request details, verification failures, and response codes.

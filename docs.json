@@ -7,11 +7,18 @@
     "light": "#c57ff6",
     "dark": "#45007e"
   },
+  "appearance": {
+    "default": "light",
+    "strict": true
+  },
+  "background": {
+    "color": { "light": "#FAF7EC" }
+  },
   "icons": {
     "library": "lucide"
   },
   "interaction": {
-    "drilldown": true
+    "drilldown": false
   },
   "favicon": "/favicon.svg",
   "styling": {
@@ -21,24 +28,32 @@
     "eyebrows": "breadcrumbs"
   },
   "navigation": {
-    "tabs": [
+    "products": [
       {
-        "tab": "Docs",
+        "product": "Agent Studio",
+        "description": "Build AI agents and automations",
+        "icon": "wand",
         "groups": [
           {
             "group": "Get Started",
+            "expanded": false,
             "pages": [
               "agent-studio/agent-studio-overview",
               {
                 "group": "Quickstarts",
+                "expanded": false,
                 "pages": [
+                  "agent-studio/quickstarts/quickstart-guide",
                   "agent-studio/quickstarts/quickstart-basic-task-agent",
+                  "agent-studio/quickstarts/quickstart-basic-task-agent-deprecated",
                   "agent-studio/quickstarts/quickstart-2-slots-resolvers-copy",
                   "agent-studio/quickstarts/quickstart-basic-process-agent",
                   "agent-studio/quickstarts/quickstart-4-structured-data-analysis-sda",
                   "agent-studio/quickstarts/webhook-triggers-quickstart-guide",
                   "agent-studio/quickstarts/quickstart-6-expense-approval-ambient-agent",
                   "agent-studio/quickstarts/quickstart-7-scheduled-trigger-ambient-agent",
+                  "agent-studio/quickstarts/agentic-automation-engine-ooo-plugin",
+                  "agent-studio/quickstarts/task-agents-with-complex-integrations-advanced-compound-actions-quickstart",
                   "agent-studio/quickstarts/hackathon-access-guide",
                   "agent-studio/quickstarts/purple-api-tool"
                 ]
@@ -47,18 +62,22 @@
           },
           {
             "group": "Core Concepts",
+            "expanded": false,
             "pages": [
               {
                 "group": "Assistants, Agents & Plugins",
+                "expanded": false,
                 "pages": [
                   "agent-studio/core-concepts/assistants-agents-plugins/overview",
                   "agent-studio/core-concepts/assistants-agents-plugins/plugin-responses",
                   "agent-studio/core-concepts/assistants-agents-plugins/reasoning-instructions",
-                  "agent-studio/core-concepts/assistants-agents-plugins/response-sizes"
+                  "agent-studio/core-concepts/assistants-agents-plugins/response-sizes",
+                  "agent-studio/core-concepts/assistants-agents-plugins/urlslinks-in-plugin-responses"
                 ]
               },
               {
                 "group": "Agentic Automation Engine",
+                "expanded": false,
                 "pages": [
                   "agent-studio/core-concepts/agentic-automation-engine/agentic-automation-engine",
                   "agent-studio/core-concepts/agentic-automation-engine/action-orchestrator",
@@ -69,6 +88,7 @@
               },
               {
                 "group": "Conversational Agents",
+                "expanded": false,
                 "pages": [
                   "agent-studio/core-concepts/conversational-agents/conversational-agents",
                   "agent-studio/core-concepts/conversational-agents/natural-language-triggers",
@@ -78,6 +98,7 @@
               },
               {
                 "group": "Ambient Agents",
+                "expanded": false,
                 "pages": [
                   "agent-studio/core-concepts/ambient-agents/ambient-agents",
                   "agent-studio/core-concepts/ambient-agents/ambient-agent-faqs"
@@ -85,19 +106,23 @@
               },
               "agent-studio/core-concepts/connecting-ambient-agents-to-conversational-agents",
               "agent-studio/core-concepts/data-types",
+              "agent-studio/core-concepts/data-bank",
               "agent-studio/core-concepts/citations-1"
             ]
           },
           {
             "group": "Actions",
+            "expanded": false,
             "pages": [
               "agent-studio/actions/actions",
               "agent-studio/actions/built-in-actions",
               "agent-studio/actions/llm-actions",
               {
                 "group": "Compound Actions",
+                "expanded": false,
                 "pages": [
                   "agent-studio/actions/compound-actions/compound-actions",
+                  "agent-studio/actions/compound-actions/compound-action-syntax-reference",
                   "agent-studio/actions/compound-actions/action",
                   "agent-studio/actions/compound-actions/compound-action-input-arguments",
                   "agent-studio/actions/compound-actions/compound-action-exposed-data",
@@ -108,60 +133,101 @@
                   "agent-studio/actions/compound-actions/switch",
                   "agent-studio/actions/compound-actions/return",
                   "agent-studio/actions/compound-actions/notify",
+                  "agent-studio/actions/compound-actions/progress-updates",
                   "agent-studio/actions/compound-actions/try-catch-and-raise-error",
                   "agent-studio/actions/compound-actions/troubleshooting-compound-actions"
                 ]
               },
               {
                 "group": "HTTP Actions",
+                "expanded": false,
                 "pages": [
                   "agent-studio/actions/http-actions/http-actions",
                   "agent-studio/actions/http-actions/http-action-data-bank",
+                  "agent-studio/actions/http-actions/http-action-data-bank-legacy",
+                  "agent-studio/actions/http-actions/data-mapper-in-http-actions",
+                  "agent-studio/actions/http-actions/http-action-event-streaming-and-xml",
+                  "agent-studio/actions/http-actions/http-action-files",
+                  "agent-studio/actions/http-actions/http-ldap-actions",
                   "agent-studio/actions/http-actions/http-action-troubleshooting"
                 ]
               },
               {
                 "group": "Script Actions",
+                "expanded": false,
                 "pages": [
                   "agent-studio/actions/script-actions/script-actions",
-                  "agent-studio/actions/script-actions/apithon-a-special-kind-of-python"
+                  "agent-studio/actions/script-actions/apithon-a-special-kind-of-python",
+                  "agent-studio/actions/script-actions/python-reference"
                 ]
               }
             ]
           },
           {
             "group": "Conversation Process",
+            "expanded": false,
             "pages": [
               "agent-studio/conversation-process/plugin-process",
               "agent-studio/conversation-process/activities",
               "agent-studio/conversation-process/slots",
+              {
+                "group": "Slots",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/conversation-process/slots/file-slots",
+                  "agent-studio/conversation-process/slots/optional-slots"
+                ]
+              },
               "agent-studio/conversation-process/resolver-strategies",
               "agent-studio/conversation-process/control-flow",
-              "agent-studio/conversation-process/plugin-process-data-bank"
+              "agent-studio/conversation-process/plugin-process-data-bank",
+              "agent-studio/conversation-process/conversation-timeouts",
+              "agent-studio/conversation-process/plugins"
             ]
           },
           {
             "group": "Connectors",
+            "expanded": false,
             "pages": [
               "agent-studio/connectors/connectors",
               "agent-studio/connectors/system-connectors",
               "agent-studio/connectors/ip-address-allowlisting",
               {
                 "group": "HTTP Connectors",
+                "expanded": false,
                 "pages": [
-                  "agent-studio/connectors/http-connectors/http-connectors"
+                  "agent-studio/connectors/http-connectors/http-connectors",
+                  "agent-studio/connectors/http-connectors/basic-auth",
+                  "agent-studio/connectors/http-connectors/api-key-auth",
+                  "agent-studio/connectors/http-connectors/bearer-token-auth",
+                  "agent-studio/connectors/http-connectors/jwt-auth",
+                  "agent-studio/connectors/http-connectors/jwks-auth",
+                  "agent-studio/connectors/http-connectors/oauth-20-client-credentials",
+                  "agent-studio/connectors/http-connectors/oauth-20-authorization-code",
+                  "agent-studio/connectors/http-connectors/oauth-20-password-credentials",
+                  "agent-studio/connectors/http-connectors/oauth-20-refresh-token",
+                  "agent-studio/connectors/http-connectors/supported-user-consent-auth-systems"
                 ]
               }
             ]
           },
           {
             "group": "System Triggers",
+            "expanded": false,
             "pages": [
               "agent-studio/system-triggers/system-triggers-overview",
               "agent-studio/system-triggers/scheduled-triggers-limited-preview",
+              {
+                "group": "Scheduled Triggers",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/system-triggers/scheduled-triggers/cron-expression-examples"
+                ]
+              },
               "agent-studio/system-triggers/webhook-logs-troubleshooting-guide",
               {
                 "group": "Webhook Triggers",
+                "expanded": false,
                 "pages": [
                   "agent-studio/system-triggers/webhook-triggers/webhook-triggers-limited-preview",
                   "agent-studio/system-triggers/webhook-triggers/webhooks-listener",
@@ -173,40 +239,109 @@
           },
           {
             "group": "Configuration Languages",
+            "expanded": false,
             "pages": [
-              "agent-studio/configuration-languages/dsl-and-mapper-playground"
+              "agent-studio/configuration-languages/dsl-and-mapper-playground",
+              {
+                "group": "DSL",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/configuration-languages/dsl/full-reference",
+                  "agent-studio/configuration-languages/dsl/examples-string-utils"
+                ]
+              },
+              {
+                "group": "Mapper",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/configuration-languages/mapper/moveworks-data-mappers",
+                  "agent-studio/configuration-languages/mapper/mapping-2d-arrays-to-lists-of-json",
+                  "agent-studio/configuration-languages/mapper/examples-parsing-a-streamed-response",
+                  "agent-studio/configuration-languages/mapper/examples-sending-an-xml-request"
+                ]
+              }
             ]
           },
           {
             "group": "Cookbooks",
+            "expanded": false,
             "pages": [
               "agent-studio/cookbooks/cookbooks",
               "agent-studio/cookbooks/agent-studio-design-philosophy",
               "agent-studio/cookbooks/plugin-architecture-guide",
               "agent-studio/cookbooks/data-retrieval-cookbook",
+              "agent-studio/cookbooks/data-transaction-cookbook",
               "agent-studio/cookbooks/ambient-agents-cookbook",
               "agent-studio/cookbooks/connect-to-other-ai-agents-applications",
+              "agent-studio/cookbooks/integrating-external-webhooks",
+              "agent-studio/cookbooks/recreating-built-in-agents",
               "agent-studio/cookbooks/mirroring-approvals"
+            ]
+          },
+          {
+            "group": "Help",
+            "expanded": false,
+            "pages": [
+              "agent-studio/help/common-errors",
+              {
+                "group": "Logs",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/help/logs/log-type-reference",
+                  "agent-studio/help/logs/log-redaction"
+                ]
+              },
+              {
+                "group": "End User Access Control",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/help/end-user-access-control/launch-configuration"
+                ]
+              },
+              {
+                "group": "Managing Plugins",
+                "expanded": false,
+                "pages": [
+                  "agent-studio/help/managing-plugins/plugin-promotion"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "expanded": false,
+            "pages": [
+              "agent-studio/troubleshooting/assistant-errors",
+              "agent-studio/troubleshooting/events-rest-api-errors",
+              "agent-studio/troubleshooting/workspace-errors"
+            ]
+          },
+          {
+            "group": "Agentic Automation",
+            "expanded": false,
+            "pages": [
+              "agent-studio/agentic-automation/ai-agent-marketplace-installation"
+            ]
+          },
+          {
+            "group": "Reference",
+            "expanded": false,
+            "pages": [
+              "agent-studio/migrating-from-classic-runbook",
+              "agent-studio/tools"
             ]
           }
         ]
       },
       {
-        "tab": "Guides",
+        "product": "Guides",
+        "description": "Learn the basics and customization",
+        "icon": "book-open",
         "groups": [
           {
             "group": "Getting started",
             "icon": "play",
-            "expanded": false,
-            "pages": [
-              "index",
-              "quickstart",
-              "development",
-              {
-                "group": "Test",
-                "pages": ["docs/action"]
-              }
-            ]
+            "pages": ["index", "quickstart", "development"]
           },
           {
             "group": "Customization",
@@ -232,7 +367,9 @@
         ]
       },
       {
-        "tab": "API reference",
+        "product": "API Reference",
+        "description": "API documentation and endpoints",
+        "icon": "code",
         "groups": [
           {
             "group": "API documentation",
