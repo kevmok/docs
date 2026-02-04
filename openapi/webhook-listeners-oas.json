@@ -1,0 +1,162 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API Reference",
+    "version": "2025-09-02",
+    "description": "APIs to build new integrations with Moveworks. Our base URL is api.moveworks.ai.",
+    "contact": {
+      "email": "support_developers@moveworks.ai"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.moveworks.ai"
+    },
+    {
+      "url": "https://api-demo.moveworks.ai"
+    },
+    {
+      "url": "https://api.am-eu-central.moveworks.ai"
+    },
+    {
+      "url": "https://api.am-ca-central.moveworks.ai"
+    },
+    {
+      "url": "https://api.moveworksgov.ai"
+    }
+  ],
+  "paths": {
+    "/webhooks/v1/listeners/{listener_id}/notify": {
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "summary": "Send a webhook to a webhook listener",
+        "description": "Sends a webhook to a webhook listener. The listener must be defined in Agent Studio.",
+        "parameters": [
+          {
+            "name": "listener_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the webhook listener.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The arbitrary JSON payload to send to the webhook listener.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "An arbitrary JSON object. The structure is defined by the external webhook producer.",
+                "additionalProperties": true
+              },
+              "example": {
+                "event_type": "incident.created",
+                "data": {
+                  "incident_id": "INC0123456",
+                  "priority": "High",
+                  "short_description": "Email server is down."
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK. The event was received successfully by the listener.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "A confirmation message."
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "The status of the event receipt."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Event received successfully",
+                  "status": "RECEIVED"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. The request lacks valid authentication credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "UNAUTHORIZED"
+                        },
+                        "message": {
+                          "type": "string",
+                          "description": "Details about the authorization failure."
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "MissingHeader": {
+                    "summary": "Missing Authorization Header",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Authorization header is missing"
+                      }
+                    }
+                  },
+                  "InvalidToken": {
+                    "summary": "Token Validation Failed",
+                    "value": {
+                      "error": {
+                        "code": "UNAUTHORIZED",
+                        "message": "Token validation failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found. The specified listener_id does not exist. The response body is empty."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {}
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "API Key in the form of a JWT Bearer token."
+      }
+    }
+  }
+}

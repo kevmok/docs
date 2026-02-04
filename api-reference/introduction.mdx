@@ -1,33 +1,63 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Moveworks REST APIs for integration and automation'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Overview
 
-## Welcome
+Moveworks provides several APIs for integrating with the platform:
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+### Core APIs (Hosted by Moveworks)
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+<CardGroup cols={2}>
+  <Card title="Events API" icon="bolt">
+    Send messages and events to Moveworks on behalf of users
+  </Card>
+  <Card title="Conversations API" icon="comments">
+    Programmatically manage conversation threads and messages
+  </Card>
+  <Card title="Data API" icon="chart-bar">
+    Export analytics data for conversations, interactions, and users
+  </Card>
+  <Card title="Webhook Listeners" icon="webhook">
+    Send webhooks to Agent Studio listeners for external triggers
+  </Card>
+</CardGroup>
+
+### Gateway APIs (Customer-Hosted)
+
+These APIs are implemented by you to integrate custom systems with Moveworks:
+
+<CardGroup cols={2}>
+  <Card title="Content Gateway" icon="file">
+    Integrate custom content systems with Copilot Search
+  </Card>
+  <Card title="Identity Gateway" icon="user">
+    Connect custom identity sources with Moveworks
+  </Card>
+  <Card title="Knowledge Gateway" icon="book">
+    Make custom knowledge bases available through the AI assistant
+  </Card>
+  <Card title="Forms Gateway" icon="rectangle-list">
+    Integrate custom forms and service catalogs
+  </Card>
+</CardGroup>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API requests require authentication using an API key. Include your API key in the `Authorization` header as a Bearer token:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+curl -X GET "https://api.moveworks.ai/..." \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
+
+## Base URLs
+
+| API | Base URL |
+|-----|----------|
+| Events API | `https://api.moveworks.ai` |
+| Conversations API | `https://api.moveworks.ai/rest/v1beta1` |
+| Data API | `https://api.moveworks.ai/export/v1/records` |
+| Webhook Listeners | `https://api.moveworks.ai` |
+| Gateway APIs | Customer-hosted endpoints |

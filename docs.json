@@ -368,21 +368,44 @@
       },
       {
         "product": "API Reference",
-        "description": "API documentation and endpoints",
+        "description": "REST APIs and integrations",
         "icon": "code",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": ["api-reference/introduction"]
           },
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "Events API",
+            "openapi": "openapi/api-reference.json"
+          },
+          {
+            "group": "Conversations API",
+            "openapi": "openapi/conversations-api.json"
+          },
+          {
+            "group": "Data API",
+            "openapi": "openapi/data-api-v1-spec.json"
+          },
+          {
+            "group": "Webhook Listeners",
+            "openapi": "openapi/webhook-listeners-oas.json"
+          },
+          {
+            "group": "Content Gateway",
+            "openapi": "openapi/content-gateway.json"
+          },
+          {
+            "group": "Identity Gateway",
+            "openapi": "openapi/identity-gateway.json"
+          },
+          {
+            "group": "Knowledge Gateway",
+            "openapi": "openapi/knowledge-gateway.json"
+          },
+          {
+            "group": "Forms Gateway",
+            "openapi": "openapi/forms-gateway.json"
           }
         ]
       }
