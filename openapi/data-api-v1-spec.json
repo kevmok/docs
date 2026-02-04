@@ -1,0 +1,1245 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Data API",
+    "description": "Data API is a collection of API which allows exporting of raw records for Moveworks Assistant Analytics.\nThese APIs can be used to ingest data in your analytics tools and build custom dashboards. ",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://api.moveworks.ai/export/v1/records",
+      "description": "US PROD server. If you are located in the US region please use this server URL"
+    },
+    {
+      "url": "https://api.am-eu-central.moveworks.ai/export/v1/records",
+      "description": "EU PROD server. If you are located in the EU region please use this server URL"
+    },
+    {
+      "url": "https://api.am-ca-central.moveworks.ai/export/v1/records",
+      "description": "CA PROD server. If you are located in the CA region please use this server URL"
+    },
+    {
+      "url": "https://api.moveworksgov.ai/export/v1/records",
+      "description": "Govcloud PROD server. If you are on GovCloud infrastrucutre (US region) please use this server URL"
+    }
+  ],
+  "paths": {
+    "/conversations": {
+      "get": {
+        "summary": "List conversations",
+        "description": "Retrieve all conversations occurring with the Moveworks AI Assistant.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "$filter",
+            "in": "query",
+            "description": "Filter conversations by a condition. This API supports the standard odata query language on all string and integer attributes",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Select which properties to include in the response for the conversations.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$orderby",
+            "in": "query",
+            "description": "Order conversations by specific fields.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "description": "Specify the number of conversations results to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "$skip",
+            "in": "query",
+            "description": "Skip the first n conversations results.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of conversations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/conversations"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limiting exceeding error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/429ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/500ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interactions": {
+      "get": {
+        "summary": "List interactions",
+        "description": "Retrieve all interactions occurring with the Moveworks AI Assistant.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "$filter",
+            "in": "query",
+            "description": "Filter interactions by a condition. This API supports the standard odata query language on all string and integer attributes",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Select which properties to include in the response for the interactions.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$orderby",
+            "in": "query",
+            "description": "Order interactions by specific fields.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "description": "Specify the number of interactions results to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "$skip",
+            "in": "query",
+            "description": "Skip the first n interaction results.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of interactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/interactions"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limiting exceeding error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/429ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/500ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugin-calls": {
+      "get": {
+        "summary": "List plugins calls",
+        "description": "Retrieve all plugins that were called by the Moveworks AI Assistant during an interaction.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "$filter",
+            "in": "query",
+            "description": "Filter plugin calls by a condition. This API supports the standard odata query language on all string and integer attributes",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Select which properties to include in the response for the plugins.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$orderby",
+            "in": "query",
+            "description": "Order plugins calls by specific fields.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "description": "Specify the number of plugin calls results to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "$skip",
+            "in": "query",
+            "description": "Skip the first n plugin calls results.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of plugins calls",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/plugincallslist"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limiting exceeding error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/429ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/500ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugin-resources": {
+      "get": {
+        "summary": "List Plugin Resources",
+        "description": "Retrieve all resources used by AI Assistant during an interaction.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "$filter",
+            "in": "query",
+            "description": "Filter plugin resources by a condition. This API supports the standard odata query language on all string and integer attributes",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Select which properties to include in the response for plugin resources.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$orderby",
+            "in": "query",
+            "description": "Order plugin resources by specific fields.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "description": "Specify the number of plugin resources results to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "$skip",
+            "in": "query",
+            "description": "Skip the first n plugin resources results.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of interactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/pluginresources"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limiting exceeding error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/429ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/500ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "List Users",
+        "description": "Retrieve all users ingested into Moveworks.",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          },
+          {
+            "OAuth2": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "$filter",
+            "in": "query",
+            "description": "Filter users by a condition. This API supports the standard odata query language on all string and integer attributes",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Select which properties to include in the response for users.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$orderby",
+            "in": "query",
+            "description": "Order users by specific fields.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "description": "Specify the number of user results to return.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "$skip",
+            "in": "query",
+            "description": "Skip the first n user results.",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of plugins calls",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/users"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/400ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/403ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "URL not found error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limiting exceeding error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/429ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/500ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "conversations": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "@odata.context": {
+            "type": "string",
+            "description": "URL to the metadata of the response.",
+            "example": "https://api.moveworks.ai/export/v1/records/metadata#conversations"
+          },
+          "@odata.nextLink": {
+            "type": "string",
+            "description": "URL to fetch the next set of results.",
+            "example": "https://api.moveworks.ai/export/v1/records/conversations?$skip=100"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/conversationsobject"
+            }
+          }
+        }
+      },
+      "conversationsobject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "12345",
+            "description": "UUID assigned by the system to a conversation. Conversations are grouped based on the context of interactions. All interactions within a conversation share the same conversation I"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "1812312452353242",
+            "description": "User record ID assigned by the system to a user."
+          },
+          "primary_domain": {
+            "type": "string",
+            "example": "IT",
+            "description": "Primary domain detected by an LLM model after going through all detected domains of free text interactions belonging to a particular conversation."
+          },
+          "route": {
+            "type": "string",
+            "example": "DM",
+            "description": "This field contains details on how a conversation was started either through DM, Notification engagement, Ticket interception engagement, or Channel resolver engagement."
+          },
+          "created_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the conversation was initiated."
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the conversations entry is last updated in this table."
+          }
+        }
+      },
+      "interactions": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "@odata.context": {
+            "type": "string",
+            "description": "URL to the metadata of the response.",
+            "example": "https://api.moveworks.ai/export/v1/records/metadata#interactions"
+          },
+          "@odata.nextLink": {
+            "type": "string",
+            "description": "URL to fetch the next set of results.",
+            "example": "https://api.moveworks.ai/export/v1/records/interactions?$skip=100"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/interactionsobject"
+            }
+          }
+        }
+      },
+      "interactionsobject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "AbG1JsIP",
+            "description": "UUID assigned by a system to a interaction. An interaction is either an input from a user to the system, or a response from the system the the user."
+          },
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "MdA951Y",
+            "description": "ID of the parent conversation."
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "1812312452353242",
+            "description": "User record ID assigned by the system to a user."
+          },
+          "actor": {
+            "type": "string",
+            "example": "user",
+            "description": "This field differentiates user v/s bot interactions."
+          },
+          "platform": {
+            "type": "string",
+            "example": "slack",
+            "description": "This field denotes the platform where the interaction took place. For example: slack, msteams."
+          },
+          "type": {
+            "type": "string",
+            "example": "INTERACTION_TYPE_FREE_TEXT",
+            "description": "This field defines the type of the interaction."
+          },
+          "label": {
+            "type": "string",
+            "example": "file_ticket",
+            "description": "This field defines the label for UI form submission interaction type."
+          },
+          "parent_interaction_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "AbG1JsIP",
+            "description": "Parent interaction ID for bot messages and user actions such as form submissions/button clicks/link clicks"
+          },
+          "detail": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "example": "Get me access to zoom",
+                "description": "This field contains the free form text, link URL, Button name according to interaction type."
+              },
+              "domain": {
+                "type": "string",
+                "example": "IT",
+                "description": "This the interaction level detected domain. Domain is only predicted for free form text interaction type. In some cases, domain of individual utterances may differ from the primary domain detected per conversation."
+              },
+              "entity": {
+                "type": "string",
+                "example": "Okta",
+                "description": "This field contains the topic as detected per each interaction. Topic is only predicted for free form text interaction type."
+              },
+              "type": {
+                "type": "string",
+                "example": "RESOURCE_TYPE_KNOWLEDGE",
+                "description": "This field indicates which type of resource were accessed during an link click interaction."
+              },
+              "detail": {
+                "type": "string",
+                "example": "HELPFUL",
+                "description": "This field indicates the form name which was submitted"
+              },
+              "resource_id": {
+                "type": "string",
+                "example": "98394cfcc31f1a90473f3bda05013170",
+                "description": "This field provides the resource ID that was accessed by the end user during an link click interaction, or when a user submits a ticket via UI form\nINTERACTION_TYPE_LINK_CLICK\nINTERACTION_TYPE_UIFORM_SUBMISSION"
+              },
+              "file_types": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": ".pdf"
+                },
+                "description": "This field provides list of types of files that were uploaded during a file upload interaction (INTERACTION_TYPE_CONTENT_UPLOAD). We do not record the file names as user can also upload a private file"
+              }
+            },
+            "description": "This is a JSON object which contains metadata per interaction type."
+          },
+          "created_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the interaction was initiated."
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the interaction entry is last updated in this table."
+          }
+        }
+      },
+      "plugincallslist": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "@odata.context": {
+            "type": "string",
+            "description": "URL to the metadata of the response.",
+            "example": "https://api.moveworks.ai/export/v1/records/metadata#plugin-calls"
+          },
+          "@odata.nextLink": {
+            "type": "string",
+            "description": "URL to fetch the next set of results.",
+            "example": "https://api.moveworks.ai/export/v1/records/plugin-calls?$skip=100"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/plugincallsobject"
+            }
+          }
+        }
+      },
+      "plugincallsobject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "85FnUWaV5pZQ",
+            "description": "UUID assigned by the system to a plugin being called by AI Assistant for a interaction."
+          },
+          "interaction_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "AbG1JsIP",
+            "description": "ID of the interaction for which the plugin is called"
+          },
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "n_PJka_HWMYw",
+            "description": "ID of the parent conversation."
+          },
+          "plugin_name": {
+            "type": "string",
+            "example": "Knowledge Base",
+            "description": "Name of the plugin being called by the AI Assistant. This field will also contain custom plugin names for Agent Studio use-cases"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "1812312452353242",
+            "description": "User record ID assigned by the system to a user."
+          },
+          "served": {
+            "type": "boolean",
+            "example": true,
+            "description": "This field denotes if the plugin was actually served to the end user"
+          },
+          "used": {
+            "type": "boolean",
+            "example": true,
+            "description": "This field denotes if the plugin was used in the interaction. Action plugin are used only when they have completed the full workflow for an end users, search plugin will always be used if they are served"
+          },
+          "plugin_update_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "This field denotes the time when the plugin was last updated. For example, Access software plugin can be updated at later point in time, once the approver has approved the software approval access."
+          },
+          "created_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the plugin call was initiated."
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the plugin call entry is last updated in this table"
+          }
+        }
+      },
+      "pluginresources": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "@odata.context": {
+            "type": "string",
+            "description": "URL to the metadata of the response.",
+            "example": "https://api.moveworks.ai/export/v1/records/metadata#plugin-resources"
+          },
+          "@odata.nextLink": {
+            "type": "string",
+            "description": "URL to fetch the next set of results.",
+            "example": "https://api.moveworks.ai/export/v1/records/plugin-resources?$skip=100"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/pluginresourcesobject"
+            }
+          }
+        }
+      },
+      "pluginresourcesobject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "85FnUWaV5pZQ",
+            "description": "UUID assigned by the system to a resource being used by a plugin called during an interaction."
+          },
+          "resource_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "12422565931618640979",
+            "description": "ID of the resource stored in Moveworks."
+          },
+          "type": {
+            "type": "string",
+            "format": "uuid",
+            "example": "RESOURCE_TYPE_KNOWLEDGE",
+            "description": "This field represents the type of resource utilized by a plugin call. AI Assistant can utilize different resources to provide a summarized response such as KNOWLEDE ARTICLE, FILES, TICKET, APPROVAL etc"
+          },
+          "plugin_call_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "sKCETbg7VR9w",
+            "description": "ID of the plugin being called."
+          },
+          "interaction_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "1jG2YF0RfoM-",
+            "description": "ID of the interaction."
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "1812312452353242",
+            "description": "User record ID assigned by the system to a user."
+          },
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "OvuW8JR7-1yu",
+            "description": "ID of the parent conversation."
+          },
+          "detail": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "domain": {
+                "type": "string",
+                "example": "IT",
+                "description": "This field denotes the resource domain configured in Moveworks Setup while configuring Content ingestion & Ticketing. Domain is defined for resources of types:\nRESOURCE_TYPE_APPROVAL\nRESOURCE_TYPE_FORM\nRESOURCE_TYPE_TICKET\nRESOURCE_TYPE_KNOWLEDGE"
+              },
+              "external_resource_id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "KB10123423",
+                "description": "Service portal ID for the resource of type RESOURCE_TYPE_KNOWLEDGE. This field can be used to join data from external system. Please note external resource ID is not provided for FILE & EXTERNAL KNOWLEDGE (Public knowledge enabled in Moveworks)"
+              },
+              "name": {
+                "type": "string",
+                "example": "Operations & Performance review",
+                "description": "Name of the resource being used by the plugin, populated for resources of types:\nRESOURCE_TYPE_FILE\nRESOURCE_TYPE_FORM\nRESOURCE_TYPE_KNOWLEDGE"
+              },
+              "snippet": {
+                "type": "string",
+                "example": "An operations and performance review is a critical examination of a company's operational processes, efficiency, and overall performance.\n The objective is to assess whether the organization's day-to-day activities align with its strategic goals, identify bottlenecks, and recommend improvements.",
+                "description": "Exact snippet from the resource being used to provide the summarized response, populated for resource types\nRESOURCE_TYPE_FILE\nRESOURCE_TYPE_KNOWLEDGE"
+              },
+              "source": {
+                "type": "string",
+                "example": null,
+                "description": "Name of the external sources from which the resource is being fetched from, populated for resource types\nRESOURCE_TYPE_TICKET\nRESOURCE_TYPE_APPROVAL"
+              },
+              "type": {
+                "type": "string",
+                "example": null,
+                "description": "Contains sub-type of approval or type of the ticket creation : User initiated v/s bot initiated, populated for resource types\nRESOURCE_TYPE_TICKET\nRESOURCE_TYPE_APPROVAL"
+              },
+              "url": {
+                "type": "string",
+                "example": "https://starcompany.servicenow.com/servicedesk/KB12434",
+                "description": "External system URL of the resource, populated for resource types\nRESOURCE_TYPE_TICKET\nRESOURCE_TYPE_KNOWLEDGE\nRESOURCE_TYPE_FILE"
+              }
+            },
+            "description": "This is a JSON object which contains metadata per resource type."
+          },
+          "cited": {
+            "type": "boolean",
+            "example": true,
+            "description": "This field denotes if the utilized resource was cited in the AI Assistant response or not."
+          },
+          "created_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the resource was utilized by a plugin."
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Timestamp when the plugin resource entry was last updated in this table."
+          }
+        }
+      },
+      "users": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "@odata.context": {
+            "type": "string",
+            "description": "URL to the metadata of the response.",
+            "example": "https://api.moveworks.ai/export/v1/records/metadata#users"
+          },
+          "@odata.nextLink": {
+            "type": "string",
+            "description": "URL to fetch the next set of results.",
+            "example": "https://api.moveworks.ai/export/v1/records/users?$skip=100"
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/userobject"
+            }
+          }
+        }
+      },
+      "userobject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "10349975680836035752",
+            "description": "User record id generated and stored in Moveworks for the end user"
+          },
+          "email_addr": {
+            "type": "string",
+            "example": "vpawar@moveworks.ai",
+            "description": "Email of the end user stored in Moveworks. This field is ingested from your systems and reflect the value present in your systems."
+          },
+          "access_to_bot": {
+            "type": "boolean",
+            "example": true,
+            "description": "Denotes if the end user has access to Moveworks Assistant or not. This is evaluated through the bot access rule configured in Moveworks Setup."
+          },
+          "first_name": {
+            "type": "string",
+            "example": "ved",
+            "description": "First name of the end user. This field is ingested from your systems and reflect the value present in your systems."
+          },
+          "last_name": {
+            "type": "string",
+            "example": "pawar",
+            "description": "Last name of the end user.This field is ingested from your systems and reflect the value present in your systems."
+          },
+          "user_preferred_language": {
+            "type": "string",
+            "example": "EN-US",
+            "description": "User preferred language set from the end user. EN-US is the default value for this field"
+          },
+          "first_interaction_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Time stamp for the first interaction for the end user."
+          },
+          "latest_interaction_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Time stamp for the latest interaction of the end user."
+          },
+          "external_ids": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "connector_name": {
+                  "type": "string",
+                  "example": "gsuite",
+                  "description": "Name of the connector created in Moveworks Setup"
+                },
+                "external_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "vpawar@moveworks.ai",
+                  "description": "External ID from the source system"
+                },
+                "source": {
+                  "type": "string",
+                  "example": "GSUITE",
+                  "description": "Identifier for the source system."
+                }
+              }
+            }
+          },
+          "last_updated_time": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-01-01T00:00:00Z",
+            "description": "Last updated time for the user entry."
+          }
+        }
+      },
+      "500ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "INTERNAL_SERVER_ERROR"
+          },
+          "message": {
+            "type": "string",
+            "example": "We are sorry, something went wrong on our side. Please try again in sometime."
+          }
+        }
+      },
+      "400ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "BAD_REQUEST"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid odata query: $top should be greater than or equal to 0."
+          }
+        }
+      },
+      "403ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "REQUEST_ACCESS_DENIED"
+          },
+          "message": {
+            "type": "string",
+            "example": "Unable to perform requested action"
+          }
+        }
+      },
+      "404ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "NOT_FOUND"
+          },
+          "message": {
+            "type": "string",
+            "example": "API not found"
+          }
+        }
+      },
+      "429ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "RATE_LIMIT_EXCEEDED"
+          },
+          "message": {
+            "type": "string",
+            "example": "Reached rate limit for api 'url-name' and org 'org-name'"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://api.moveworks.ai/oauth/v1/token",
+            "scopes": {}
+          }
+        }
+      }
+    },
+    "x-readme": {
+      "explorer-enabled": true,
+      "proxy-enabled": true
+    }
+  },
+  "x-readme": {
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  }
+}

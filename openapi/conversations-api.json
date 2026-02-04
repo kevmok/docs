@@ -1,0 +1,1743 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Moveworks Conversations API",
+    "version": "v1beta1",
+    "description": "The Conversations API allows customers to integrate Moveworks intelligence directly into their own applications and workflows, allowing them to create custom experiences and orchestrate interactions across their ecosystem.",
+    "contact": {
+      "name": "Moveworks API Support",
+      "url": "https://developer.moveworks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.moveworks.ai/rest/v1beta1",
+      "description": "US production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Conversations",
+      "description": "Manage conversation threads"
+    },
+    {
+      "name": "Responses",
+      "description": "Create and retrieve assistant responses"
+    },
+    {
+      "name": "Messages",
+      "description": "Retrieve conversation messages"
+    }
+  ],
+  "paths": {
+    "/conversations": {
+      "post": {
+        "summary": "Create conversation",
+        "description": "Creates a new conversation thread. Returns the created Conversation object with a unique `conversation_id`. If `title` is not provided, an AI generated title will be assigned based on the first user message.",
+        "operationId": "createConversation",
+        "tags": [
+          "Conversations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationRequest"
+              },
+              "example": {
+                "title": "Help with user permissions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conversation created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversation"
+                },
+                "example": {
+                  "conversation_id": "conv_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                  "title": "Help with user permissions",
+                  "archived": false,
+                  "created_at": "2025-01-20T10:00:00Z",
+                  "updated_at": "2025-01-20T10:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTitleErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List conversations",
+        "description": "Retrieves a paginated list of conversations in descending order by `updated_at` time (last accessed first).",
+        "operationId": "listConversations",
+        "tags": [
+          "Conversations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor for pagination (obtained from previous response)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of conversations to return (1-100)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Filter by archived status",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conversations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListConversationsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidCursorErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversation_id}": {
+      "get": {
+        "summary": "Get conversation",
+        "description": "Retrieves a specific conversation.",
+        "operationId": "getConversation",
+        "tags": [
+          "Conversations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversation"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update conversation",
+        "description": "Updates title, or archive a conversation.",
+        "operationId": "updateConversation",
+        "tags": [
+          "Conversations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConversationRequest"
+              },
+              "example": {
+                "title": "User permissions discussion",
+                "archived": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conversation updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidTitleErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversation_id}/responses": {
+      "post": {
+        "summary": "Create response",
+        "description": "Creates a response object for processing. Returns immediately with the response object. Use `GetResponse` by `response_id` to poll for the complete result.",
+        "operationId": "createResponse",
+        "tags": [
+          "Responses"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateResponseRequest"
+              },
+              "example": {
+                "input": {
+                  "text": "Who does John Doe report to?"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Response accepted for processing (acknowledgement)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                },
+                "example": {
+                  "response_id": "resp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                  "conversation_id": "conv_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                  "status": "CREATED",
+                  "created_at": "2025-01-20T10:00:00Z",
+                  "updated_at": "2025-01-20T10:00:00Z",
+                  "completed_at": null,
+                  "outputs": [],
+                  "error": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputRequiredErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversation_id}/responses/{response_id}": {
+      "get": {
+        "summary": "Get response",
+        "description": "Retrieves the current state and output of a response. Poll this endpoint after creating a response to get the complete result.",
+        "operationId": "getResponse",
+        "tags": [
+          "Responses"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          },
+          {
+            "$ref": "#/components/parameters/ResponseId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversation_id}/responses/stream": {
+      "post": {
+        "summary": "Create response (streaming)",
+        "description": "Creates a response and streams updates in real-time via Server-Sent Events (SSE). Returns response creation, output deltas, and completion events.",
+        "operationId": "createResponseStream",
+        "tags": [
+          "Responses"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateResponseStreamRequest"
+              },
+              "example": {
+                "input": {
+                  "text": "Who does John Doe report to?"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events stream of response updates",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseStreamEvent"
+                },
+                "examples": {
+                  "response_created": {
+                    "summary": "Response created event",
+                    "value": "event: RESPONSE_CREATED\nid: 1\ndata: {\"sequence_number\":1,\"response\":{\"response_id\":\"resp_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"conversation_id\":\"conv_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"status\":\"CREATED\",\"created_at\":\"2025-01-20T10:00:00Z\",\"updated_at\":\"2025-01-20T10:00:00Z\",\"completed_at\":null,\"outputs\":[]}}\n\n"
+                  },
+                  "response_in_progress": {
+                    "summary": "Response in progress event",
+                    "value": "event: RESPONSE_IN_PROGRESS\nid: 2\ndata: {\"sequence_number\":2,\"response\":{\"response_id\":\"resp_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"conversation_id\":\"conv_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"status\":\"IN_PROGRESS\",\"created_at\":\"2025-01-20T10:00:00Z\",\"updated_at\":\"2025-01-20T10:00:01Z\",\"completed_at\":null,\"outputs\":[]}}\n\n"
+                  },
+                  "output_delta": {
+                    "summary": "Output delta event",
+                    "value": "event: RESPONSE_OUTPUT_DELTA\nid: 3\ndata: {\"sequence_number\":3,\"output\":{\"type\":\"MESSAGE\",\"message\":{\"message_id\":\"msg_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"conversation_id\":\"conv_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"response_id\":\"resp_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"actor\":\"ASSISTANT\",\"content\":{\"type\":\"COMMONMARK_TEXT\",\"commonmark_text\":{\"text\":\"John Doe reports to Jane\"}},\"citations\":[],\"created_at\":\"2025-01-20T10:00:01Z\"}}}\n\n"
+                  },
+                  "response_completed": {
+                    "summary": "Response completed event",
+                    "value": "event: RESPONSE_COMPLETED\nid: 5\ndata: {\"sequence_number\":5,\"response\":{\"response_id\":\"resp_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"conversation_id\":\"conv_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"status\":\"COMPLETED\",\"created_at\":\"2025-01-20T10:00:00Z\",\"updated_at\":\"2025-01-20T10:00:15Z\",\"completed_at\":\"2025-01-20T10:00:15Z\",\"outputs\":[{\"type\":\"MESSAGE\",\"message\":{\"message_id\":\"msg_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"conversation_id\":\"conv_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"response_id\":\"resp_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"actor\":\"ASSISTANT\",\"content\":{\"type\":\"COMMONMARK_TEXT\",\"commonmark_text\":{\"text\":\"John Doe reports to Jane Smith in the Engineering department.\"}},\"citations\":[{\"id\":\"user_123\",\"type\":\"person\",\"mention\":\"John Doe\",\"location\":{\"start\":0,\"end\":8},\"url\":\"https://workday.com/users/123\"}],\"created_at\":\"2025-01-20T10:00:01Z\"}}]}}\n\n"
+                  },
+                  "response_failed": {
+                    "summary": "Response failed event",
+                    "value": "event: RESPONSE_FAILED\nid: 4\ndata: {\"sequence_number\":4,\"response\":{\"response_id\":\"resp_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"conversation_id\":\"conv_01ARZ3NDEKTSV4RRFFQ69G5FAV\",\"status\":\"FAILED\",\"created_at\":\"2025-01-20T10:00:00Z\",\"updated_at\":\"2025-01-20T10:00:02Z\",\"completed_at\":null,\"outputs\":[],\"error\":{\"code\":\"INTERNAL_ERROR\",\"message\":\"Failed to process user query\"}}}\n\n"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversation_id}/messages": {
+      "get": {
+        "summary": "List conversation messages",
+        "description": "Retrieves all messages (both user and assistant) in a conversation in descending order by creation time (most recent first).",
+        "operationId": "listConversationMessages",
+        "tags": [
+          "Messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Opaque cursor for pagination",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of messages to return (1-100)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of messages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListConversationMessagesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid input parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidCursorErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversations/{conversation_id}/responses/{response_id}/messages": {
+      "get": {
+        "summary": "List response messages",
+        "description": "Retrieves all messages associated with a specific response (both the user's input message and all assistant reply messages).",
+        "operationId": "listResponseMessages",
+        "tags": [
+          "Messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssistantName"
+          },
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          },
+          {
+            "$ref": "#/components/parameters/ResponseId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of messages for this response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponseMessagesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Resource does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitExceededErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "AssistantName": {
+        "name": "Assistant-Name",
+        "in": "header",
+        "required": true,
+        "description": "The Moveworks assistant identifier that was configured for your organization.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "acmecorp-conversations-rest-api"
+      },
+      "ConversationId": {
+        "name": "conversation_id",
+        "in": "path",
+        "required": true,
+        "description": "Unique conversation identifier (format: conv_<ulid>)",
+        "schema": {
+          "type": "string",
+          "pattern": "^conv_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "example": "conv_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+      },
+      "ResponseId": {
+        "name": "response_id",
+        "in": "path",
+        "required": true,
+        "description": "Unique response identifier (format: resp_<ulid>)",
+        "schema": {
+          "type": "string",
+          "pattern": "^resp_[0-9A-HJKMNP-TV-Z]{26}$"
+        },
+        "example": "resp_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+      }
+    },
+    "schemas": {
+      "Conversation": {
+        "type": "object",
+        "required": [
+          "conversation_id",
+          "archived",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "description": "Unique conversation identifier (format: conv_<ulid>)",
+            "example": "conv_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Optional user-defined title (max 256 characters)",
+            "example": "Help with user permissions"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "User-controlled flag to mark conversation as archived",
+            "example": false
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (ISO 8601)",
+            "example": "2025-01-20T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (ISO 8601)",
+            "example": "2025-01-20T10:00:00Z"
+          }
+        }
+      },
+      "Response": {
+        "type": "object",
+        "required": [
+          "response_id",
+          "conversation_id",
+          "status",
+          "created_at",
+          "updated_at",
+          "outputs"
+        ],
+        "properties": {
+          "response_id": {
+            "type": "string",
+            "description": "Unique response identifier (format: resp_<ulid>)",
+            "example": "resp_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "conversation_id": {
+            "type": "string",
+            "description": "Parent conversation identifier",
+            "example": "conv_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ResponseStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (ISO 8601)",
+            "example": "2025-01-20T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (ISO 8601)",
+            "example": "2025-01-20T10:00:15Z"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Completion timestamp (ISO 8601), null if not completed",
+            "example": "2025-01-20T10:00:15Z"
+          },
+          "outputs": {
+            "type": "array",
+            "description": "Output items",
+            "items": {
+              "$ref": "#/components/schemas/OutputItem"
+            }
+          },
+          "error": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Error"
+              }
+            ],
+            "description": "Error details (only present if status is FAILED)"
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "required": [
+          "message_id",
+          "conversation_id",
+          "response_id",
+          "actor",
+          "content",
+          "citations",
+          "created_at"
+        ],
+        "properties": {
+          "message_id": {
+            "type": "string",
+            "description": "Unique message identifier (format: msg_<ulid>)",
+            "example": "msg_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "conversation_id": {
+            "type": "string",
+            "description": "Parent conversation identifier",
+            "example": "conv_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "response_id": {
+            "type": "string",
+            "description": "Associated response identifier",
+            "example": "resp_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/ActorType"
+          },
+          "content": {
+            "$ref": "#/components/schemas/Content"
+          },
+          "citations": {
+            "type": "array",
+            "description": "Entity citations (assistant messages only)",
+            "items": {
+              "$ref": "#/components/schemas/Citation"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (ISO 8601)",
+            "example": "2025-01-20T10:00:01Z"
+          }
+        }
+      },
+      "OutputItem": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/OutputItemType"
+          },
+          "message": {
+            "$ref": "#/components/schemas/Message"
+          }
+        },
+        "description": "Output item wrapper (currently only supports messages, extensible for future types)"
+      },
+      "Content": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ContentType"
+          }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "commonmark_text": {
+                "$ref": "#/components/schemas/CommonmarkTextContent"
+              }
+            },
+            "required": [
+              "commonmark_text"
+            ]
+          },
+          {
+            "properties": {
+              "plain_text": {
+                "$ref": "#/components/schemas/PlainTextContent"
+              }
+            },
+            "required": [
+              "plain_text"
+            ]
+          }
+        ],
+        "description": "Message content with type discriminator"
+      },
+      "PlainTextContent": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Plain text content",
+            "example": "John Doe reports to Jane Smith in the Engineering department."
+          }
+        }
+      },
+      "CommonmarkTextContent": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Commonmark-formatted text content",
+            "example": "John Doe reports to Jane Smith in the Engineering department."
+          },
+          "fallback_text": {
+            "type": "string",
+            "description": "Fallback plain text version of the content",
+            "example": "John Doe reports to Jane Smith in the Engineering department."
+          }
+        }
+      },
+      "Citation": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "mention",
+          "location",
+          "url"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Entity identifier",
+            "example": "user_123"
+          },
+          "type": {
+            "type": "string",
+            "description": "Entity type (e.g., person, ticket, document)",
+            "example": "person"
+          },
+          "mention": {
+            "type": "string",
+            "description": "Mention text in the message",
+            "example": "John Doe"
+          },
+          "location": {
+            "$ref": "#/components/schemas/CitationLocation"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the entity",
+            "example": "https://workday.com/users/123"
+          }
+        }
+      },
+      "CitationLocation": {
+        "type": "object",
+        "required": [
+          "start",
+          "end"
+        ],
+        "properties": {
+          "start": {
+            "type": "integer",
+            "description": "Start position in message text (0-indexed)",
+            "example": 0
+          },
+          "end": {
+            "type": "integer",
+            "description": "End position in message text (exclusive)",
+            "example": 8
+          }
+        }
+      },
+      "UserInput": {
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "User's input text",
+            "example": "Who does John Doe report to?"
+          }
+        }
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "next_cursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Opaque cursor for next page (null if no more results)",
+            "example": "eyJvZmZzZXQiOjIwfQ=="
+          }
+        }
+      },
+      "ResponseStatus": {
+        "type": "string",
+        "enum": [
+          "CREATED",
+          "IN_PROGRESS",
+          "COMPLETED",
+          "FAILED"
+        ],
+        "description": "Response processing status",
+        "example": "COMPLETED"
+      },
+      "ActorType": {
+        "type": "string",
+        "enum": [
+          "USER",
+          "ASSISTANT"
+        ],
+        "description": "Message actor type",
+        "example": "ASSISTANT"
+      },
+      "ContentType": {
+        "type": "string",
+        "enum": [
+          "PLAIN_TEXT",
+          "COMMONMARK_TEXT"
+        ],
+        "description": "Content type discriminator",
+        "example": "COMMONMARK_TEXT"
+      },
+      "OutputItemType": {
+        "type": "string",
+        "enum": [
+          "MESSAGE"
+        ],
+        "description": "Output item type discriminator",
+        "example": "MESSAGE"
+      },
+      "StreamEventType": {
+        "type": "string",
+        "enum": [
+          "RESPONSE_CREATED",
+          "RESPONSE_IN_PROGRESS",
+          "RESPONSE_OUTPUT_DELTA",
+          "RESPONSE_COMPLETED",
+          "RESPONSE_FAILED"
+        ],
+        "description": "Response streaming event type (matches ResponseEvent protobuf enum)",
+        "example": "RESPONSE_OUTPUT_DELTA"
+      },
+      "CreateConversationRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "Optional conversation title (max 256 characters)",
+            "example": "Help with user permissions"
+          }
+        }
+      },
+      "ListConversationsRequest": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor for pagination"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Max results per page"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "Filter by archived status"
+          }
+        }
+      },
+      "ListConversationsResponse": {
+        "type": "object",
+        "required": [
+          "conversations"
+        ],
+        "properties": {
+          "conversations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Conversation"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        }
+      },
+      "UpdateConversationRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "New conversation title (max 256 characters)"
+          },
+          "archived": {
+            "type": "boolean",
+            "description": "New archived status"
+          }
+        }
+      },
+      "CreateResponseRequest": {
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/UserInput"
+          }
+        }
+      },
+      "CreateResponseStreamRequest": {
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/UserInput"
+          }
+        }
+      },
+      "ResponseStreamEvent": {
+        "type": "object",
+        "description": "A server-sent event containing response update content",
+        "required": [
+          "id",
+          "event",
+          "data"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the event (sequence number)"
+          },
+          "event": {
+            "$ref": "#/components/schemas/StreamEventType"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResponseStreamData"
+          }
+        }
+      },
+      "ResponseStreamData": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ResponseCreatedData"
+          },
+          {
+            "$ref": "#/components/schemas/ResponseInProgressData"
+          },
+          {
+            "$ref": "#/components/schemas/ResponseOutputDeltaData"
+          },
+          {
+            "$ref": "#/components/schemas/ResponseCompletedData"
+          },
+          {
+            "$ref": "#/components/schemas/ResponseFailedData"
+          }
+        ],
+        "description": "Event data payload (structure depends on event type)"
+      },
+      "ResponseCreatedData": {
+        "type": "object",
+        "description": "Data for RESPONSE_EVENT_CREATED - response initially created",
+        "required": [
+          "sequence_number",
+          "response"
+        ],
+        "properties": {
+          "sequence_number": {
+            "type": "integer",
+            "description": "Sequential event number (starts at 1)",
+            "example": 1
+          },
+          "response": {
+            "$ref": "#/components/schemas/Response",
+            "description": "Newly created response object with IN_PROGRESS status"
+          }
+        }
+      },
+      "ResponseInProgressData": {
+        "type": "object",
+        "description": "Data for RESPONSE_EVENT_IN_PROGRESS - response processing update",
+        "required": [
+          "sequence_number",
+          "response"
+        ],
+        "properties": {
+          "sequence_number": {
+            "type": "integer",
+            "description": "Sequential event number",
+            "example": 2
+          },
+          "response": {
+            "$ref": "#/components/schemas/Response",
+            "description": "Response object with updated status/metadata"
+          }
+        }
+      },
+      "ResponseOutputDeltaData": {
+        "type": "object",
+        "description": "Data for RESPONSE_EVENT_OUTPUT_DELTA - new output generated",
+        "required": [
+          "sequence_number",
+          "output"
+        ],
+        "properties": {
+          "sequence_number": {
+            "type": "integer",
+            "description": "Sequential event number",
+            "example": 3
+          },
+          "output": {
+            "$ref": "#/components/schemas/OutputItem",
+            "description": "Output item delta (message chunk with accumulated content)"
+          }
+        }
+      },
+      "ResponseCompletedData": {
+        "type": "object",
+        "description": "Data for RESPONSE_EVENT_COMPLETED - response successfully completed",
+        "required": [
+          "sequence_number",
+          "response"
+        ],
+        "properties": {
+          "sequence_number": {
+            "type": "integer",
+            "description": "Sequential event number",
+            "example": 5
+          },
+          "response": {
+            "$ref": "#/components/schemas/Response",
+            "description": "Final response object with COMPLETED status and all outputs"
+          }
+        }
+      },
+      "ResponseFailedData": {
+        "type": "object",
+        "description": "Data for RESPONSE_EVENT_FAILED - response processing failed",
+        "required": [
+          "sequence_number",
+          "response"
+        ],
+        "properties": {
+          "sequence_number": {
+            "type": "integer",
+            "description": "Sequential event number",
+            "example": 3
+          },
+          "response": {
+            "$ref": "#/components/schemas/Response",
+            "description": "Response object with FAILED status and error details"
+          }
+        }
+      },
+      "ListConversationMessagesRequest": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor for pagination"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50,
+            "description": "Max results per page"
+          }
+        }
+      },
+      "ListConversationMessagesResponse": {
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        }
+      },
+      "ListResponseMessagesRequest": {
+        "type": "object"
+      },
+      "ListResponseMessagesResponse": {
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code",
+            "example": "INVALID_INPUT"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Title exceeds maximum length of 256 characters"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/Error"
+          }
+        },
+        "description": "Standard error response wrapper"
+      },
+      "InvalidTitleErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_INPUT"
+                ],
+                "example": "INVALID_INPUT"
+              },
+              "message": {
+                "type": "string",
+                "example": "Title exceeds maximum length of 256 characters"
+              }
+            }
+          }
+        },
+        "description": "Error response for invalid conversation title"
+      },
+      "InputRequiredErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_INPUT"
+                ],
+                "example": "INVALID_INPUT"
+              },
+              "message": {
+                "type": "string",
+                "example": "Field 'input' is required"
+              }
+            }
+          }
+        },
+        "description": "Error response for missing required input field"
+      },
+      "InvalidCursorErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_CURSOR"
+                ],
+                "example": "INVALID_CURSOR"
+              },
+              "message": {
+                "type": "string",
+                "example": "Value passed for cursor was not valid or is no longer valid"
+              }
+            }
+          }
+        },
+        "description": "Error response for invalid pagination cursor"
+      },
+      "UnauthorizedErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "UNAUTHORIZED"
+                ],
+                "example": "UNAUTHORIZED"
+              },
+              "message": {
+                "type": "string",
+                "example": "Invalid API key"
+              }
+            }
+          }
+        },
+        "description": "Error response for unauthorized access"
+      },
+      "NotFoundErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "NOT_FOUND"
+                ],
+                "example": "NOT_FOUND"
+              },
+              "message": {
+                "type": "string",
+                "example": "Requested resource not found"
+              }
+            }
+          }
+        },
+        "description": "Error response for resource not found"
+      },
+      "InternalErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INTERNAL_ERROR"
+                ],
+                "example": "INTERNAL_ERROR"
+              },
+              "message": {
+                "type": "string",
+                "example": "An unexpected error occurred"
+              }
+            }
+          }
+        },
+        "description": "Error response for internal server error"
+      },
+      "RateLimitExceededErrorResponse": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "RATE_LIMIT_EXCEEDED"
+                ],
+                "example": "RATE_LIMIT_EXCEEDED"
+              },
+              "message": {
+                "type": "string",
+                "example": "Reached rate limit for api 'url-name' and org 'org-name'"
+              }
+            }
+          }
+        },
+        "description": "Error response for rate limit exceeded"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT bearer token authentication. Obtain an access token from the Moveworks auth endpoint and include it in the Authorization header as 'Bearer <token>'."
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
+}
