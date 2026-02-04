@@ -377,35 +377,59 @@
           },
           {
             "group": "Events API",
-            "openapi": "openapi/api-reference.json"
+            "openapi": {
+              "source": "openapi/api-reference.json",
+              "directory": "api-reference/events"
+            }
           },
           {
             "group": "Conversations API",
-            "openapi": "openapi/conversations-api.json"
+            "openapi": {
+              "source": "openapi/conversations-api.json",
+              "directory": "api-reference/conversations"
+            }
           },
           {
             "group": "Data API",
-            "openapi": "openapi/data-api-v1-spec.json"
+            "openapi": {
+              "source": "openapi/data-api-v1-spec.json",
+              "directory": "api-reference/data"
+            }
           },
           {
             "group": "Webhook Listeners",
-            "openapi": "openapi/webhook-listeners-oas.json"
+            "openapi": {
+              "source": "openapi/webhook-listeners-oas.json",
+              "directory": "api-reference/webhooks"
+            }
           },
           {
             "group": "Content Gateway",
-            "openapi": "openapi/content-gateway.json"
+            "openapi": {
+              "source": "openapi/content-gateway.json",
+              "directory": "api-reference/content-gateway"
+            }
           },
           {
             "group": "Identity Gateway",
-            "openapi": "openapi/identity-gateway.json"
+            "openapi": {
+              "source": "openapi/identity-gateway.json",
+              "directory": "api-reference/identity-gateway"
+            }
           },
           {
             "group": "Knowledge Gateway",
-            "openapi": "openapi/knowledge-gateway.json"
+            "openapi": {
+              "source": "openapi/knowledge-gateway.json",
+              "directory": "api-reference/knowledge-gateway"
+            }
           },
           {
             "group": "Forms Gateway",
-            "openapi": "openapi/forms-gateway.json"
+            "openapi": {
+              "source": "openapi/forms-gateway.json",
+              "directory": "api-reference/forms-gateway"
+            }
           }
         ]
       }
