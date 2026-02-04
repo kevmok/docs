@@ -1,0 +1,108 @@
+---
+title: Assistant Errors
+deprecated: false
+hidden: true
+metadata:
+  robots: index
+---
+Here, you can find troubleshooting instructions for all errors that happen inside your Moveworks Assistant.
+
+# Plugin not selected by Assistant
+
+### Possible cause: Plugin not deployed
+
+**To fix:** Your plugins can take up to 2 minutes to be deployed after launch. Please wait & try again.
+
+### Possible cause: Failed access control
+
+**To fix:** Make sure your [identity](https://help.moveworks.com/docs/control-centre-identity) matches your [launch options](https://help.moveworks.com/docs/launch-configuration#/). Data is case sensitive.
+
+![](https://files.readme.io/d949edf950304907bbc4bf599fae15f513bae40c494e657a8c32111e0dfbf0d3-troubleshooting_6.png)
+
+### Possible cause: Assistant believed your plugin was irrelevant
+
+Natural language may not have found your chat message similar to the trained examples.
+
+**To fix:** Try adding the new chat messages as positive examples to the `Edit Triggering` stage & test again.
+
+![](https://files.readme.io/401811b41599126d4505e9d4c6e12064009899b8147ace2d49154fe1cd17f032-troubleshooting_5a.png)
+
+**To fix:** Try updating your plugin name & description to be more clear.
+
+# Plugin questions are confusing / drop details
+
+Assistant use reasoning & chat context to ask more natural questions but it may drop important details.
+
+![](https://files.readme.io/2d5cbf208e3f941f28999d8d844d13d8fcfd840114dbccd7b3c38d390b544b11-copilot_bad_question.png)
+
+**To fix:** Setup descriptive slot names: Make sure your [slot names](https://help.moveworks.com/docs/slots#agent-studio-classic) are 1. descriptive & 2. unique from other slot names. Assistant will be more accurate when generating questions if it clearly understands the purpose of your slots.
+
+**To fix:** Consider setting up your slots as explicit questions so that the question dialog doesn't get skipped.
+
+# Plugin drops-off during follow ups
+
+![](https://files.readme.io/1c208b4fc871fa32afd67ed2a10c7d8cc7b724479fdd7ea10d7a8bebea39c678-copilot_dropoff.png)
+
+### Possible cause: Plugin dropped previous slots from its context
+
+**To fix:** To improve Assistant's ability to retain slots, set up descriptive slot names & question details.
+
+**To fix:** Check if you can reduce plugin complexity. Generally the more the number of slots, the higher risk of dropoffs:
+
+* Remove extra event slots that are not useful.
+* Check if multiple event slots can be combined into 1 larger event slot.
+* Check if extra Path branches can be combined or reduced.
+
+### Possible cause: Plugin found another plugin to be more relevant
+
+**To fix:** Add re-triggering instructions to plugin description: e.g. Continue selecting this plugin for PTO balance related issues.
+
+# API call fails in a plugin
+
+Your Path fails when you get the message: `Unfortunately, I ran into an issue and can't directly help you at the moment.` This typically happens due to a malformed API connection.
+
+![](https://files.readme.io/8f19949a2548336f04b5524c8a6f9eea880d59ec99dc112778eb647546008987-troubleshooting_7.png)
+
+### Possible cause: Invalid characters in API endpoint
+
+We don’t support special characters in the API endpoint path.
+
+**To fix:** Make sure you only include letters (`a … Z`), numbers (`0 … 9`) or slashes (`/`) in your endpoint path.
+
+![](https://files.readme.io/9755b92ca19ca91503c37aabe2ef8305277c7f8f7f0ebf86c7b8cff4e77ada18-troubleshooting_8.png)
+
+### Possible cause: No opening slash `/` or trailing slashes `/` in API endpoint
+
+**To fix:** ✅ Ensure there’s an opening slash
+
+![](https://files.readme.io/04e44b18b5aeb65c7bbd9d66da35179e8838a34d79f6f82b3edcf4a8120f6371-troubleshooting_9.png)
+
+**To fix:** ❌ Make sure there’s no trailing slash
+
+![](https://files.readme.io/64718b25c4d8f99633836f0fecbb9f4260d90c7b942a5eb0b5129866ebef2cba-troubleshooting_10.png)
+
+### Possible cause: Invalid reference to the user’s email in API
+
+**To fix:** Make sure to use `{{user_email_addr}}` to reference the internally stored user’s email. This value is only available in the endpoint URL, Query Param, & the Request Body Bender.
+
+![](https://files.readme.io/b6a9d29dff0aaab2438a037fdfcd12443574ae016a3fcf88587271e17d511b11-troubleshooting_11.png)
+
+### Possible cause: Invalid reference to a user question in API
+
+**To fix:** User question responses are reference-able using the `{{question prompt}}` notation. Again, these prompts are only available in the endpoint URL, Query Param, & the Request Body Bender. Accessing this information from another field may cause this error.
+
+![](https://files.readme.io/44adce92d637708806bb41cf3fd935654485e480c7c262a3fc7207b2e5696702-troubleshooting_12.png)
+
+# Assistant is extracting wrong user slots
+
+![](https://files.readme.io/2de1b069d95b4cb8fe31292765f815f493f62422216469753cdadcc63282155f-copilot_slot_failure.png)
+
+### Possible cause: Assistant isn't trained to extract your slots
+
+**To fix**: To improve Assistant's ability to extract slots accurately, set up descriptive slot names & question details.
+
+**To fix**: For Queries, add examples of slot extraction to clarify how Assistant should extract slots from your utterances.
+
+![](https://files.readme.io/97640483082cc3ecfdf0d0caff729d71da7f05cade05c5d05604a8e4d1be596b-troubleshooting_14.png)
+
+<br />

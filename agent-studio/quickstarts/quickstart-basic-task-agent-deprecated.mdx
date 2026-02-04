@@ -1,0 +1,438 @@
+---
+title: 'Quickstart #1: Basic Task Agent'
+excerpt: ''
+deprecated: true
+hidden: true
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: Try building your own Plugins, or view one of our other Quickstart examples!
+  pages:
+    - type: basic
+      slug: quickstart-2-slots-resolvers-copy
+      title: 'Quickstart #2: Slots & Resolvers'
+    - type: basic
+      slug: quickstart-basic-process-agent
+      title: 'Quickstart #3: Basic Process Agent'
+---
+# Overview
+
+Welcome to Agent Studio, your comprehensive platform for creating intelligent AI agents that transform how work gets done. Agent Studio empowers your organization to automate complex business processes through intuitive, low-code development tools that connect seamlessly with your existing systems. 
+
+In today's fast-paced business environment, the ability to automate routine tasks while maintaining flexibility and intelligence is crucial for staying competitive. Our Agent Studio platform meets this need by providing a complete ecosystem for building, deploying, and managing AI agents that work alongside your teams to enhance productivity and drive innovation.
+
+With Agent Studio, you can create customized AI agents that understand natural language, execute complex actions across multiple systems, and learn from interactions to continuously improve. Whether you're looking to streamline IT support, enhance customer service, or optimize internal workflows, Agent Studio gives you the tools to build intelligent solutions that address your specific business challenges.
+
+This guide teaches you how to build your first Task Agent -- just one of the many intelligent agents you can create with our platform. You'll discover how Plugins extend your agent's capabilities, how to configure slots for gathering information, how to set up launch rules, and how to implement triggering mechanisms that make your agent responsive to user needs.
+
+# Learning Objectives
+
+This Quickstart guide provides a comprehensive walkthrough on how to build a simple Task Agent that will **allow a user to easily check their PTO (Paid Time Off) balance**. As part of the building process you'll learn how to:
+
+* Set up and test HTTP Actions.
+* Configure Conversational Processes.
+* Understand and set up Slots.
+
+# Prerequisites
+
+1. Access to "Agent Studio" App.
+2. Basic understanding of [Actions](actions).
+
+***
+
+# Background
+
+Before getting started, here are some terms and concepts to get you up to speed.
+
+## What is an Agent?
+
+Agents are AI-powered digital workers who can understand natural language requests, reason through complex problems, and act on users' behalf across your organization's systems. Unlike traditional automation tools, agents combine the power of large language models with secure system access to create truly intelligent automations.
+
+### Types of Agents
+
+#### Task Agents
+
+Task Agents are designed to handle specific, well-defined tasks that typically involve a single request and response cycle. They excel at executing discrete actions like checking statuses, submitting tickets, or retrieving information. Task Agents are perfect for automating routine operations that previously required manual intervention.
+
+#### Process Agents
+
+Process Agents manage multi-step workflows that span across different systems and may require sequential actions. These agents can coordinate complex business processes that involve decision points, conditional logic, and multiple backend systems. Process Agents are ideal for automating end-to-end workflows like employee onboarding or change management processes.
+
+#### Proactive Agents
+
+Proactive Agents monitor systems and data to initiate actions without explicit user requests. They can detect patterns, anticipate needs, and take preemptive steps to address potential issues before they impact operations. These agents provide value through timely interventions based on predefined triggers and conditions.
+
+#### Ambient Agents
+
+Ambient Agents work continuously in the background, learning from interactions and improving over time. They build a contextual understanding of your organization's operations and can offer insights or assistance based on observed patterns. Ambient Agents enhance the overall intelligence of your automation ecosystem.
+
+## Agent Studio Overview
+
+Agent Studio is a comprehensive environment where you can discover, create, deploy, and monitor AI agents throughout their lifecycle. It provides an intuitive interface for developers and business users to collaborate on agent creation without deep AI expertise. The studio offers templates, testing tools, and analytics to streamline the development process.
+
+## What is a Plugin?
+
+Plugins are the building blocks that give agents their capabilities. Each Plugin represents a specific function or integration that can be added to an agent, allowing it to perform certain actions or access particular systems. Plugins become powerful AI agents when deployed in your AI Assistant, enabling seamless automation across your digital landscape.
+
+A Plugin in the new Plugin Workspace is comprised of 3 key components:
+
+1. **A Trigger.** Defines the situations under which the AI agent should execute a Plugin.
+2. **A Launch Configuration.** Specifies which end users should have access to a Plugin.
+3. **A Process.** Contains the actual execution logic of the Plugin. 
+
+In this guide, we'll be building a Plugin that is triggered conversationally and runs a *Conversational* Process. A Conversational Process contains the definitions of data that a Plugin needs & the steps executed by a Plugin.
+
+**Triggers** and **Launch Configurations** are existing concepts but the **Conversational Process** is new. 
+
+📖 *[Learn more about Triggers](natural-language-triggers)*\
+📖 *[Learn more about Launch Configurations](launch-configuration)*\
+:book: *[Learn more about Conversational Processes](https://help.moveworks.com/docs/plugin-process)*
+
+*What exactly goes into a Conversational Process?*
+
+A Conversational Process houses the logic that defines what a Plugin actually does. There are several key building blocks involved in a Process: **Activities** (key steps to execute throughout the process), **Decision Policies** (controls when to run certain activities), and **Slots** (values that the process needs to make decisions and execute activities).
+
+1. **Activities.** Key steps to perform throughout the process. For example, an Activity can involve taking action in some external system, or sharing a piece of configured content back to the end user.
+2. **Decision Policies.** Represent decision points in a process, which can control when to run certain Activities.
+3. **Slots**. Values that the process needs in order to effectively execute. For example, Slots may be required in order to execute Activities and make Decisions. There are a few interesting properties of Slots that we can leverage, for example:
+   1. **Input Validator**. Ensures that a Slot value meets a certain condition (via DSL rule).
+   2. **Slot Inference Policy**. Specifies whether an AI Agent can automatically infer a value for the slot.
+   3. **Resolver Strategy**. Determines how an AI agent can get a value for the Slot. For example, a Resolver can help resolve natural language values to API values that a Process will need to use.
+
+***
+
+# What You'll Build
+
+The objective of the Plugin you're about to build is to allow an employee to get their PTO (Paid Time Off) balance. (This would fall under the category of **Task Agents**).
+
+Before starting to build, we always recommend that you first map out the desired **end user experience** and the overall **building blocks of the Conversational Process**.
+
+Here is an example of the **end-user experience** we hope to enable:
+
+<Image align="center" width="800px" src="https://files.readme.io/9750cc52a12c712943b10e8642e78eb14c1cc63f4e9a604fe56dd6898b2dc43b-CleanShot_2025-04-09_at_14.57.26.png" />
+
+To get to this experience, the **Conversational Process** should consist of one *Activity* (powered by an HTTP Action) and one user email *Slot* required in order to run the Activity:
+
+<Image alt="Note: this single-Activity Process does not require any Decision Policies." align="center" width="60% " src="https://files.readme.io/f9562f73488d0198b2a309bd36d0f1aa0afd065559a197c956b2ecd2ea58c77c-Screenshot_2025-04-12_at_02.09.18.png">
+  Note: this single-Activity Process does not require any Decision Policies.
+</Image>
+
+You'll build an end-to-end working Plugin via these phases: 
+
+1. Set up an  **Action (HTTP Action)**.
+2. Build the **Conversational Process**, containing the 1 Activity (using the Action set up in the previous phase) and the 1 Slot, as illustrated above.
+3. Add the Conversational Process to your AI Agent by launching a **Plugin**.
+
+*Let's get started!*
+
+# Phase 0: Generate a Unique Session ID & Set Up Your Connector
+
+> ❗️ Import building notes if you are using the Moveworks Developer Labs environment
+>
+> 1. If you are working in a Moveworks lab environment, name anything you save (Plugin, Action, Data Type, etc.) with `<fullname>_<descriptive_name>` 
+>    1. For example: `lucasrollo_Submit_PTO_Action`
+> 2. When launching your Plugin, make sure to only launch to yourself! You can do this by going to Your Plugin > Launch Configuration > Allow Selected Users > the email on your credential card
+
+> 👀 You may be able to skip this phase if you've completed another Agent Studio Quickstart guide.
+>
+> *You can skip this phase if:*
+>
+> 1. You have already created a `firstname_lastname_moveworks_purple` connector.
+>
+> This section will walk you through how to set up your own connector to the Moveworks Purple API (which powers the Actions used in the Quickstart guides), so no need to repeat this step if you've done it before.
+
+In this guide, the PTO data that your Action will access lives behind the Moveworks Purple API Connector. To access this data via your Action, you need to set up a (reusable) connector:
+
+1. Navigate to the App Picker in the top right corner of Agent Studio.
+2. Click on "HTTP Connectors", which will take you to another browser tab.
+
+   <Image align="center" width="300px" src="https://files.readme.io/eac1a5fcfe10b386a1f5cbadfefbfe55b6fafe24491c492b176bcc107a674470-CleanShot_2025-04-12_at_12.06.49.png" />
+3. Click "Create" in the top right corner.
+4. Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
+
+   | Field               | Value to enter (replace "firstname" & "lastname" with your info)  |
+   | :------------------ | :---------------------------------------------------------------- |
+   | **Connection Name** | `firstname_lastname_moveworks_purple`                             |
+   | **Description**     | `Moveworks Purple APIs Connector`                                 |
+   | **Base Url**        | `https://us-central1-creator-studio-workflows.cloudfunctions.net` |
+   | **Auth Config**     | `No Auth`                                                         |
+5. Click "Save" on the bottom right corner.
+
+> 👍 You're now fully ready to start building. On to Phase 1!
+
+# Phase 1: Set Up Your Action (Get PTO Balance)
+
+> ❗️ Import building notes if you are using the Moveworks Developer Labs environment
+>
+> 1. If you are working in a Moveworks lab environment, name anything you save (Plugin, Action, Data Type, etc.) with `<fullname>_<descriptive_name>` 
+>    1. For example: `lucasrollo_Submit_PTO_Action`
+> 2. When launching your Plugin, make sure to only launch to yourself! You can do this by going to Your Plugin > Launch Configuration > Allow Selected Users > the email on your credential card
+
+We'll start by creating an [HTTP Action](http-actions) that can query an external system for a user's PTO balance.
+
+1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+
+   <Image align="center" width="300px" src="https://files.readme.io/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png" />
+2. Navigate to a new HTTP Action.
+3. Click "Create".
+
+   <Image align="center" src="https://files.readme.io/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png" />
+4. Set the following Title and Description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+
+   ![](https://files.readme.io/b359101066aa7ca26d1d6178e1c6d5807a1255f1d59c89b0a524a8aa7b598fbf-CleanShot_2025-04-12_at_12.19.00.png)
+
+   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+   | :-------------- | :--------------------------------------------------------------- |
+   | **Title**       | `firstname_lastname_get_mw_pto_balance_action`                   |
+   | **Description** | `Fetches the PTO balance for a given user`                       |
+5. Enter the details of your API:
+
+   1. Click on the "Import" icon to the right of the "TEST" button.
+
+      <Image align="center" src="https://files.readme.io/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png" />
+   2. Paste the following cURL command (this represents an endpoint which has one dynamic user email query parameter):
+      ```Text cURL
+      curl -X GET "https://us-central1-creator-studio-workflows.cloudfunctions.net/getPTOBalance?email={{user_email}}"
+      ```
+   3. Click "Import" (your Action should now be auto-populated with details).
+6. Add your Connector.
+
+   1. Navigate to the Connector tab.
+   2. Select the "Inherit from existing connector" radio button.
+   3. Select the Connector you created in Phase 0 from the dropdown (e.g. `firstname_lastname_moveworks_purple`).
+
+      ![](https://files.readme.io/93ef94d69662aace66549cb4d4258a2cb77c0465b2d1e11613cd844e4c9125d2-CleanShot_2025-04-12_at_12.37.14.png)
+7. Define a formal input argument to represent the "user email" input this Action requires:
+
+   1. Click on the "Input Args" button near the top right corner.
+
+      <Image align="center" src="https://files.readme.io/81413c52f88eaf2d5bf6364e688d70073a439352a96775e458ca60d91a326842-Screenshot_2025-04-11_at_15.40.07.png" />
+   2. Click "Create New" in the Input Arguments pop up.
+   3. Fill out the following details for your input argument:
+
+      | Field label       | Value to enter/select                                    |
+      | :---------------- | :------------------------------------------------------- |
+      | **Argument Name** | `user_email`                                             |
+      | **Data Type**     | *Select "string"*                                        |
+      | **Example Value** | `test_email@example.com`                                 |
+      | **Description**   | `The email address of the user to fetch PTO balance for` |
+      | **Required**      | *Check the box*                                          |
+   4. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+8. Test your Action:
+
+   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
+   2. Inspect the Console to verify that you receive a successful response:
+
+      <Image alt="You should see: Status Code 200, a PTO result object, and a response schema of the returned object." align="center" src="https://files.readme.io/b123ac83f5b78ce76be856a9ea9f516b53a654696bbd60684284a6e05e329ddc-Screenshot_2025-04-11_at_15.26.49.png">
+        You should see: Status Code 200, a PTO result object, and a response schema of the returned object.
+      </Image>
+9. Click "Publish". Review details, and click "Publish" once again.
+
+> 👍 Congratulations! You've set up your first Action.
+>
+> You should see your Action marked as "Published" in the HTTP Action library. In the next phase, you'll use this Action in a **Conversational Process**, as part of the main Action Activity in that process.
+
+# Phase 2: Build Your Conversational Process
+
+> ❗️ Import building notes if you are using the Moveworks Developer Labs environment
+>
+> 1. If you are working in a Moveworks lab environment, name anything you save (Plugin, Action, Data Type, etc.) with `<fullname>_<descriptive_name>` 
+>    1. For example: `lucasrollo_Submit_PTO_Action`
+> 2. When launching your Plugin, make sure to only launch to yourself! You can do this by going to Your Plugin > Launch Configuration > Allow Selected Users > the email on your credential card
+
+You will now leverage the action you just created to retrieve your user's PTO balance. (Conversational processes will often involve multiple actions, but we'll keep it simple for this use case).
+
+In this phase, you'll 1) build a `user_email` **[Slot](https://help.moveworks.com/docs/slots)**, and 2) an **[Action Activity](https://help.moveworks.com/docs/activities)** to fetch PTO balance (which requires the user email Slot as input). Here's a reminder of the bird's-eye view for our Process.
+
+<Image align="center" width="50% " src="https://files.readme.io/f0d78b166c14e9518feaa191ceb8d2f1ceaa3254b10f563b1a888e18676d5b62-Screenshot_2025-04-12_at_02.09.18.png" />
+
+1. Navigate to a new Conversational Process (navigate to the library and click "Create").\
+   ![](https://files.readme.io/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+2. Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
+
+   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+   | :-------------- | :--------------------------------------------------------------- |
+   | **Title**       | `firstname_lastname_get_mw_pto_balance_process`                  |
+   | **Description** | `Fetches the PTO balance for a given user`                       |
+3. Add a new **Slot** to represent the user email that this process will need to collect. 📖 *[Learn more about Slots](https://help.moveworks.com/docs/slots)*.
+
+   1. Click on the "Slots" button near the top right corner of the editor.
+
+      <Image align="center" src="https://files.readme.io/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png" />
+   2. Click "Create New" in the Slots pop up.
+   3. Fill out the following details for your Slot:
+
+      | Field label                     | Value to enter/select                                     |
+      | :------------------------------ | :-------------------------------------------------------- |
+      | **Name**                        | `user_email`                                              |
+      | **Data Type**                   | *Select "string"*                                         |
+      | **Slot Description**            | `The email address of the user to fetch PTO balance for.` |
+      | **Slot Validation Policy**      | *Leave blank*                                             |
+      | **Slot Validation Description** | *Leave blank*                                             |
+      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*             |
+   4. Hit "Save" (scroll to the bottom of the popup) and hit the "X" icon to close this "Slots" pop up.
+4. Build an **Action Activity** that will perform the retrieval of a user's PTO balance. 📖 *[Learn more about Activities](https://help.moveworks.com/docs/activities).*
+
+   1. Click on the "+ Add a block to your process" button in the main section of the editor.
+   2. Click on "Action Activity".
+
+      <Image align="center" width="60% " src="https://files.readme.io/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png" />
+   3. Fill out the following details for your Action Activity, which mostly involves connecting your Slot to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process):
+
+      <Table align={["left","left"]}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left" }}>
+              Field label
+            </th>
+
+            <th style={{ textAlign: "left" }}>
+              Value to enter/select
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td style={{ textAlign: "left" }}>
+              **Action**
+            </td>
+
+            <td style={{ textAlign: "left" }}>
+              *Select the`firstname_lastname_get_mw_pto_balance_action` Action that you built in Phase 1 *
+            </td>
+          </tr>
+
+          <tr>
+            <td style={{ textAlign: "left" }}>
+              **Required Slots**
+            </td>
+
+            <td style={{ textAlign: "left" }}>
+              *Select the`user_email` Slot that you added* 
+            </td>
+          </tr>
+
+          <tr>
+            <td style={{ textAlign: "left" }}>
+              **Input mapping**
+            </td>
+
+            <td style={{ textAlign: "left" }}>
+              `user_email: data.user_email`
+            </td>
+          </tr>
+
+          <tr>
+            <td style={{ textAlign: "left" }}>
+              **Output Mapping**\
+              (".dot\_walk\_here" box)
+            </td>
+
+            <td style={{ textAlign: "left" }}>
+              `.pto_details`
+            </td>
+          </tr>
+
+          <tr>
+            <td style={{ textAlign: "left" }}>
+              **Output Key**
+            </td>
+
+            <td style={{ textAlign: "left" }}>
+              `pto_balance_result`
+            </td>
+          </tr>
+
+          <tr>
+            <td style={{ textAlign: "left" }}>
+              **Confirmation Policy**
+            </td>
+
+            <td style={{ textAlign: "left" }}>
+              *Leave unchecked*
+            </td>
+          </tr>
+        </tbody>
+      </Table>
+5. Click "Validate" (Located in the top right corner. Click on the caret icon next to the Publish button). If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
+
+   1. 💡Pro-tip: You can also use the following hotkeys to validate without pressing the button:
+
+      | On a MacOS machine | On a Windows machine |
+      | :----------------- | :------------------- |
+      | Cmd + Shift + V    | Ctrl + Shift + V     |
+6. Click "Publish". Review details, and click "Publish" once again.
+
+> 👍 Awesome! You've just built the main part of this Plugin: the Conversational Process.
+>
+> We're ready for the last step: now you'll launch a **Plugin** — this packages the Conversational Process into a tool that your AI Agent can use directly.
+
+# Phase 3: Launch a Plugin
+
+> ❗️ Import building notes if you are using the Moveworks Developer Labs environment
+>
+> 1. If you are working in a Moveworks lab environment, name anything you save (Plugin, Action, Data Type, etc.) with `<fullname>_<descriptive_name>` 
+>    1. For example: `lucasrollo_Submit_PTO_Action`
+> 2. When launching your Plugin, make sure to only launch to yourself! You can do this by going to Your
+
+In our final section, you’ll learn how to add your Conversational Process to a **Plugin**, and control the Triggering scenarios of your Plugin, and specify which end users are allowed to use your Plugin.
+
+1. Navigate to a new Plugin (navigate to the library and click "Create").\
+   ![](https://files.readme.io/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+2. Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
+
+   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+   | :-------------- | :--------------------------------------------------------------- |
+   | **Title**       | `firstname_lastname_get_mw_pto_balance`                          |
+   | **Description** | `Fetches the PTO balance for a given user`                       |
+3. Define a Conversational Trigger.  📖 *[Learn more about Natural Language Triggers](https://help.moveworks.com/docs/natural-language-triggers).*
+
+   1. Click on "Define a trigger".
+   2. In the panel that appears on the right, either:
+
+      1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
+      2. Add the following recommended utterances:
+
+         | Utterances to add                                   |
+         | :-------------------------------------------------- |
+         | `How can I check my current paid time off balance?` |
+         | `Can I take PTO next week?`                         |
+         | `I want to take PTO the first week of May`          |
+         | `Check PTO balance`                                 |
+         | `What is my remaining paid time off balance`        |
+4. Choose your Conversational Process (the one you built in Phase 2).
+   1. Click on "Set a process".
+   2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_get_mw_pto_balance_process`)
+5. Define your Launch Configuration.
+
+   1. Navigate to the "Launch Configuration" tab.
+
+      <Image align="center" width="50% " src="https://files.readme.io/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png" />
+   2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
+
+      <Image align="center" src="https://files.readme.io/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png" />
+6. Click "Publish". Review details, and click "Publish" once again to launch your Plugin.  
+
+> ❗️ Don't forget to press "enter" when adding user emails
+>
+> After entering emails under "allow selected users" press "enter" or the email will not save when publishing.
+
+> 👍 And that's all! You've built your Plugin, and now it's ready for you to use.
+>
+> Use one of your triggering examples (e.g. "*check PTO balance*") to access the Plugin in conversation.
+
+# Reflecting on Your First Plugin
+
+Congratulations, you’ve successfully completed the entire quick-start guide! You’ve built a fully functional PTO balance Plugin from the ground up, and that’s no small feat.
+
+Through this guide, you’ve created a Plugin that:
+
+* **Retrieves PTO balance information** from an external system with a well-crafted Action.
+* **Prompts users for details** using Slots to make it interactive and user-friendly.
+* **Activates effortlessly** with Conversational Triggers you’ve set up.
+* **Controls access perfectly** with Launch Configurations you’ve just finalized.
+
+From start to finish, you’ve mastered every step of the process — amazing work! Your Plugin is now ready to help users check their PTO balances with ease.

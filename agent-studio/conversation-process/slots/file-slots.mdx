@@ -1,0 +1,94 @@
+---
+title: File Slots
+excerpt: >-
+  Learn how to use the File slot type to receive file attachments from users in
+  plugins.
+deprecated: false
+hidden: false
+link:
+  new_tab: false
+metadata:
+  robots: index
+next:
+  pages:
+    - slug: http-action-files
+      title: HTTP Action Files
+      type: basic
+---
+> ❗ File Slots are currently in Limited Preview!
+>
+> _To get access, please request through our <Anchor label="Community" target="_blank" href="https://community.moveworks.com/p/file-slots-limited-preview">Community</Anchor>_
+
+The `File` slot type enables plugins to receive file attachments from users. It is resolved only when the user interacts with the dedicated "Upload file" button in the assistant interface.
+
+<div id="video-container">
+  <iframe id="video-frame" src="https://www.tella.tv/video/cmhwn2j2x000a04jvf2ibb2s7/embed?b=0&title=0&a=1&loop=0&t=0&muted=0&wt=0" allowfullscreen allowtransparency />
+</div>
+
+# File Object Structure
+
+When a an attachment is added to the File slot, it generates this object structure:
+
+```json
+{
+  "file_name": string, // Name used when uploading to the external system's API
+  "location": string,  // File location
+	"content": string, // base-64 encoded
+}
+```
+
+# Supported file extensions (case-insensitive)
+
+(case-insensitive)
+
+`.png`, `.jpg`, `.jpeg`, `.pdf`, `.txt`, `.csv`, `.xlsx`, `.xlsm`, `.xls`, `.xltx`, `.xltm`
+
+<Callout icon="📘" theme="info">
+  **Callout**: Only these extensions are allowed as ticket attachments. Attempts to upload unsupported types will fail validation.
+</Callout>
+
+# Upload Interface
+
+<Image border={false} src="https://files.readme.io/18aff6906d8fb8ac7cc9e8cd4ec4a8b335c309c22d38d1fa5b93cc0d2db71c7a-CleanShot_2025-11-12_at_17.50.422x.png" />
+
+> _Users must use the **"Upload file"** button._
+
+# Limitations
+
+| Limitation                           | Details                                                                                                                                                                                                             |
+| :----------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **File size limit**                  | Maximum file size is **5MB**. Files exceeding this limit will fail to upload.                                                                                                                                       |
+| **No file delivery to users**        | Files cannot be sent back to end users in chat responses.                                                                                                                                                           |
+| **No content manipulation**          | The system cannot read, parse, or modify file contents beyond base64 encoding.                                                                                                                                      |
+| **Upload only via dedicated button** | Uploading files directly in chat (e.g., Slack drag-and-drop) will not populate the `File` slot — it triggers BriefMe instead. Use only the **"Upload file" pop-up** that appears when the `File` slot is requested. |
+| **Multiple files not supported**     | `List[File]` is not supported. Even if the platform (e.g., Slack) allows selecting multiple files in the upload dialog, only the first file is processed. Subsequent files are ignored.                             |
+
+***
+
+# Workarounds
+
+## Use Case: Avoid Local File Download
+
+**Problem:**
+
+You do not want users to download files to their machine. Instead, you want users to paste a link (e.g., from Google Drive, OneDrive, or internal file server) directly into the assistant.
+
+**Limitation:**
+
+The platform **cannot download** files from external URLs on behalf of the user.
+
+**Solution:**
+
+Use a string slot named `file_link` instead of `File`.
+
+#### Customer API responsibility:
+
+Your API will **need** to handle the file download from the link passed by the user.
+
+* Download file from `file_url`
+* Validate content/type
+* Process as needed
+
+<Callout icon="📘" theme="info">
+  _This bypasses local upload entirely. No file is stored or transmitted through the assistant._
+</Callout>

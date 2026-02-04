@@ -1,0 +1,57 @@
+---
+title: API Key Auth
+excerpt: ''
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+API Key authentication requires you to send an API key with your request. You can do this in two ways:
+
+# Authentication Options
+
+## API Key in Header
+
+Your API key will be added to an HTTP Header like this:
+
+```shell
+curl -X GET "https://api.example.com/data" \
+     -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+To set this up:
+
+1. Select **API Key** from the **Auth Config** dropdown.
+2. Choose **Header Auth** as the **Auth Type**.
+3. Fill in these fields:
+
+   | Field Name                | Field Value                                                                                                                                  |
+   | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------- |
+   | Header Auth Key           | The HTTP Header name. Defaults to `Authorization`                                                                                            |
+   | Header Auth Value Pattern | A "[% string](https://www.freecodecamp.org/news/python-string-format-python-s-print-format-example/)" format string. Defaults to `Bearer %s` |
+   | API Key                   | The API key inserted over `%s`. (`YOUR_API_KEY` above)                                                                                       |
+
+## API Key in Query Parameter
+
+Your API key will be added as an HTTP query parameter like this:
+
+```shell
+curl -X GET "https://api.example.com/data?API_Key=YOUR_API_KEY"
+```
+
+To set this up:
+
+1. Select **API Key** from the **Auth Config** dropdown.
+2. Choose **Param Auth** as the **Auth Type**.
+3. Fill in these fields:
+
+   | Field Name            | Field Value                                                              |
+   | :-------------------- | :----------------------------------------------------------------------- |
+   | Param Auth Param Name | The query parameter name associated with your API key. (`API_Key` above) |
+   | API Key               | The actual API key value itself. (`YOUR_API_KEY` above)                  |
+
+   <br />

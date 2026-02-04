@@ -1,0 +1,111 @@
+---
+title: Migrating From Classic
+excerpt: 'Agent Studio Migration Runbook: From Classic to Agent Studio'
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+next:
+  pages:
+    - slug: plugin-process
+      title: Conversation Process
+      type: basic
+    - slug: http-actions
+      title: HTTP Actions
+      type: basic
+    - slug: control-flow
+      title: Control Flow
+      type: basic
+    - slug: activities
+      title: Activities
+      type: basic
+    - slug: compound-actions
+      title: Compound Actions
+      type: basic
+    - slug: notify
+      title: Notify
+      type: basic
+    - slug: webhooks-listener
+      title: Listener Configuration
+      type: basic
+---
+# Overview
+
+This runbook provides high-level guidance for migrating use cases from Agent Studio Classic to Agent Studio 2.0. It focuses on replacing classic constructs (**Queries**, **Paths**, **Query-Triggered Paths**, **Events**, and **Event-Triggered Paths**) with 2.0 equivalents: **Conversation Agents** for user-triggered interactions and **Ambient Agents** for external triggers.
+
+#### Key principles:
+
+* Classic limitations (e.g., single API calls) are lifted in 2.0, allowing multiple actions where beneficial, though this runbook emphasizes direct migrations.
+* Conversation Agents handle user-initiated flows via Conversation Processes.
+* Ambient Agents manage event-driven flows using Webhook Listeners and Compound Actions.
+
+# Migration for User-Triggered Use Cases (Conversation Agents)
+
+These replace classic Queries and Paths. Build them as Conversation Processes, which orchestrate user interactions, data retrieval, and decisions.
+
+## 1. Migrating a Query (GET Request for Business Records)
+
+* **Classic Behavior**: Single GET request to fetch records.
+* **2.0 Approach**: Create a Conversation Process with a single Action Activity invoking an HTTP Action (GET).
+  * **Steps**:
+    * Create a Conversation Process.
+    * Add an Action Activity; configure it to call the HTTP endpoint with necessary slots (e.g., query strings from user input).
+    * Attach the conversation process to a plugin.
+  * **Optional Enhancement**: Add multiple Action Activities for fetching from disparate sources and combining data via Moveworks Data Mappers.
+* **Expected Outcome**: User receives retrieved data in the conversation.
+
+## 2. Migrating a Path that Submits an HTTP Request (Decision-Based POST/PUT)
+
+* **Classic Behavior**: Branching decisions leading to a single POST/PUT at the end; no data presentation mid-path.
+* **2.0 Approach**: Use a Conversation Process with a Decision Policy for branching.
+  * **Steps**:
+    * Create a Conversation Process.
+    * Implement a **Decision Policy** to route based on user selections or intents (e.g., conditions like "if user chooses option A").
+    * At the branch end, add an **Action Activity** for the HTTP Action (POST/PUT) to update records.
+  * Note: Unlike classic, you can intersperse multiple actions or present intermediate data if needed.
+* **Expected Outcome**: User navigates branches, finishing with a record update.
+
+## 3. Migrating a Path that Branches to Forms or Knowledge
+
+* **Classic Behavior**: Similar to above, but ends with an ingested form or knowledge base (KB) instead of an API.
+* **2.0 Approach**: Mirror the above, but use a Content Activity at the branch end.
+  * **Steps**:
+    * Configure the **Conversation Process** and **Decision Policy** as in migration 2
+    * In the target branch, insert a **Content Activity** linked to the form or KB resource.
+  * Note: Ensure the form/KB is ingested by the assistant.
+* **Expected Outcome**: User is routed to and presented with the form or KB content.
+
+## 4. Migrating a Query-Triggered Path (Lookup Followed by Modification)
+
+* **Classic Behavior**: Data lookup combined with path for modification or other actions.
+* **2.0 Approach**: Employ a Conversation Process with a Slot using a Dynamic Resolver for external lookup.
+  * **Steps**:
+    * Define a **Slot** in the process to capture user criteria for lookup.
+    * Attach a **Dynamic Resolver** to the Slot; configure it to call an HTTP Action (GET) for data retrieval.
+    * Present resolved options to the user for selection.
+    * Use a **Decision Policy** or subsequent **Action Activity** to handle modifications (e.g., POST/PUT on selected record).
+* **Expected Outcome**: User views and selects from looked-up data, then proceeds to update.
+
+# Migration for External-Triggered Use Cases (Ambient Agents)
+
+These replace classic **Events**. Use **Listeners** to receive arbitrary payloads, processed via **Compound Actions**. For message delivery, leverage the notify expression.
+
+## 5. Migrating an Event (External Trigger for User Message)
+
+* **Classic Behavior**: Event API receives payload,`{recipients: [], message: ""}`, and delivers to the assistant.
+* **2.0 Approach**: Configure an Ambient Agent with a Listener and Compound Action.
+  * Steps:
+    * Set up a Listener to accept any payload (e.g., include user email as recipient and custom data/message).
+    * Route the payload to a Compound Action for processing (e.g., validate data, transform if needed).
+    * In the Compound Action, use the `notify` expression to send a notification to the user (via email or assistant).
+* **Expected Outcome**: External system triggers a webhook; user receives the processed message/notification.
+
+## 6. Migrating an Event-Triggered Path (Event with Update Options)
+
+* **Classic Behavior**: Event triggers a path for actions like approve/reject.
+* **2.0 Approach**: Extend the above with interactive elements in `notify`.
+  * **Steps**:
+    * Follow migration 5 for Listener and Compound Action setup.
+    * In the `notify` expression, add buttons linked to HTTP Actions (e.g., approve triggers POST to approval endpoint; reject triggers another).
+    * Handle button responses within the Compound Action or chained processes.
+* **Expected Outcome**: User receives notification with actionable buttons; selections execute updates.

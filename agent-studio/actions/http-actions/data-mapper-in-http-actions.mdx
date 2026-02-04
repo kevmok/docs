@@ -1,0 +1,336 @@
+---
+title: Data Mapper in HTTP Actions
+excerpt: >-
+  Build complex JSON payloads directly in the HTTP Action body editor using Data
+  Mapper syntax.
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+next:
+  pages:
+    - slug: moveworks-bender-language-reference
+      title: Data Mapper / JSON Bender Reference
+      type: basic
+    - slug: moveworks-dsl-reference
+      title: DSL Reference
+      type: basic
+---
+## Overview
+
+Data Mapper is a YAML-based transformation language for constructing and manipulating JSON payloads. Within Data Mapper, you can also use [DSL expressions](/docs/moveworks-dsl-reference) for string manipulation, type conversion, and computed values.
+
+```yaml
+# Data Mapper with DSL expressions
+ticket_number: number.display_value.$TRIM()
+total: "$INTEGER(quantity) * $INTEGER(price)"
+```
+
+<Image border={false} src="https://files.readme.io/95778ff62d4abcca218cdb970ccebadb87e1fd5d8304a3386323ff3722cb7484-CleanShot_2026-01-26_at_10.54.14.gif" />
+
+## When to Use Data Mapper
+
+Use Data Mapper when you need to:
+
+* Build **dynamic arrays** of objects from input data
+* Create **nested JSON structures** with computed fields
+* **Transform data** before sending (filter, map, sort)
+* Include **conditional fields** based on input values
+
+Stick with Mustache for simple variable substitution where the JSON structure is static.
+
+## Quick Start
+
+### Mustache (Before)
+
+```json
+{
+  "user": "{{user_email}}",
+  "message": "{{message_text}}"
+}
+```
+
+### Data Mapper (After)
+
+```yaml
+user: user_email
+message: message_text.$TRIM()
+```
+
+Both produce the same output for simple cases. Data Mapper is useful when you need array manipulation or conditional logic.
+
+***
+
+## Building Complex Payloads
+
+### Example 1: Create a List of Objects
+
+**Scenario**: Send a bulk update request with multiple items.
+
+**Input Data**:
+
+```json
+{
+  "items": [
+    {"id": "001", "name": "Item A", "quantity": 5},
+    {"id": "002", "name": "Item B", "quantity": 3}
+  ]
+}
+```
+
+**Data Mapper**:
+
+```yaml
+updates:
+  MAP():
+    items: items
+    converter:
+      item_id: item.id
+      item_name: item.name.$UPPERCASE()
+      qty: item.quantity
+```
+
+**Output**:
+
+```json
+{
+  "updates": [
+    {"item_id": "001", "item_name": "ITEM A", "qty": 5},
+    {"item_id": "002", "item_name": "ITEM B", "qty": 3}
+  ]
+}
+```
+
+***
+
+### Example 2: Conditional Fields
+
+**Scenario**: Include a field only when a condition is met.
+
+**Input Data**:
+
+```json
+{
+  "priority": "high",
+  "description": "Server is down"
+}
+```
+
+**Data Mapper**:
+
+```yaml
+ticket:
+  description: description
+  urgency:
+    CONDITIONAL():
+      condition: priority == 'high'
+      on_pass: "'urgent'"
+      on_fail: "'normal'"
+```
+
+**Output**:
+
+```json
+{
+  "ticket": {
+    "description": "Server is down",
+    "urgency": "urgent"
+  }
+}
+```
+
+***
+
+### Example 3: Flatten Nested Data
+
+**Scenario**: Extract values from a nested API response.
+
+**Input Data** (ServiceNow-style):
+
+```json
+{
+  "number": {"display_value": "INC12345", "value": "INC12345"},
+  "state": {"display_value": "Open", "value": "1"},
+  "assigned_to": {"display_value": "John Doe", "value": "user123"}
+}
+```
+
+**Data Mapper**:
+
+```yaml
+ticket_number: number.display_value
+status: state.display_value
+assignee: assigned_to.display_value.$TRIM()
+```
+
+**Output**:
+
+```json
+{
+  "ticket_number": "INC12345",
+  "status": "Open",
+  "assignee": "John Doe"
+}
+```
+
+***
+
+### Example 4: Filter and Transform Arrays
+
+**Scenario**: Send only high-priority items to an API.
+
+**Input Data**:
+
+```json
+{
+  "tasks": [
+    {"name": "Task 1", "priority": 1},
+    {"name": "Task 2", "priority": 3},
+    {"name": "Task 3", "priority": 1}
+  ]
+}
+```
+
+**Data Mapper**:
+
+```yaml
+high_priority_tasks:
+  FILTER():
+    items: tasks
+    condition: item.priority == 1
+```
+
+**Output**:
+
+```json
+{
+  "high_priority_tasks": [
+    {"name": "Task 1", "priority": 1},
+    {"name": "Task 3", "priority": 1}
+  ]
+}
+```
+
+***
+
+### Example 5: Build Request from 2D Array
+
+**Scenario**: Transform a Snowflake/SQL response into structured JSON.
+
+**Input Data**:
+
+```json
+{
+  "columns": ["id", "name", "email"],
+  "rows": [
+    ["001", "Alice", "alice@example.com"],
+    ["002", "Bob", "bob@example.com"]
+  ]
+}
+```
+
+**Data Mapper**:
+
+```yaml
+users:
+  MAP():
+    items: rows
+    converter:
+      MERGE():
+        FLATTEN():
+          - "item.$MAP((x, i) => {columns[i]: x})"
+```
+
+**Output**:
+
+```json
+{
+  "users": [
+    {"id": "001", "name": "Alice", "email": "alice@example.com"},
+    {"id": "002", "name": "Bob", "email": "bob@example.com"}
+  ]
+}
+```
+
+***
+
+## Common Operators Reference
+
+| Operator        | Purpose                       | Example                                                           |
+| --------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `MAP()`         | Transform each item in array  | `MAP(): { items: list, converter: ... }`                          |
+| `FILTER()`      | Keep items matching condition | `FILTER(): { items: list, condition: item.active }`               |
+| `CONDITIONAL()` | If/else logic                 | `CONDITIONAL(): { condition: x > 5, on_pass: ..., on_fail: ... }` |
+| `MERGE()`       | Combine multiple objects      | `MERGE(): [obj1, obj2]`                                           |
+| `FLATTEN()`     | Flatten nested arrays         | `FLATTEN(): [arr1, arr2]`                                         |
+| `CONCAT()`      | Join strings                  | `CONCAT(): { items: [a, b], separator: ", " }`                    |
+| `LOOKUP()`      | Map values                    | `LOOKUP(): { key: status, mapping: {"1": "Open"} }`               |
+
+### String Functions
+
+Apply directly to field values:
+
+```yaml
+# Trim whitespace
+name: user_name.$TRIM()
+
+# Convert to uppercase
+code: product_code.$UPPERCAES()
+
+# Convert to lowercase  
+email: user_email.$LOWERCASE()
+
+# Parse as integer
+count: "$INTEGER(quantity_string)"
+```
+
+***
+
+## Troubleshooting
+
+> **Tip**: Test with hardcoded values first, then add Data Mapper transformations one at a time.
+
+### Syntax Errors
+
+Data Mapper uses YAML. Watch for:
+
+* **Indentation**: Use consistent spaces (not tabs)
+* **Quotes**: String literals need single quotes inside: `"'literal string'"`
+* **Colons in values**: Wrap in quotes if value contains `:`
+
+**Wrong**:
+
+```yaml
+message: Hello: World
+```
+
+**Correct**:
+
+```yaml
+message: "'Hello: World'"
+```
+
+### Empty Arrays
+
+If `MAP()` or `FILTER()` returns empty, check:
+
+1. The `items` path is correct
+2. Input data actually contains the expected array
+3. Filter condition isn't too restrictive
+
+### Debugging
+
+1. Test your API with hardcoded values first
+2. Add one Data Mapper transformation at a time
+3. Check the **Response** tab to see actual output
+
+***
+
+## Migration from Mustache
+
+| Mustache                    | Data Mapper Equivalent    |
+| --------------------------- | ------------------------- |
+| `{{variable}}`              | `variable`                |
+| `{{{array}}}` (stringified) | `array` (as actual array) |
+
+**Key difference**: Data Mapper preserves types. Arrays stay as arrays, numbers stay as numbers. No need for `$STRINGIFY_JSON()` workarounds.

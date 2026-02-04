@@ -1,0 +1,71 @@
+---
+title: 'Examples: Parsing a Streamed Response'
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+<Callout icon="📘" theme="info">
+  Scenario: You receive streamed (SSE-style) responses from an action and want to parse it into objects.
+</Callout>
+
+An HTTP action returns a streamed response in this format:
+
+```
+data: {"thread_id": "d7b653f6-076a-4dfe-ae1f-cba4c442jd34", "date": "2025-11-11T20:37:49.053856Z"}
+
+data: {"chunk": "echo bravo papa juliet oscar echo kilo mike kilo. (topic: hello from azure)"}
+
+data: {"chunk": "charlie delta lima victor zulu whiskey delta uniform november. (topic: hello from azure)"}
+
+data: {"chunk": "victor tango foxtrot india hotel tango papa xray alpha romeo. (topic: hello from azure)"}
+
+data: {"chunk": "lima hotel oscar november uniform whiskey zulu india whiskey papa. (topic: hello from azure)"}
+```
+
+You want to produce:
+
+* `thread_id` from the first object
+* `date` from the first object
+* `text`as a concatenation of all chunk values
+
+**Approach**
+
+Treat the streamed output as a JSON array encoded as text:
+
+1. Remove the data: prefix
+2. Create JSON Strings
+3. Parse with $PARSE_JSON()
+4. Extract metadata from index [0] and chunks from [1:]
+
+In your compound action the return can reference the SSE action
+
+```yaml
+- return:
+    output_mapper:
+      thread_id: $CONCAT("[", data.action_output.$REPLACE("data: ", ",").$TRIM(),"]"], "").$PARSE_JSON([0].thread_id
+      date: $CONCAT(["[", data.action_output.$REPLACE("data: ", ",").$TRIM(),"]"], "").$PARSE_JSON()[0].date
+      text:
+        EVAL():
+          expression: $CONCAT(x, " ")
+          args:
+            x:
+              MAP():
+                items: >
+                  $CONCAT(
+                    ["[", data.action_output.$REPLACE("data: ", ",").$TRIM()[1:], "]"],
+                    ""
+                  ).$PARSE_JSON()[1:]
+                converter: item.chunk
+
+```
+
+Or
+
+```yaml
+MERGE():
+  - data.action_output.$SPLIT("\n\n")[0].$REPLACE("^data: ", "").$PARSE_JSON()
+  - text: data.action_output.$TRIM().$SPLIT("\n\n").$MAP(x => x.$REPLACE("^data: ", "").$PARSE_JSON().chunk).$CONCAT("\n", true)
+```
+
+<br />

@@ -1,0 +1,66 @@
+---
+title: Plugin Promotion
+excerpt: >-
+  Export & import your plugins across instances to move it from a development
+  sandbox to production.
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+# How it works
+
+> 🚧 Webhook triggered plugins are currently not importable. Please create the webhook in the desired tenant and copy over the assets as needed.
+
+> 🚧 When exporting plugins from one tenant to another, we drop the connector by design from the plugin. This is to ensure we are not sharing sensitive authentication details cross use cases.
+>
+> If you have sensitive information in other components of the plugin (such as the action), please remove them or template them before exporting the plugin. We will not automatically trim these fields when exporting.
+
+1. Go to Agent Studio and select the hamburger menu for any specific **Plugin** on the far right. Click on **Export**
+
+<Image border={false} src="https://files.readme.io/ff9a6cc7922f5d51d48672bb32733dad54074d5c3bf24dcf5a9c75f8803c40ff-image.png" />
+
+<br />
+
+2. You will be given an installation link that you can copy and paste into another browser tab.
+
+   <Image border={false} src="https://files.readme.io/8bfe387dc882dadc9ab3c5f3c22ffe99952495716f1752ea84c97b912012a3e7-CleanShot_2025-06-27_at_13.35.072x.png" />
+
+   <br />
+
+   > 📘 Installation Links are valid for 24 hours.
+   >
+   > Once they expire you will need to regenerate them.
+3. Paste the link into your browser. Select the tenant you wish to export this plugin to. Note: if you are not already logged into this tenant, you can also **Add another tenant**. You will then be prompted to login to the new tenant.
+
+<Image border={false} src="https://files.readme.io/b15047dc4c9f27f6caba6e359deb7c3f4c176c81e32e21ef7fb7f8bbe06ee68c-CleanShot_2025-06-27_at_13.36.322x.png" />
+
+5. Follow the **Installation Steps** as part of the installation wizard. You will have to select the connector(s) used in your use case and resolve any name conflicts.
+
+<Image border={false} src="https://files.readme.io/e9c9e96bcfaab5fdcc18151591130726d4befda8ea8bcbe7783fc43dd47cb574-CleanShot_2025-06-27_at_13.43.532x.png" />
+
+<br />
+
+6. Click **Install Template** and this plugin should now be in the new environment! Congrats – you've successfully promoted a plugin between instances.
+
+# FAQ
+
+## Can you import across data centers?
+
+No. For example, if you have a sandbox instance in a US West instance, but you want to move it to an EU instance, this is not allowed for security reasons.
+
+## What happens if you import a plugin into the same environment?
+
+It will work, but it will duplicate the plugin. It does not matter which instance your import key was generated from. If you need to apply an update to an existing plugin, you will need to delete the existing plugin and redeploy it.
+
+## Can you export a draft plugin?
+
+No. The plugin MUST be published to be exported.
+
+## Can I export from production and import to sandbox?
+
+Yes! You can export and import between production and sandbox and vice versa!

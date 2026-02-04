@@ -1,0 +1,164 @@
+---
+title: 'Examples: 2D Arrays'
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+If you're building an integration with a tool like Snowflake, you might get a response that looks something like this:
+
+```
+{
+    "resultSetMetaData": {
+        "numRows": 3931,
+        "format": "jsonv2",
+        "rowType": [
+            {
+                "name": "FEEDBACK_ID",
+            },
+            {
+                "name": "APPLICATION_ID",
+            },
+            {
+                "name": "CANDIDATE_ID",
+            },
+            {
+                "name": "REQ_ID",
+            },
+            {
+                "name": "STAGE",
+            },
+            {
+                "name": "INTERVIEWER",
+            },
+            {
+                "name": "POSITIVE_THEMES",
+            },
+            {
+                "name": "NEGATIVE_THEMES",
+            },
+            {
+                "name": "RATING",
+            },
+            {
+                "name": "CANDIDATE_NAME",
+            },
+            {
+                "name": "APPLICATION_DATE",
+            },
+            {
+                "name": "CLOSE_DATE",
+            },
+            {
+                "name": "CURRENT_STAGE",
+            },
+            {
+                "name": "FURTHEST_STAGE",
+            },
+            {
+                "name": "APPLICATION_STATUS",
+            },
+            {
+                "name": "ROLE",
+            },
+            {
+                "name": "DEPARTMENT",
+            },
+            {
+                "name": "HIRING_MANAGER",
+            },
+            {
+                "name": "TARGET_HIRE_DATE",
+            },
+            {
+                "name": "REQUISITION_STATUS",
+            },
+            {
+                "name": "FEEDBACK",
+            }
+        ]
+    },
+    "data": [
+        [
+            "F-3001",
+            "APP-2001",
+            "C-9001",
+            "REQ-1001",
+            "Phone",
+            "Richard Garza",
+            "Culture Fit",
+            "Domain Knowledge Gap, Skills Alignment",
+            "2",
+            "Dan Turner",
+            "20307",
+            null,
+            "Rejected",
+            "Phone",
+            "Active",
+            "Backend Engineer",
+            "Infrastructure",
+            "Julie Gonzalez",
+            "20403",
+            "Open",
+            "Dan seemed like he'd be a good fit interpersonally, and I enjoyed our conversation. However, he struggled when I asked him about different approaches to scaling a database; he wasn't familiar with sharding or other common techniques. I have concerns about whether his current skillset aligns with the requirements of the backend engineer role."
+        ],
+        [
+            "F-3002",
+            "APP-2001",
+            "C-9001",
+            "REQ-1001",
+            "Onsite",
+            "Traci Thomas",
+            "Collaboration, Creativity",
+            "Slow Execution",
+            "3",
+            "Dan Turner",
+            "20307",
+            null,
+            "Rejected",
+            "Phone",
+            "Active",
+            "Backend Engineer",
+            "Infrastructure",
+            "Julie Gonzalez",
+            "20403",
+            "Open",
+            "Dan collaborated well in the group exercise, and I liked his creative solutions for scaling the caching layer. However, when implementing the suggested improvements to the message queue, he seemed to get bogged down in the details and didn’t complete the task in the allotted time. The candidate demonstrated slow execution."
+        ],
+        [
+            "F-3003",
+            "APP-2001",
+            "C-9001",
+            "REQ-1001",
+            "Offer",
+            "Gina Hoffman",
+            "Creativity, Collaboration",
+            "Debugging Skills",
+            "5",
+            "Dan Turner",
+            "20307",
+            null,
+            "Rejected",
+            "Phone",
+            "Active",
+            "Backend Engineer",
+            "Infrastructure",
+            "Julie Gonzalez",
+            "20403",
+            "Open",
+            "Dan showed a lot of creativity when suggesting alternative solutions for scaling our data pipelines and he proactively sought input from other engineers on the team to refine his ideas. However, during the coding exercise, I observed that he struggled to efficiently debug a memory leak, which could be a point of concern in our fast-paced environment. This is definitely something that he could work on."
+        ]
+    ]
+}
+```
+
+There's basically an array of Column Definitions, and then a 2D array of data. To make this data more LLM (and human) friendly, you'll want to convert it using a Data Mapper. So for example, if that API response came from an action-based activity, you would map it like this:
+
+```yaml
+MAP():
+	items: response.data
+	converter:
+		MERGE():
+			FLATTEN():
+      - "item.$MAP((x, i) => {response.resultSetMetaData.rowType[i].name: x})"
+```

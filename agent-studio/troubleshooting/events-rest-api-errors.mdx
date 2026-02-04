@@ -1,0 +1,142 @@
+---
+title: Events - REST API Errors
+deprecated: false
+hidden: true
+metadata:
+  robots: index
+---
+Here, you can find troubleshooting instructions for all errors that happen when sending requests to our [REST API](https://help.moveworks.com/reference/sendmessageforevent#/).
+
+# `Unauthorized` error - "Token validation failed"
+
+### Possible Cause: Wrong Base URL
+
+**To fix:** make sure you are hitting the correct endpoint based on the data center your organization uses.
+
+Most customers will use `https://api.moveworks.ai` as their base URL.
+
+### Possible Cause: Incorrect Token Prefix
+
+**To fix:** make sure you're including the appropriate prefix for your Authorization headers. For example, if using API key authentication, specify `Authorization: Bearer <YOUR_TOKEN_HERE>` instead of just`Authorization: <YOUR_TOKEN_HERE>`.
+
+***
+
+# `BAD_REQUEST` error - "One or more fields have an incorrect data-type"
+
+### Possible Cause: the recipients list are not put in an array
+
+**To fix:** wrap the recipients list in an array
+
+* ie: "email1@moveworks", "email2@moveworks" -> ["email1@moveworks", "email2@moveworks"]
+
+***
+
+# `BAD_REQUEST` error  - "Parsing of json payload failed : invalid character"
+
+### Possible Cause: the emails in the recipients list aren't strings
+
+**To fix:** cast each email into a string (ie. ["email1@moveworks", "email2@moveworks"])
+
+* ie: [email1@moveworks, email2@moveworks] -> ["email1@moveworks", "email2@moveworks"]
+
+***
+
+# `INVALID_EVENT_ID` error
+
+### Possible Cause: The Event ID you are using the Events API call doesn't exist
+
+**To fix:** Copy and paste directly from Agent Studio to avoid typos.
+
+***
+
+# `INVALID_VALUE_SIZE_TOO_LONG` error
+
+### Possible Cause: The recipients list is larger than 500 emails
+
+**To fix:** Seperate the recipients list over multiple, back-to-back API Requests
+
+### Possible Cause: The message is larger than 20000 characters
+
+**To fix:** Make your message more concise! See our [designing for chat guide](/creator-studio/conversation-design/guidelines/chat-design/) for more tips!
+
+***
+
+# 429 error code
+
+### Possible Cause: You sent more than 120 requests/min. This is the Events API rate limit
+
+**To fix:** Ask Support if it's appropriate to increase your rate limit
+
+***
+
+# End User not receiving message
+
+### Possible Cause: Emails in the recipient list are not valid
+
+**To fix:** Make sure the recipient list contains each user's full, primary work email
+
+### Possible Cause: User is not whitelisted in the Launch Management settings for the Event
+
+**To fix:** Make sure the user not receiving notifications is added to the whitelist. This may require you to switch "Launch to all users"
+
+***
+
+# Analytics not appearing for specific use case
+
+### Possible Cause: Using incorrect Event ID for the use case you are looking to track
+
+**To fix:** Make sure you have copy and pasted the correct Event ID into the request(s) this message is being sent from.
+
+***
+
+# Invalid Slot Keys Error
+
+### Possible Cause: Slot Key is not defined for Event ID in CREST
+
+If you see this error, it means that the slot key is NOT DEFINED for the Event ID specified in CREST:
+
+```json
+{
+    "error": {
+        "code": "INVALID_SLOT_KEYS",
+        "message": "Undefined slot keys: ['property2'] for 013d8484-26e7-454e-9de0-eb4bd70bc0a3; slots must be defined in Agent Studio for the specified Event"
+    }
+}
+```
+
+**To fix:**
+
+1. Find the Event with the specified Event ID, add the slot, and click `save`
+
+   ![](https://files.readme.io/e6fb1fee7ce301f5d95ddfcfb7ab028caf590ffa1c52a385487c666a7abee8cc-101slotkeys.png)
+
+2. Publish the event again
+
+   ![](https://files.readme.io/7e64af14803a027bf170d09e4430ae650e96871bdba8d383cba6a184eb624aee-102slotkeys.png)
+
+### Possible Cause: Slot Key is defined and not used in the request
+
+If you see this error, it means that the slot key is DEFINED for the Event ID specified in CREST but NOT USED in the request:
+
+```json
+{
+    "error": {
+        "code": "INVALID_SLOT_KEYS",
+        "message": "Missing slot keys: ['property1'] for 013d8484-26e7-454e-9de0-eb4bd70bc0a3; slots defined for the specified Event must be used in the request"
+    }
+}
+```
+
+**To fix:** Add the specified slot to the “slots” object like so:
+
+```json
+{
+    "message": "We wanted to notify you of a current Kibana Outage. \nOur IT team is looking into it and will follow up when the issue is resolved.",
+    "recipients": [
+        "lucas.rollo@moveworks.ai"
+    ],
+    "context": {
+        "slots":{"property1": "some_data"}
+    }
+}
+```

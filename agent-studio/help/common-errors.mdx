@@ -1,0 +1,51 @@
+---
+title: Common Errors
+excerpt: This guide covers common errors across the product.
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+If you're having an issue with a specific feature or component, please check the corresponding documentation for relevant troubleshooting materials.
+
+# Unknown Error Codes
+
+> ❗️ Sorry we cannot process your request this time
+>
+> The following error codes are considered **Unknown**.
+>
+> * 1, 4, 101, 201, 11500, 13000, 13100, 13200
+
+We recommend [contacting support](https://help.moveworks.com/docs/support#how-to-contact-moveworks-support) if you encounter this error.
+
+# Error Code: 12911
+
+> ❗️ The item you are trying to delete is still used elsewhere. Please remove all usage(s) and try again.
+>
+> For example, if you are trying to delete a connector and are seeing this message, it means that connector is actively used in one or more use cases.
+
+We plan on providing better support for this error message in the future. In the mean time, you should [contact support](https://help.moveworks.com/docs/support#how-to-contact-moveworks-support) to help identify the additional usages.
+
+# Error Code: 13005
+
+> ❗️ "Failed to save DSL V1 config: \{error\_detail}"
+>
+> This is referring to an DSL field that has an invalid DSL rule.
+
+The \{error\_detail} should tell you the DSL error & where it's located.
+
+For example, `Failed to save DSL V1 config: **Empty DSL expression** for field [**launch_config**.user_allow_list_config.allowlist_rule]` tells us we have an empty launch config.
+
+# Error Code: 13121
+
+> ❗️ "There are errors with the field: \{error\_detail}"
+>
+> For example, you use an invalid character when naming your connector
+
+The \{error\_detail} should give you enough information to resolve this error.
+
+As a reminder, connectors can only use lowercase, uppercase, and underscore characters.

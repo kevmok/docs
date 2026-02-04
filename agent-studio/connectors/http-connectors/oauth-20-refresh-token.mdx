@@ -1,0 +1,36 @@
+---
+title: OAuth 2.0 - Refresh Token
+excerpt: ''
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+OAuth 2.0 with Refresh Token grant type entails sending a valid Client ID and Client Secret in exchange for an Access Token and a Refresh Token.
+
+* This Access Token is then used in subsequent requests, usually as a Bearer Token, to authenticate the API Request. When this Access Token is expired, the Refresh Token is used to retrieve a new one from the `token url`.
+* To set this up, choose `Oauth2` from the **Auth Config** dropdown list.
+
+<Image align="center" className="border" border={true} src="https://files.readme.io/168a0b5ef0507b8ebbbf4cade764be68a5501a7970aa4277b674f53621105b73-refreshtoken_part1.png" />
+
+* `Oauth 2 Grant Type`: This should be set to `Refresh Token Grant`
+
+* `Client ID`: This is where you input your actual Client ID value itself. 
+
+* `Client Secret`: This is where you input your actual Client Secret value itself. 
+
+* `Refresh Token Grant Refresh Token`: This is where you input your actual Refresh Token value itself. 
+
+* `Client Credentials Grant Scope`: Leave this blank.
+
+* `Oauth2 Token Url`: This is where you input the ***full*** token URL.
+
+<Image align="center" className="border" border={true} src="https://files.readme.io/817b871a7415371aa7dbf649bb3ba2423ca01b1e0a0669acdb71e1e75d4b6f9c-oauth2part2_2.png" />
+
+* `Oauth2 Client Authentication`: This can be left blank.\
+  Moveworks will try making the request with both Basic Auth and Request Body Auth by default.
+* `Header Auth Key`, `Header Auth Value Pattern`, `Oauth2 Custom Grant Type`, `Oauth2 Custom Oauth Request Options Custom Grant Type`, `Oauth2 Custom Oauth Request Options Additional Headers`, and `Oauth2 Custom Oauth Request Options Additional Request Data` should all be left blank.

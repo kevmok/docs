@@ -1,0 +1,262 @@
+---
+title: 'Quickstart #5: Advanced Compound Actions'
+excerpt: ''
+deprecated: true
+hidden: true
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+# Use Case Overview
+
+This quickstart guide walks you through creating a use case for Task Agents with Complex Integrations using Advanced Compound Actions in Moveworks. The scenario focuses on filtering an API response to extract relevant data when the API lacks built-in filtering capabilities or the user inputs require additional refinement. Instead of relying on [APIthon](apithon-a-special-kind-of-python), this use case leverages [Moveworks Data Mappers](moveworks-bender-language-reference) and [Moveworks DSL](moveworks-dsl-reference) to process and filter API responses quickly and efficiently. By the end, you will learn how to streamline API data handling, making your Task Agents more responsive and adaptable to user needs without the burden of custom scripting.
+
+![](https://files.readme.io/3457d9aac240f0257bbe193d07b8f0c55a1bb5c5a03609241c3f31e8689e9cc2-CleanShot_2025-04-07_at_14.22.47.png)
+
+<br />
+
+## Objectives
+
+* Understand how to use Moveworks Data Mappers to transform and structure API response data effectively.
+* Learn to apply Moveworks DSL to filter API responses based on user inputs or specific conditions
+* Build an Advanced Compound Action that processes an unfiltered API response and delivers tailored results faster than traditional scripting methods like APIthon.
+* Gain practical experience in creating a Task Agent that integrates complex API data with minimal coding.
+
+## Prerequisites
+
+1. Completion of [Quickstart #1: Basic Task Agent](https://help.moveworks.com/docs/intro-to-agent-studio-build-your-first-task-agent)
+2. Completion of [Quickstart #3: Beginner Compound Actions](https://help.moveworks.com/docs/agentic-automation-engine-ooo-plugin)
+
+<br />
+
+# Step-by-Step Guide
+
+1. **Create an HTTP Action:**\
+   To get started, you need to create an [**HTTP Action**](https://help.moveworks.com/docs/http-actions). This action will allow us to communicate with an external system. Navigate to your Agent Studio portal.\
+   \[placeholder image]
+   1. Click on **Plugins**
+   2. Select **Actions** on the left sidebar
+   3. Click on **Create** to initiate your first action
+2. **Enter API Information:**\
+   *If you already have the Purple API connector, you can skip steps 1 & 2 and import the connector instead.*
+
+   ![](https://files.readme.io/4d37678c2707aa6b5e2b890349d98b7b5dd18eaed645ba6d72d65a1ff779bc7c-CleanShot_2025-04-07_at_16.48.32.png)
+
+   1. Set the **Name** to `get_session_devices`
+   2. Set the **Description** to `An API that returns all devices for a session`
+   3. Provide the base URL of the API and set the action to **GET** [`https://us-central1-creator-studio-workflows.cloudfunctions.net`](https://us-central1-creator-studio-workflows.cloudfunctions.net/)
+   4. Set the Authorization to `No Auth`
+   5. Enter the endpoint `/getDevices`
+   6. **OPTIONAL**: import this cURL using the icon button next to the **Test** button
+      ```
+      curl "https://us-central1-creator-studio-workflows.cloudfunctions.net/getDevices?sessionId={{session_id}}"
+      ```
+3. **Create Purple API Session:**\
+   You will need to a create a session ID in the [Purple API tool](purple-api-tool) and select the **Devices** tab and add few devices to that session.
+
+   ![](https://files.readme.io/712f2a93c66b93d9080b1c54eaf8519a1c36aaee1d085c62119e64f987ce381c-CleanShot_2025-04-07_at_16.56.51.png)
+
+   1. Click on **Create New Session ID**
+   2. Select the **Devices** tab
+   3. Add some devices by clicking on the **Add a Device** button
+4. **Add sessionId Parameter:**\
+   You will be using the session ID you created in step 3 in the action's `sessionId` query parameter, this will allow the action fetch the devices you added.\
+   *If you imported the endpoint as a curl as shown in step 2, the query parameter will be populated for you. You will only need to replace the value of it.*
+
+   ![](https://files.readme.io/3404764ad9acca89725b401c8ce60f677c64cec5404732c61243adef5e5afc75-CleanShot_2025-04-07_at_17.01.39.png)
+
+   1. Head to the **Params** tab and click on **+ADD** to add a new entry
+   2. In the **Key** field type,  type `sessionId`
+   3. In the **Value** field type the Session ID you generated in step 2.
+5. **Publish Your Action:**\
+   You will now be publishing your action, so your plugins and compound actions can use it. First, you will test the action and confirm that the response body is as expected and then publish it.
+
+   ![](https://files.readme.io/082cc08abbbf4391807339e2e645b75dd3bfabd5110676bce947a8a70b147713-CleanShot_2025-04-07_at_17.06.13.png)
+
+   1. Click on the **Test** button to test the action.
+   2. Once the action has executed, confirm in the **Console** section that the response matches the devices that you set up in the Purple API Tool
+   3. Click on the **Publish** button to finish creating your action
+6. **Create a Compound action:**\
+   After publishing your action, head back to **Home**. Now you are ready to create a Compound Action, which will allow us to use our Action and filter the data it responds with.
+
+   ![](https://files.readme.io/8a69428b1b773f4b05a80152398c5ac045aeebb0f5dc91e7d2dad690fd3dfd78-CleanShot_2025-04-07_at_17.11.06.png)
+
+   1. Click on **Bodies** on the sidebar
+   2. Click on **Compound Actions**
+   3. Select **Create** to initiate a new Compound Action
+7. **Enter Compound Action Details:**
+
+   ![](https://files.readme.io/c809beb73f8858110d8e0146cbe9af89cb9755835d926e3c5446f0449ed47c78-CleanShot_2025-04-07_at_17.14.35.png)
+
+   1. Set the **Name** field to `get_session_devices_compound_action`
+   2. Set the **Description** field to `Retrieve and filter session devices for a user`
+8. **Create Compound Action Input Args**\
+   You will be creating input arguments for the compound action. This input arguments serve as inputs passed by the plugin, this could be **user inputs** or information passed from other plugin activities. In this case, it will the both the device status and device health inputted by the user.
+
+   ![](https://files.readme.io/d6f7929575a2d3d77e24171feacc6f519e59e72d22da585c584f3de15fab4c36-CleanShot_2025-04-07_at_17.20.56.png)
+
+   1. Click on the **Input Args** button
+   2. Click on **Create New**
+   3. The first input argument **status**
+      1. Set the **Variable Name** field to `status`
+      2. Set the **Data Type** dropdown field to `String`
+      3. Set the **Test Value** field to `active`
+      4. Set the **Description** field to `The status of the devices the user is looking for`
+      5. Check the **Required** field
+   4. 1. The first input argument **health\_status**
+      2. Set the **Variable Name** field to `health_status`
+      3. Set the **Data Type** dropdown field to `String`
+      4. Set the **Test Value** field to `healthy`
+      5. Set the **Description** field to `The health status of the devices the user is looking for`
+      6. Check the **Required** field
+9. **Write the Compound Action Script:**\
+   You will be writing a compound action script that will leverage the slots you created in the previous step to filter the API response from the action.
+
+   1. Copy the code block below and paste in the **Compound Actions Editor**
+
+      ```yaml YAML
+      steps:
+        - action:
+            action_name: get_session_devices
+            progress_updates:
+              on_complete: ON_COMPLETE_MESSAGE
+              on_pending: ON_PENDING_MESSAGE
+            output_key: get_session_devices_result
+        - return:
+            output_mapper:
+              MAP():
+                converter:
+                  health_status: item.device_health
+                  status: item.status
+                  name: item.device_name
+                items: data.get_session_devices_result.$FILTER(device => device.status ==
+                  data.status AND device.device_health == data.health_status)
+
+      ```
+
+   **Step-by-Step Explanation of the compound action**
+
+   1. Accessing the API Response Data
+      1. The process begins with `data.get_session_devices_result`, which is the list of device objects returned from your action
+   2. Applying the FILTER function
+      1. The `$FILTER` method is applied to `data.get_session_devices_result` with the condition:\
+         `device => device.status == data.status AND device.device_health == data.health_status`
+      2. **What FILTER does:**
+         1. It evaluates each device in the list.
+         2. It keeps only those devices where both conditions are true:
+            1. The device’s `status` matches `data.status` (the value provided by the user)
+            2. The device’s `device_health` matches `data.health_status` (another user provided value)
+         3. The `AND` operator ensures both conditions must hold for a device to be included
+      3. **Result**: A filtered list containing only the devices that satisfy these criteria
+   3. Applying the MAP Function
+      1. The filtered list from step 2 is passed as the `items` input to the `MAP()` function
+      2. The `converter` block defines how each item (device) in this filtered list is transformed: 
+         ```yaml
+         converter:
+           health_status: item.device_health
+           status: item.status
+           name: item.device_name
+         ```
+      3. **What MAP does:**
+         1. For each device in the filtered list, it creates a new object
+         2. This new object has three fields:
+            1. `health_status`: Set to the device’s `device_health` value.
+            2. `status`: Set to the device’s `status` value.
+            3. `name`: Set to the device’s `device_name` value.
+         3. Essentially, it extracts and renames these specific fields from each device.
+      4. **Result**: A new list of transformed objects, each containing only `health_status`, `status`, and `name`.
+   4. Click on the **Validate** and **Publish** buttons to create your compound action.
+10. **Create Conversational Plugin Body:**
+
+    ![](https://files.readme.io/a4ae45e2549187fbb5861dd5da623fdc5dad045939f3b81d5e11257bc53f5f96-CleanShot_2025-04-09_at_12.06.48.png)
+
+    1. Set the **Name**field to `retrieve_session_devices_body`
+    2. Set the **Description** field to `Retrieves a list of devices based on the status and health status of the devices`
+11. **Configure Conversational Body Slots:**
+
+    1. Click on the **Configure Slots** button
+    2. Click on **Create New**
+    3. The first slot **status**
+
+       1. Set the **Name** field to `status`
+       2. Set the **Data Type** dropdown field to string 
+       3. Set the **Slow Description field** to `You need to first retrieve the list of device statuses, show them to the user, and the user can choose their status from the list`
+       4. Set the **Slot Inference Policy** to `Infer slow value if available`
+       5. Click the **OPEN** button to set a resolver strategy:
+
+          ![](https://files.readme.io/6a9517c3d1305cf65b35c635c3ee936e63e6d52e39ecfba129d500d1d6512ebd-CleanShot_2025-04-08_at_09.34.22.png)
+
+          1. Set the **Method Name** field to `device_status_list`
+          2. Set the **Method Type** dropdown field to `Static`
+          3. Create 4 options - Active, Offline, Idle, Busy
+    4. The second slot **health\_status**
+
+       1. Set the **Name** field to `health_status`
+       2. Set the **Data Type** dropdown field to string (**right now as a custom type**)
+       3. Set the **Slow Description field** to `You need to first retrieve the list of device health statuses, show them to the user, and the user can choose their health status from the list`
+       4. Set the **Slot Inference Policy** to `Infer slow value if available`
+       5. Click the **OPEN** button to set a resolver strategy:
+
+          ![](https://files.readme.io/0a0014207b75d5a1b4d4258d79317c837a1e2876682861262114d98b8774b55f-CleanShot_2025-04-08_at_09.36.07.png)
+
+          1. Set the **Method Name** field to `device_health_status_list`
+          2. Set the **Method Type** dropdown field to `Static`
+          3. Create 4 options - Healthy, Poor, Degraded, Unknown
+12. **Add Compound Action to Conversational Body:**\
+    You will now add the compound action to the conversational body.
+
+    ![](https://files.readme.io/a24e0c31b344ba8616e6f5cf71e543c57dcd12e081c0f97fdcf2ec407c601122-CleanShot_2025-04-08_at_09.50.54.png)
+
+    1. Create an **Action Activity**
+    2. In the **Action** dropdown field, select the compound action `get_session_devices_compound_action`
+    3. In the **Required Slots** dropdown field select both the `health_status` and `status` slots
+    4. Set the **Input Mapping**
+       ```Text yaml
+       health_status: data.health_status
+       status: data.status
+       ```
+    5. Set the **Output Key** field to `get_session_devices_result`
+    6. Click **Validate** and then **Publish** to save your conversational body.
+13. **Create Plugin:**\
+    After creating your conversational body, head back home. You will now be creating a plugin and will be setting launch rules etc placeholder.
+
+    ![](https://files.readme.io/4352e437b864beffdfd35fe80ae5804205d371b95ff1e4eee0400c63f8e447be-CleanShot_2025-04-08_at_10.31.57.png)
+
+    1. In the Plugins tab click on **Create** and a new tab will open
+    2. Set the **Name**field to `retrieve_session_devices`
+    3. Set the **Description** field to `Retrieves a list of devices based on the status and health status of the devices`
+    4. In the **Plugin Low Code Editor** section click on **Set Your Trigger**
+    5. Set your plugins positive and negative utterances, refer to [Natural Language Triggers](natural-language-triggers#how-does-your-plugin-get-triggered) 
+14. **Add Conversational Body to Plugin**\
+    You will now add the conversational body you created earlier to the plugin
+
+    ![](https://files.readme.io/1356ece23dab0247582b8dd0f78816287cb4c1d8039c7b0845fbc869c555b323-CleanShot_2025-04-08_at_10.40.32.png)
+
+    1. In the **PlugIn Low Code Editor** section click on **Conversational Body**
+    2. Set the **Select Conversational Body** dropdown field to `retrieve_session_devices_body`
+15. **Set Permissions and Publish your Plugin**
+
+    ![](https://files.readme.io/7530150581497c4a965a6903ea8c6f9b634ceb411aa6f87f7ad19b30f4e90ba1-CleanShot_2025-04-07_at_16.22.06.png)
+
+    1. Click on the **Set Permissions** tab to open your permission settings on who has access to trigger the plugin.
+    2. In the **Audience Settings** section make sure **Allow selected users** is checked
+    3. In the Input field under **Allow selected users** set your email or multiple emails separated by commas `,`. Such as `john.doe@example.com` or `jane.doe@example.com, john.doe@example.com` for multiple emails.
+    4. Click on **Validate** and then **Publish** buttons to finish your plugin
+
+<br />
+
+# Wrapping Up Your Advanced Compound Action Plugin
+
+Congratulations! You’ve successfully created a plugin that filters API responses using Moveworks Data Mappers and DSL. Let’s review what you’ve accomplished:
+
+## What You’ve Built
+
+You’ve created a plugin that:
+
+* Leverages an HTTP Action named `get_session_devices` to fetch device data from the Purple API.
+* Uses a Compound Action named `get_session_devices_compound_action` to filter devices by user-specified `status` and `health_status` without relying on APIthon.
+* Is configured with a conversational body named `retrieve_session_devices_body` to dynamically collect user inputs and deliver tailored results.
+* Integrates seamlessly into a plugin named `retrieve_session_devices` with clear launch rules and permissions, enabling responsive automation for device queries.

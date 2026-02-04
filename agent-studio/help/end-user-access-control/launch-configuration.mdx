@@ -1,0 +1,114 @@
+---
+title: Launch Permissions
+excerpt: >-
+  Your launch configuration determines how your plugin is deployed to your AI
+  Agent
+deprecated: false
+hidden: false
+metadata:
+  title: ''
+  description: ''
+  robots: index
+next:
+  description: ''
+---
+# Launch Audience
+
+Your plugin shouldn’t be available to just anyone. Launch Rules let you define who can use it and when. You can base these rules on factors like:
+
+* User roles (e.g., only full-time employees)
+* Departments (e.g., only HR or engineering teams)
+* Conditions (e.g., only during weekdays)
+
+You might limit access to employees in specific departments or exclude contractors for your plugin, ensuring only authorized users can receive the plugin response.
+
+> *Tip: Test with a small group first to refine your rules before rolling it out widely.*
+
+## How does it work
+
+When launching your plugin, you can choose two different modes:
+
+### 1. List Mode (Simple Access Control)
+
+![](https://files.readme.io/fe6b77d3f6be11bace8ef05731feb81bcdc908fce0020f05f7dd93a3fdb588a6-CleanShot_2025-04-08_at_15.22.39.png)
+
+It is ideal for simple setups where you want to manage access with specific emails or allow/deny everyone.
+
+1. **Allow selected users**:
+   1. Enter specific email addresses of users who should have access, separated by commas.
+   2. Example: `jane.doe@example.com, john.smith@example.com`.
+2. **Allow all users**:
+   1. Select this to give everyone in your organization access.
+3. **Deny selected users**:
+   1. Enter email addresses of users to block, separated by commas.
+   2. All other users will have access.
+4. **Launch to no one**: 
+   1. Switch to **Advanced Mode** (see below)
+   2. type `False`
+
+### 2. Advanced Mode (Custom DSL rules)
+
+![](https://files.readme.io/9b3357ad71dd7b74f4c20e79abf8c785031deb83cea773cec76c0c82cec2bf65-CleanShot_2025-04-08_at_15.24.04.png)
+
+For more complex access rules, click the **Advanced Mode** button. This opens a text box where you write rules using [**Moveworks DSL**](moveworks-dsl-reference). DSL lets you base access on user attributes like department or role.\
+**Examples:**
+
+1. Allow only HR staff in New York: `user.department == "HR" AND user.location == "New York"`
+2. Allow only managers: `user.role == "manager" `\
+   Check out our [User Attribute Reference](user-attribute-reference) to see what fields you have access to.
+
+# Data Settings
+
+The **Data Settings** section controls how your plugin manages data.
+
+![](https://files.readme.io/c4f1338b3f3e5eab8e9c6c0c59d6bb68eb7666348603005ba8fc77d44759ebf9-CleanShot_2025-04-08_at_15.29.40.png)
+
+You have three options:
+
+1. 1. **Standard Log Redaction (Always ON)**
+      1. Redacts personally identifiable information (PII) and credentials from logs.
+      2. Good balance between security and troubleshooting.
+   2. **Strict Log Redaction**:
+      1. Redacts any potentially sensitive data.
+      2. Best for maximum privacy, but logs may be less useful for debugging.
+   3. **Enable Analytics**
+      1. Tracks plugin usage in Moveworks’ analytics dashboards.
+      2. Keep this off during testing; turn it on for production.
+
+## Analytics
+
+When you build & test new plugins, you don't want those plugins to affect your production analytics. Until you check this box, your plugin won't affect production analytics.
+
+This primarily affects classic plugins, and if unchecked, those analytics will not appear on the [Agent Studio Analytics dashboard](https://developer.moveworks.com/creator-studio/analytics/overview/). 
+
+Plugins built with the Agentic Automation Engine will appear in Copilot Insights. 
+
+## Data Redaction Policy
+
+Set the log redaction policy for your plugin. See our [log redaction documentation](https://help.moveworks.com/docs/logs#log-redaction) for details.
+
+# Launch Configuration Troubleshooting
+
+## Error Code: 13120
+
+> ❗️ There are validation errors in the email allow list. Please ensure all emails are formatted properly and there are no duplicates.
+>
+> There are two primary reasons why you may have gotten this error. You'll need to check each email to validate.
+>
+> * For small email lists (\< 20) you can `ctrl + f` or `cmd + f` and copy & paste each email into the search bar.
+> * For larger lists (> 20), you can dump your emails into Google Sheets or Excel and remove duplicates.
+
+### Duplicate Emails
+
+We recommend checking & removing duplicate emails.
+
+### Invalid Email Format
+
+We recommend looking for malformed email addresses:
+
+* Doesn’t have an @domain (e.g. `@moveworks.ai` )
+* Has an @domain that is different than what your org uses (e.g. `@moveworks.com` instead of `@moveworks.ai`)
+
+## Configuration saves, but Plugin does not trigger
+
+Make sure your [identity configuration](https://help.moveworks.com/docs/control-centre-identity) matches your configured values. **Data is case sensitive.**

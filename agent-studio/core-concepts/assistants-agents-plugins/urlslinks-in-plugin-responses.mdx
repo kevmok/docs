@@ -1,0 +1,141 @@
+---
+title: URLs/Links In Plugin Responses
+deprecated: false
+hidden: false
+metadata:
+  robots: index
+---
+# Overview
+
+<br />
+
+When your plugin needs to return URLs or hyperlinks, it’s critical to do so in a structured, consistent, and safe manner. Correctly formatted links improve reliability, readability, and ensure the reasoning engine interprets them correctly.
+
+This document outlines the best practices for returning URLs and hyperlinks from your plugin responses.
+
+## URLs
+
+### General Guidance
+
+Ideally, URLs should be returned as a string value within a structured payload under a url key.
+Avoid embedding them inside free-form, mixed-format text that combines instructions and URLs.
+
+For example, when returning a URL such as [https://help.moveworks.com](https://help.moveworks.com), you can choose one of two presentation styles:
+
+* **Hyperlink format** - when you want the link to display as descriptive text:
+
+<Image align="center" border={false} src="https://files.readme.io/6b641ac2aa555ab2edb2165d0dac9771056e4a0e9fd663f10f81d9124ea028a5-Screenshot_2025-10-20_at_3.50.46_PM.png" />
+
+```yaml
+url: '"[Click here](https://help.moveworks.com)"'
+```
+
+* **Raw URL format** - when you want the URL to appear directly:
+
+<Image align="center" border={false} src="https://files.readme.io/9756a4cf844af97d597df0982fe44f472849518c9e83d6df6d0ab81ce0196482-Screenshot_2025-10-20_at_3.51.15_PM.png" />
+
+```yaml
+url: '"Moveworks Docs: https://help.moveworks.com"'
+```
+
+Both are valid, depending on how you want the client or reasoning engine to interpret the response.
+
+***
+
+### Formatting Guidelines
+
+Follow these rules whenever possible:
+
+1. **Always prepend https:// to URLs.**
+   1. ✅ Good: [https://example.com](https://example.com)
+   2. ❌ Bad: example.com
+2. **URI-encode special characters when used outside their reserved meaning.**
+   1. Encode **spaces** as `%20` — this is the most critical.
+   2. Encode bracket characters `()[] `if used outside reserved contexts, especially `()`.
+
+**Why this matters**:
+
+Characters like `?`, `()`, and `[]` have reserved meanings in URLs or in Markdown syntax. Failing to encode them can break the link or cause rendering or hallucination issues in LLM contexts.
+
+| Character   | Encoding |
+| :---------- | :------- |
+| Space `" "` | `%20`    |
+| `(`         | `%28`    |
+| `)`         | `%29`    |
+| `[`         | `%5B`    |
+| `]`         | `%5D`    |
+
+<br />
+
+* ✅ Good: [https://help.moveworks.com/page%20with%20spaces%20and%20%28parentheses%29](https://help.moveworks.com/page%20with%20spaces%20and%20%28parentheses%29)
+* ❌ Bad: [https://help.moveworks.com/page](https://help.moveworks.com/page) with spaces and (parentheses)
+
+***
+
+### Constructing URLs Dynamically
+
+When building URLs dynamically and deterministically in your plugin, use **DSL**  or **Bender/Data Mapper** utilities like `$CONCAT()` or `RENDER()` to define them as part of your payload. This makes them easier for the reasoning engine to interpret and reduces hallucination risk as opposed to trying to use free form text and have the llm figure it out.
+
+**Example using** `$CONCAT()`
+
+If you have:
+
+* a base URL: `https://us2.itsm.com`
+* a ticket ID under `data.result.ticket_id`
+
+You can define:
+
+```yaml
+ticket_url: $CONCAT(["https://us2.itsm.com/", data.result.ticket_id], "")
+```
+
+This creates a properly structured `ticket_url` key that represents the final link.
+
+**Example using** `RENDER()`
+
+```yaml
+ticket_url:
+  RENDER():
+    template: >
+      {{base_url}}{{ticket_number}}
+    args:
+      base_url: '"https://us2.itsm.com/"'
+      ticket_number: data.result.ticket_id
+
+```
+
+Both approaches ensure the URL is generated consistently and readable by downstream systems.
+
+***
+
+## Hyperlinks
+
+When returning **hyperlinks ** in a plugin response, use a consistent, machine-readable format. Proper hyperlink formatting ensures that links are rendered correctly across clients (e.g., chat interfaces, documentation, or dashboards) and parsed reliably by the reasoning engine.
+
+### **Recommended Formats (in order of preference)**
+
+1. **Markdown format** - Use standard Markdown link syntax whenever possible:
+
+```markdown
+[Click here](https://help.moveworks.com)
+```
+
+✅ Preferred — Markdown is portable, readable, and supported in most rendering contexts.
+
+2. Slack-style format - Use Slack’s `<URL|text>` syntax only when using Slack as you only chat interface.
+
+```markdown
+<https://help.moveworks.com|Click here>
+```
+
+⚠️ Acceptable, but not preferred — This format is platform-specific.
+
+### Formats to Avoid
+
+The following formats should **not** be used in plugin responses:
+
+* ❌ `<https://example.com>` — plain angle-bracketed URL
+* ❌ `<a href="https://example.com">link</a>` — raw HTML anchor tags
+* ❌ `[Click here|https://example.com]` — invalid Markdown syntax
+
+<br />
