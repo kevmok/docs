@@ -12,8 +12,14 @@ This Quickstart guide will walk you through the steps of creating a Process Agen
 
 # Prerequisites
 
-1. Access to the "Agent Studio" App.
-2. Completed [Quickstart #1: Basic Task Agent](/docs/quickstart-basic-task-agent).
+<CardGroup cols={2}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to the "Agent Studio" App.
+  </Card>
+  <Card title="Quickstart #1 Complete" icon="check">
+    Completed [Quickstart #1: Basic Task Agent](/docs/quickstart-basic-task-agent).
+  </Card>
+</CardGroup>
 
 # What you'll build
 
@@ -29,9 +35,17 @@ In order to build this, here's one way to decompose the process into a **Convers
 
 In this guide, you'll work your way through these main phases:
 
-1. Set up **2 (HTTP)[Actions](/docs/actions)**: one to fetch historical PRs, and another to Submit a PR.
-2. Build the **Conversational Process**, complete with 4 Slots, 5 different Activities, 1 Decision Policy, as illustrated above.
-3. Add the Conversational Process to your AI Agent by launching a Plugin.
+<Steps>
+  <Step title="Set up Actions">
+    Set up **2 (HTTP)[Actions](/docs/actions)**: one to fetch historical PRs, and another to Submit a PR.
+  </Step>
+  <Step title="Build the Conversational Process">
+    Build the **Conversational Process**, complete with 4 Slots, 5 different Activities, 1 Decision Policy, as illustrated above.
+  </Step>
+  <Step title="Launch a Plugin">
+    Add the Conversational Process to your AI Agent by launching a Plugin.
+  </Step>
+</Steps>
 
 *Let's get started!*
 
@@ -56,30 +70,46 @@ In this guide, you'll work your way through these main phases:
   This section will walk you through how to set up your own connector to the Moveworks Purple API (which powers the Actions used in the Quickstart guides), so no need to repeat this step if you've done it before.
 </Info>
 
-In this guide, you'll build a Plugin that will actually fetch from and take action on a store of feature requests that's **set up just for you**. In preparation for this, follow these steps
+In this guide, you'll build a Plugin that will actually fetch from and take action on a store of feature requests that's **set up just for you**. In preparation for this, follow these steps:
 
-1. Go to the [Moveworks Purple API Tool](purple-api-tool).
-2. Click "Create New Session ID". You should see sample feature requests populate below.
-3. Copy your **Session ID** to your own notes. You'll to have this on hand in the following phase when we set up your Actions.
+<Steps>
+  <Step title="Go to Purple API Tool">
+    Go to the [Moveworks Purple API Tool](purple-api-tool).
+  </Step>
+  <Step title="Create Session ID">
+    Click "Create New Session ID". You should see sample feature requests populate below.
+  </Step>
+  <Step title="Copy Session ID">
+    Copy your **Session ID** to your own notes. You'll to have this on hand in the following phase when we set up your Actions.
+  </Step>
+</Steps>
 
 Now, you just need to set up a (reusable) connector that will allow you to seamlessly hit the necessary Actions that your Plugin will use.
 
-1. Navigate to the App Picker in the top right corner of Agent Studio.
+<Steps>
+  <Step title="Open App Picker">
+    Navigate to the App Picker in the top right corner of Agent Studio.
+  </Step>
+  <Step title="Navigate to HTTP Connectors">
+    Click on "HTTP Connectors", which will take you to another browser tab.
+  </Step>
+  <Step title="Create Connector">
+    Click "Create" in the top right corner.
+  </Step>
+  <Step title="Configure Connector">
+    Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Click on "HTTP Connectors", which will take you to another browser tab.
-
-3. Click "Create" in the top right corner.
-
-4. Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
-
-   | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
-   | ------------------- | ---------------------------------------------------------------- |
-   | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
-   | **Description**     | `Moveworks Purple APIs Connector`                                |
-   | **Base Url**        | `https://marketplace.moveworks.com`                              |
-   | **Auth Config**     | `No Auth`                                                        |
-
-5. Click "Save" on the bottom right corner.
+    | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
+    | ------------------- | ---------------------------------------------------------------- |
+    | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
+    | **Description**     | `Moveworks Purple APIs Connector`                                |
+    | **Base Url**        | `https://marketplace.moveworks.com`                              |
+    | **Auth Config**     | `No Auth`                                                        |
+  </Step>
+  <Step title="Save Connector">
+    Click "Save" on the bottom right corner.
+  </Step>
+</Steps>
 
 <Check>
   ### You're now fully ready to start building. On to Phase 1 to set up your Actions!
@@ -99,52 +129,62 @@ Now, you just need to set up a (reusable) connector that will allow you to seaml
 
 Let's first set up an [HTTP Action](/docs/http-actions) that will retrieve historical PRs. This Action doesn't require any dynamic inputs, and will just query an external system for a list of purchase requests.
 
-1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+<Steps>
+  <Step title="Open Agent Studio">
+    Navigate to the App Picker in the top right corner. Click on "Agent Studio".
 
-   ![](/images/docs/438f1d36c6c956eb17f6e93d3ca28966a783e67a75a8e1dddcd741594258a4f8-CleanShot_2025-04-14_at_08.48.272x.png)
+    ![](/images/docs/438f1d36c6c956eb17f6e93d3ca28966a783e67a75a8e1dddcd741594258a4f8-CleanShot_2025-04-14_at_08.48.272x.png)
+  </Step>
+  <Step title="Navigate to HTTP Action">
+    Navigate to a new HTTP Action.
 
-2. Navigate to a new HTTP Action.
+    ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-   ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_get_historical_purchases`                    |
+    | **Description** | `Fetches a list of historical purchase requests`                 |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-3. Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+    1. Click on the "Import" icon to the right of the "TEST" button.
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_get_historical_purchases`                    |
-   | **Description** | `Fetches a list of historical purchase requests`                 |
+       ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
 
-4. Enter the details of your API:
+    2. Paste the following cURL command:
 
-   1. Click on the "Import" icon to the right of the "TEST" button.
+       <CodeGroup>
+         ```bash bash
+         curl "https://marketplace.moveworks.com/api/purple-suite/erp/purchase-requests/history"
+         ```
+       </CodeGroup>
 
-      ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+    3. Click "Import" (your Action should now be auto-populated with details).
+  </Step>
+  <Step title="Add Connector">
+    Navigate to the "Connector" tab, and select your existing Moveworks Purple Connector (set up in Phase 0).
 
-   2. Paste the following cURL command:
+    ![](/images/docs/1cb57a734bacebaf642886e3960a0cf0eab133646ab10288e2e85317dffd513d-Screenshot_2025-04-12_at_02.48.16.png)
+  </Step>
+  <Step title="Test Action">
+    Test your Action:
 
-      <CodeGroup>
-        ```bash bash
-        curl "https://marketplace.moveworks.com/api/purple-suite/erp/purchase-requests/history"
-        ```
-      </CodeGroup>
+    1. Click on the "TEST" icon (to the right of the endpoint URL definition).
 
-   3. Click "Import" (your Action should now be auto-populated with details).
+    2. Inspect the Console to verify that you receive a successful response:
 
-5. Navigate to the "Connector" tab, and select your existing Moveworks Purple Connector (set up in Phase 0).
-
-   ![](/images/docs/1cb57a734bacebaf642886e3960a0cf0eab133646ab10288e2e85317dffd513d-Screenshot_2025-04-12_at_02.48.16.png)
-
-6. Test your Action:
-
-   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
-
-   2. Inspect the Console to verify that you receive a successful response:
-
-      <Frame caption="You should see: Status Code 200, a list of Purchase Request objects, and a response schema of the list.">
-        <img src="/images/docs/4fc1ade462018ae2d7c21fe1c60dfec6da1964fa17b5901337fbf1f52f5f6bf6-Screenshot_2025-04-12_at_16.56.14.png" />
-      </Frame>
-
-7. Hit "Publish".
+       <Frame caption="You should see: Status Code 200, a list of Purchase Request objects, and a response schema of the list.">
+         <img src="/images/docs/4fc1ade462018ae2d7c21fe1c60dfec6da1964fa17b5901337fbf1f52f5f6bf6-Screenshot_2025-04-12_at_16.56.14.png" />
+       </Frame>
+  </Step>
+  <Step title="Publish Action">
+    Hit "Publish".
+  </Step>
+</Steps>
 
 <Check>
   ### You've just set up 1 out of 2 custom Actions needed for this process!
@@ -164,106 +204,116 @@ Let's first set up an [HTTP Action](/docs/http-actions) that will retrieve histo
 
 The next (and final) Action to set up will add a new purchase request object (and will actually update the purchase record database in your personal session!). This Action will require three dynamic inputs: `item_name`, `quantity`, and `justification`.
 
-1. Navigate to a new HTTP Action.
+<Steps>
+  <Step title="Navigate to HTTP Action">
+    Navigate to a new HTTP Action.
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_submit_purchase_request`                     |
+    | **Description** | `Submits a new purchase request to Procurement`                  |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_submit_purchase_request`                     |
-   | **Description** | `Submits a new purchase request to Procurement`                  |
+    1. Click on the import button to the right of the "TEST" button.
 
-3. Enter the details of your API:
+       ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
 
-   1. Click on the import button to the right of the "TEST" button.
+    2. Find the same **Session ID** that you created & copied from Phase 0 — you'll use it in the next step.
 
-      ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+    3. Paste (don't click "Import" yet) the following almost-ready cURL command:
 
-   2. Find the same **Session ID** that you created & copied from Phase 0 — you'll use it in the next step.
+       <CodeGroup>
+         ```bash bash
+         curl -X POST "https://marketplace.moveworks.com/api/purple-suite/erp/purchase-requests" \
+         -H "Content-Type: application/json" \
+         -d '{
+             "sessionId": "YOUR_SESSION_ID",
+             "purchase_request": {
+               "item_name": "{{item_name}}",
+               "quantity": "{{quantity}}",
+               "business_justification": "{{justification}}",
+               "amount": 1200.00
+             }
+         }'
+         ```
+       </CodeGroup>
 
-   3. Paste (don't click "Import" yet) the following almost-ready cURL command:
+    4. Replace `YOUR_SESSION_ID` (*scroll all the way to the right to find it at the end of the URL*) in the pasted command with your actual Session ID.
 
-      <CodeGroup>
-        ```bash bash
-        curl -X POST "https://marketplace.moveworks.com/api/purple-suite/erp/purchase-requests" \
-        -H "Content-Type: application/json" \
-        -d '{
-            "sessionId": "YOUR_SESSION_ID",
-            "purchase_request": {
-              "item_name": "{{item_name}}",
-              "quantity": "{{quantity}}",
-              "business_justification": "{{justification}}",
-              "amount": 1200.00
-            }
-        }'
-        ```
-      </CodeGroup>
+    5. Click "Import" (your Action should now be auto-populated with details).
+  </Step>
+  <Step title="Add Connector">
+    Navigate to the "Connector" tab, and select your existing Moveworks Purple Connector (set up in Phase 0).
 
-   4. Replace `YOUR_SESSION_ID` (*scroll all the way to the right to find it at the end of the URL*) in the pasted command with your actual Session ID.
+    ![](/images/docs/1cb57a734bacebaf642886e3960a0cf0eab133646ab10288e2e85317dffd513d-Screenshot_2025-04-12_at_02.48.16.png)
+  </Step>
+  <Step title="Define Input Arguments">
+    Define 3 formal input arguments to represent the "item name", and "quantity", and "business justification" inputs that this Action requires:
 
-   5. Click "Import" (your Action should now be auto-populated with details).
+    1. Click on the "Input Args" button near the top right corner.
 
-4. Navigate to the "Connector" tab, and select your existing Moveworks Purple Connector (set up in Phase 0).
+    2. Click "Create New" in the "Input Arguments" pop up.
 
-   ![](/images/docs/1cb57a734bacebaf642886e3960a0cf0eab133646ab10288e2e85317dffd513d-Screenshot_2025-04-12_at_02.48.16.png)
+    3. Fill out the following details for your `item_name` argument:
 
-5. Define 3 formal input arguments to represent the "item name", and "quantity", and "business justification" inputs that this Action requires:
+       | Field label       | Value to enter/select                  |
+       | ----------------- | -------------------------------------- |
+       | **Argument Name** | `item_name`                            |
+       | **Data Type**     | *Select "string"*                      |
+       | **Example Value** | `pen`                                  |
+       | **Description**   | `The name of the item to be purchased` |
+       | **Required**      | *Check the box*                        |
 
-   1. Click on the "Input Args" button near the top right corner.
+    4. Hit "Save".
 
-   2. Click "Create New" in the "Input Arguments" pop up.
+    5. Click "Create New" again in the "Input Arguments" pop up.
 
-   3. Fill out the following details for your `item_name` argument:
+    6. Fill out the following details for your `quantity` argument:
 
-      | Field label       | Value to enter/select                  |
-      | ----------------- | -------------------------------------- |
-      | **Argument Name** | `item_name`                            |
-      | **Data Type**     | *Select "string"*                      |
-      | **Example Value** | `pen`                                  |
-      | **Description**   | `The name of the item to be purchased` |
-      | **Required**      | *Check the box*                        |
+       | Field label       | Value to enter/select                |
+       | ----------------- | ------------------------------------ |
+       | **Argument Name** | `quantity`                           |
+       | **Data Type**     | *Select "Number"*                    |
+       | **Example Value** | `20`                                 |
+       | **Description**   | `The quantity of the item in the PR` |
+       | **Required**      | *Check the box*                      |
 
-   4. Hit "Save".
+    7. Hit "Save".
 
-   5. Click "Create New" again in the "Input Arguments" pop up.
+    8. Click "Create New" again in the "Input Arguments" pop up.
 
-   6. Fill out the following details for your `quantity` argument:
+    9. Fill out the following details for your `justification` argument:
 
-      | Field label       | Value to enter/select                |
-      | ----------------- | ------------------------------------ |
-      | **Argument Name** | `quantity`                           |
-      | **Data Type**     | *Select "Number"*                    |
-      | **Example Value** | `20`                                 |
-      | **Description**   | `The quantity of the item in the PR` |
-      | **Required**      | *Check the box*                      |
+       | Field label       | Value to enter/select                                  |
+       | ----------------- | ------------------------------------------------------ |
+       | **Argument Name** | `justification`                                        |
+       | **Data Type**     | *Select "string"*                                      |
+       | **Example Value** | `Needed to refill supply closet`                       |
+       | **Description**   | `The business justification for the item(s) in the PR` |
+       | **Required**      | *Check the box*                                        |
 
-   7. Hit "Save".
+    10. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+  </Step>
+  <Step title="Test Action">
+    Test your Action:
 
-   8. Click "Create New" again in the "Input Arguments" pop up.
+    1. Click on the "TEST" icon (to the right of the endpoint URL definition).
 
-   9. Fill out the following details for your `justification` argument:
+    2. Inspect the Console to verify that you receive a successful response:
 
-      | Field label       | Value to enter/select                                  |
-      | ----------------- | ------------------------------------------------------ |
-      | **Argument Name** | `justification`                                        |
-      | **Data Type**     | *Select "string"*                                      |
-      | **Example Value** | `Needed to refill supply closet`                       |
-      | **Description**   | `The business justification for the item(s) in the PR` |
-      | **Required**      | *Check the box*                                        |
-
-   10. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
-
-6. Test your Action:
-
-   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
-
-   2. Inspect the Console to verify that you receive a successful response:
-
-      <Frame caption="You should see: Status Code 200, a response containing the new PR details, and a schema for the object.">
-        <img src="/images/docs/64ca2aecebc890a82029c8a226b960fd1370cd0694a3cf92269fa7cad5f0f178-Screenshot_2025-04-12_at_17.23.09.png" />
-      </Frame>
-
-7. Hit "Publish".
+       <Frame caption="You should see: Status Code 200, a response containing the new PR details, and a schema for the object.">
+         <img src="/images/docs/64ca2aecebc890a82029c8a226b960fd1370cd0694a3cf92269fa7cad5f0f178-Screenshot_2025-04-12_at_17.23.09.png" />
+       </Frame>
+  </Step>
+  <Step title="Publish Action">
+    Hit "Publish".
+  </Step>
+</Steps>
 
 <Check>
   ### Nice, your Actions are all set up and ready to go!
@@ -287,207 +337,227 @@ Here's a reminder of the bird's eye view for this Submit Procurement Purchase Re
 
 Let's build it!
 
-1. Navigate to a new Conversational Process (navigate to the library and click "Create"). ![](/images/docs/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+<Steps>
+  <Step title="Create Conversational Process">
+    Navigate to a new Conversational Process (navigate to the library and click "Create"). 
+    
+    ![](/images/docs/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info)   |
+    | --------------- | ------------------------------------------------------------------ |
+    | **Title**       | `firstname_lastname_support_procurement_purchases_process`         |
+    | **Description** | `This will help users submit a Procurement purchase request (PR).` |
+  </Step>
+  <Step title="Add Slots">
+    Add the FOUR **Slots** that this process will need: `item_name`, `quantity`, `business_justification`, and `is_purchase_for_organization_acknowledgement`. 📖 *[Learn more about Slots](/docs/slots)*.
+
+    1. Click on the "Slots" button near the top right corner of the editor.
+
+       ![](/images/docs/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png)
+
+    2. Click "Create New" in the "Slots" pop up.
+
+    3. Fill out the following details for your first `item_name` Slot:
+
+       | Field label                     | Value to enter/select                                   |
+       | ------------------------------- | ------------------------------------------------------- |
+       | **Name**                        | `item_name`                                             |
+       | **Data Type**                   | *Select "string"*                                       |
+       | **Slot Description**            | `The name of the item that the user wants to purchase.` |
+       | **Slot Validation Policy**      | *Leave blank*                                           |
+       | **Slot Validation Description** | *Leave blank*                                           |
+       | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*           |
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info)   |
-   | --------------- | ------------------------------------------------------------------ |
-   | **Title**       | `firstname_lastname_support_procurement_purchases_process`         |
-   | **Description** | `This will help users submit a Procurement purchase request (PR).` |
+    4. Hit "Save" (scroll to the bottom of the popup).
 
-3. Add the FOUR **Slots** that this process will need: `item_name`, `quantity`, `business_justification`, and `is_purchase_for_organization_acknowledgement`. 📖 *[Learn more about Slots](/docs/slots)*.
+    5. Click "Create New" again in the "Slots" pop up to build your second Slot.
 
-   1. Click on the "Slots" button near the top right corner of the editor.
+    6. Fill out the following details for your `business_justification` Slot:
 
-      ![](/images/docs/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png)
+       | Field label                     | Value to enter/select                                              |
+       | ------------------------------- | ------------------------------------------------------------------ |
+       | **Name**                        | `business_justification`                                           |
+       | **Data Type**                   | *Select "string"*                                                  |
+       | **Slot Description**            | `A justification from the user on why this purchase is necessary.` |
+       | **Slot Validation Policy**      | *Leave blank*                                                      |
+       | **Slot Validation Description** | *Leave blank*                                                      |
+       | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                      |
 
-   2. Click "Create New" in the "Slots" pop up.
+    7. Hit "Save" (scroll to the bottom of the popup).
 
-   3. Fill out the following details for your first `item_name` Slot:
+    8. Click "Create New" again in the "Slots" pop up to build your third Slot.
 
-      | Field label                     | Value to enter/select                                   |
-      | ------------------------------- | ------------------------------------------------------- |
-      | **Name**                        | `item_name`                                             |
-      | **Data Type**                   | *Select "string"*                                       |
-      | **Slot Description**            | `The name of the item that the user wants to purchase.` |
-      | **Slot Validation Policy**      | *Leave blank*                                           |
-      | **Slot Validation Description** | *Leave blank*                                           |
-      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*           |
+    9. Fill out the following details for your `quantity` Slot:
 
-   4. Hit "Save" (scroll to the bottom of the popup).
+       | Field label                     | Value to enter/select                                                         |
+       | ------------------------------- | ----------------------------------------------------------------------------- |
+       | **Name**                        | `quantity`                                                                    |
+       | **Data Type**                   | *Select "number"*                                                             |
+       | **Slot Description**            | `The number of units of the item that the user wants to purchase.`            |
+       | **Slot Validation Policy**      | `value > 0`                                                                   |
+       | **Slot Validation Description** | `The quantity for the item in the purchase request must be greater than zero` |
+       | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                                 |
 
-   5. Click "Create New" again in the "Slots" pop up to build your second Slot.
+    10. Hit "Save" (scroll to the bottom of the popup).
 
-   6. Fill out the following details for your `business_justification` Slot:
+    11. Click "Create New" again in the "Slots" pop up to build your fourth and final Slot.
 
-      | Field label                     | Value to enter/select                                              |
-      | ------------------------------- | ------------------------------------------------------------------ |
-      | **Name**                        | `business_justification`                                           |
-      | **Data Type**                   | *Select "string"*                                                  |
-      | **Slot Description**            | `A justification from the user on why this purchase is necessary.` |
-      | **Slot Validation Policy**      | *Leave blank*                                                      |
-      | **Slot Validation Description** | *Leave blank*                                                      |
-      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                      |
+    12. Fill out the following details for your `is_purchase_for_organization_acknowledgement` Slot:
 
-   7. Hit "Save" (scroll to the bottom of the popup).
+        | Field label                     | Value to enter/select                                                                                                                  |
+        | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+        | **Name**                        | `is_purchase_for_organization_acknowledgement`                                                                                         |
+        | **Data Type**                   | *Select "boolean"*                                                                                                                     |
+        | **Slot Description**            | `An explicit acknowledgement from the user that this purchase is for the organization and not for personal use.`                       |
+        | **Slot Validation Policy**      | `value == TRUE`                                                                                                                        |
+        | **Slot Validation Description** | `The user must explicitly acknowledge "yes" to indicate that this purchase is intended for the organization and not for personal use.` |
+        | **Slot Inference Policy**       | *Select "Always prompt the user"*                                                                                                      |
 
-   8. Click "Create New" again in the "Slots" pop up to build your third Slot.
+    13. Hit "Save" (scroll to the bottom of the popup) and hit the "X" icon to close this "Slots" pop up.
+  </Step>
+  <Step title="Build First Action Activity">
+    Build the first **Action Activity** that fetch a list of historical purchase requests that the process will later compare against. 📖 *[Learn more about Activities](/docs/activities).*
 
-   9. Fill out the following details for your `quantity` Slot:
+    1. Click on the "+ Add a block to your process" button in the main section of the editor.
 
-      | Field label                     | Value to enter/select                                                         |
-      | ------------------------------- | ----------------------------------------------------------------------------- |
-      | **Name**                        | `quantity`                                                                    |
-      | **Data Type**                   | *Select "number"*                                                             |
-      | **Slot Description**            | `The number of units of the item that the user wants to purchase.`            |
-      | **Slot Validation Policy**      | `value > 0`                                                                   |
-      | **Slot Validation Description** | `The quantity for the item in the purchase request must be greater than zero` |
-      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                                 |
+    2. Click on "Action Activity".
 
-   10. Hit "Save" (scroll to the bottom of the popup).
+       ![](/images/docs/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png)
 
-   11. Click "Create New" again in the "Slots" pop up to build your fourth and final Slot.
+    3. Fill out the following details for your Action Activity, which simply hooks up the Action you created to this Action Activity:
 
-   12. Fill out the following details for your `is_purchase_for_organization_acknowledgement` Slot:
+       | Field label                                 | Value to enter/select                                                                          |
+       | ------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+       | **Action**                                  | \*Select the`firstname_lastname_get_historical_purchases` Action that you built in Phase 1A \* |
+       | **Required Slots**                          | *Leave blank (no Slots are needed as input to this Activity)*                                  |
+       | **Input mapping**                           | *Leave blank (no inputs to map to)*                                                            |
+       | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                           |
+       | **Output Key**                              | `historical_purchases`                                                                         |
+       | **Confirmation Policy**                     | *Leave unchecked*                                                                              |
+  </Step>
+  <Step title="Build Second Action Activity">
+    Build the second **Action Activity**, which will utilize a Built-in Action that can generate an output according to a natural language prompt. 📖 *[Learn more about the Built-in Generate Text Action](/docs/built-in-actions#generate_text_action).*
 
-       | Field label                     | Value to enter/select                                                                                                                  |
-       | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-       | **Name**                        | `is_purchase_for_organization_acknowledgement`                                                                                         |
-       | **Data Type**                   | *Select "boolean"*                                                                                                                     |
-       | **Slot Description**            | `An explicit acknowledgement from the user that this purchase is for the organization and not for personal use.`                       |
-       | **Slot Validation Policy**      | `value == TRUE`                                                                                                                        |
-       | **Slot Validation Description** | `The user must explicitly acknowledge "yes" to indicate that this purchase is intended for the organization and not for personal use.` |
-       | **Slot Inference Policy**       | *Select "Always prompt the user"*                                                                                                      |
+    1. Click on the "+" icon below the previous Activity in the main section of the Conversational Process Editor.
 
-   13. Hit "Save" (scroll to the bottom of the popup) and hit the "X" icon to close this "Slots" pop up.
+    2. Click on "Action Activity".
 
-4. Build the first **Action Activity** that fetch a list of historical purchase requests that the process will later compare against. 📖 *[Learn more about Activities](/docs/activities).*
+    3. Fill out the following details for your Action Activity, which mostly involves constructing a templated prompt to the Action, and mapping the predicted PR classification out of the model's response:
 
-   1. Click on the "+ Add a block to your process" button in the main section of the editor.
-
-   2. Click on "Action Activity".
-
-      ![](/images/docs/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png)
-
-   3. Fill out the following details for your Action Activity, which simply hooks up the Action you created to this Action Activity:
-
-      | Field label                                 | Value to enter/select                                                                          |
-      | ------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-      | **Action**                                  | \*Select the`firstname_lastname_get_historical_purchases` Action that you built in Phase 1A \* |
-      | **Required Slots**                          | *Leave blank (no Slots are needed as input to this Activity)*                                  |
-      | **Input mapping**                           | *Leave blank (no inputs to map to)*                                                            |
-      | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                           |
-      | **Output Key**                              | `historical_purchases`                                                                         |
-      | **Confirmation Policy**                     | *Leave unchecked*                                                                              |
-
-5. Build the second **Action Activity**, which will utilize a Built-in Action that can generate an output according to a natural language prompt. 📖 *[Learn more about the Built-in Generate Text Action](/docs/built-in-actions#generate_text_action).*
-
-   1. Click on the "+" icon below the previous Activity in the main section of the Conversational Process Editor.
-
-   2. Click on "Action Activity".
-
-   3. Fill out the following details for your Action Activity, which mostly involves constructing a templated prompt to the Action, and mapping the predicted PR classification out of the model's response:
-
-      | Field label                                 | Value to enter/select                                                                                                                                                                                                                           |
-      | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-      | **Action**                                  | *Select the`mw.generate_text_action` Built-in Action*                                                                                                                                                                                           |
-      | **Required Slots**                          | *Select 1 slot:`item_name`*                                                                                                                                                                                                                     |
-      | **Input mapping** (2 fields mapped)         | `system_prompt: $CONCAT(["'Take the '", data.item_name, "' and compare it against the '", data.historical_purchases.$STRINGIFY_JSON(), "' to determine its Opex or Capex classification. Only output Opex or Capex'"], "") ``user_input: "' '"` |
-      | **Output Mapping** (".dot\_walk\_here" box) | `.openai_chat_completions_response.choices[0].message.content`                                                                                                                                                                                  |
-      | **Output Key**                              | `pr_classification`                                                                                                                                                                                                                             |
-      | **Confirmation Policy**                     | *Check the "Require consent from the user" box*                                                                                                                                                                                                 |
-
-6. Build your first **Decision Policy**, which will execute after the already configured 2 Activity blocks. This policy will allow the Process to branch its execution depending on the `pr_classification` returned by the generate text Action Activity. 📖 *[Learn more about Decision Policies](/docs/control-flow).*
-
-   1. Click on the "+" square icon below the second generate text Activity in the main section of the Conversational Process Editor.
-
-   2. Click on "Decision Policy". (No need to input anything in the panel that appears on the right).
-
-      ![](/images/docs/bf9dab05124baa8593de3230dfe9d7ff2110945f6dd8d05dc1d2b4dc37cb9b7c-Screenshot_2025-04-12_at_18.31.00.png)
-
-   3. Increment the number of Cases by clicking on the "+" button to the right of the words "1 case".
-
-      ![](/images/docs/bc0023b28981318b05ea335ac03acbba9209a9daabf646aaaed8be8ee94bb452-Screenshot_2025-04-12_at_18.32.32.png)
-
-   4. Click on the *first* Case entry under the Decision Policy and enter the below DSL rule in the panel that appears on the right:
-
-      ![](/images/docs/f4ea9279552fe304dfa0f0dbd31d0be2ad1e8cb342adcea5d2b196799f2f3708-Screenshot_2025-04-12_at_18.35.31.png)
-
-      <CodeGroup>
-        ```bash bash
-        data.pr_classification.$LOWERCASE() == "opex"
-        ```
-      </CodeGroup>
-
-   5. Click on the *second* Case entry under the Decision Policy and enter the below DSL rule in the panel that appears on the right:
-
-      ![](/images/docs/d5c539a7ff47cd8595735e70c743975df554da62e5f7162f7a2df3ccf08168e2-Screenshot_2025-04-12_at_18.38.57.png)
-
-      ```
-      data.pr_classification.$LOWERCASE() == "capex"
-      ```
-
-7. Create the Action Activity that will execute under the *first* Decision Policy Case (`pr_classification` is `opex`).
-
-   1. Click on the "+" icon below the *first* Case entry under the Decision Policy.
-
-      ![](/images/docs/3bcd2ff69cd038d21f86d26af855592e895efc9537ee87245fd97be2ec220376-Screenshot_2025-04-12_at_18.41.40.png)
-
-   2. Select "Action Activity".
-
-   3. Fill out the following details for your Action Activity, which will connect your slots to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process).
-
-      | Field label                                 | Value to enter/select                                                                                                      |
-      | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-      | **Action**                                  | \*Select the`firstname_lastname_submit_purchase_request` Action that you built in Phase 1B \*                              |
-      | **Required Slots**                          | *Select all 4 Slots:`item_name`, `quantity`, `business_justification`, and `is_purchase_for_organization_acknowledgement`* |
-      | **Input mapping** (3 fields mapped)         | `item_name: data.item_name` `justification: data.business_justification` `quantity: data.quantity`                         |
-      | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                                                       |
-      | **Output Key**                              | `submitted_pr_result`                                                                                                      |
-      | **Confirmation Policy**                     | *Check the "Require consent from the user" box*                                                                            |
-
-      1. Note that even though `is_purchase_for_organization_acknowledgement` is not technically needed to invoke the submit pr action, marking it as a required Slot for this Activity ensures that the AI Agent will ensure it fills the Slot before executing this Activity.
-
-8. Create the Content Activity that will execute under the *second* Decision Policy Case (`pr_classification` is `capex`).
-
-   1. Click on the "+" icon below the *second* Case entry under the Decision Policy.
-
-   2. Select "Content Activity" this time.
-
-      ![](/images/docs/d49b0d9da342e99e38b4e09207f808adf307fbee690d3e6a9b5bbd9d14417a9c-Screenshot_2025-04-12_at_18.54.18.png)
-
-   3. Keep the "Content Type" set to "Text".
-
-   4. Paste the following text content (which will share text instructions with the user on how to submit purchase requests that fall under CapEx).
-
-      <CodeGroup>
-        ```bash bash
-        This request falls under CapEx. Please visit <a href="https://www.google.com">CapEx Submission Portal</a> to submit your request.
-        ```
-      </CodeGroup>
-
-9. Create the Content Activity that will execute under the `default` branch (when `pr_classification` somehow is neither `opex` nor `capex`).
-
-   1. Click on the "+" icon below the *second* Case entry under the Decision Policy.
-   2. Select "Content Activity" again.
-   3. Keep the "Content Type" set to "Text".
-   4. Paste the following text content (which will share text instructions with the user on how to submit purchase requests that fall under CapEx).
-      <CodeGroup>
-        ```bash bash
-        Unfortunately, this purchase request could not get categorized, so it was not submitted. Please feel free to try submitting another request.
-        ```
-      </CodeGroup>
-
-10. Click "Validate". If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
-
-    1. 💡Pro-tip: You can also use the following hotkeys to validate without pressing the button:
-
-       | On a MacOS machine | On a Windows machine |
-       | ------------------ | -------------------- |
-       | Cmd + Shift + V    | Ctrl + Shift + V     |
-
-11. Click "Publish", review details, and Click "Publish" once again.
+       | Field label                                 | Value to enter/select                                                                                                                                                                                                                           |
+       | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+       | **Action**                                  | *Select the`mw.generate_text_action` Built-in Action*                                                                                                                                                                                           |
+       | **Required Slots**                          | *Select 1 slot:`item_name`*                                                                                                                                                                                                                     |
+       | **Input mapping** (2 fields mapped)         | `system_prompt: $CONCAT(["'Take the '", data.item_name, "' and compare it against the '", data.historical_purchases.$STRINGIFY_JSON(), "' to determine its Opex or Capex classification. Only output Opex or Capex'"], "") ``user_input: "' '"` |
+       | **Output Mapping** (".dot\_walk\_here" box) | `.openai_chat_completions_response.choices[0].message.content`                                                                                                                                                                                  |
+       | **Output Key**                              | `pr_classification`                                                                                                                                                                                                                             |
+       | **Confirmation Policy**                     | *Check the "Require consent from the user" box*                                                                                                                                                                                                 |
+  </Step>
+  <Step title="Build Decision Policy">
+    Build your first **Decision Policy**, which will execute after the already configured 2 Activity blocks. This policy will allow the Process to branch its execution depending on the `pr_classification` returned by the generate text Action Activity. 📖 *[Learn more about Decision Policies](/docs/control-flow).*
+
+    1. Click on the "+" square icon below the second generate text Activity in the main section of the Conversational Process Editor.
+
+    2. Click on "Decision Policy". (No need to input anything in the panel that appears on the right).
+
+       ![](/images/docs/bf9dab05124baa8593de3230dfe9d7ff2110945f6dd8d05dc1d2b4dc37cb9b7c-Screenshot_2025-04-12_at_18.31.00.png)
+
+    3. Increment the number of Cases by clicking on the "+" button to the right of the words "1 case".
+
+       ![](/images/docs/bc0023b28981318b05ea335ac03acbba9209a9daabf646aaaed8be8ee94bb452-Screenshot_2025-04-12_at_18.32.32.png)
+
+    4. Click on the *first* Case entry under the Decision Policy and enter the below DSL rule in the panel that appears on the right:
+
+       ![](/images/docs/f4ea9279552fe304dfa0f0dbd31d0be2ad1e8cb342adcea5d2b196799f2f3708-Screenshot_2025-04-12_at_18.35.31.png)
+
+       <CodeGroup>
+         ```bash bash
+         data.pr_classification.$LOWERCASE() == "opex"
+         ```
+       </CodeGroup>
+
+    5. Click on the *second* Case entry under the Decision Policy and enter the below DSL rule in the panel that appears on the right:
+
+       ![](/images/docs/d5c539a7ff47cd8595735e70c743975df554da62e5f7162f7a2df3ccf08168e2-Screenshot_2025-04-12_at_18.38.57.png)
+
+       ```
+       data.pr_classification.$LOWERCASE() == "capex"
+       ```
+  </Step>
+  <Step title="Create OpEx Action Activity">
+    Create the Action Activity that will execute under the *first* Decision Policy Case (`pr_classification` is `opex`).
+
+    1. Click on the "+" icon below the *first* Case entry under the Decision Policy.
+
+       ![](/images/docs/3bcd2ff69cd038d21f86d26af855592e895efc9537ee87245fd97be2ec220376-Screenshot_2025-04-12_at_18.41.40.png)
+
+    2. Select "Action Activity".
+
+    3. Fill out the following details for your Action Activity, which will connect your slots to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process).
+
+       | Field label                                 | Value to enter/select                                                                                                      |
+       | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+       | **Action**                                  | \*Select the`firstname_lastname_submit_purchase_request` Action that you built in Phase 1B \*                              |
+       | **Required Slots**                          | *Select all 4 Slots:`item_name`, `quantity`, `business_justification`, and `is_purchase_for_organization_acknowledgement`* |
+       | **Input mapping** (3 fields mapped)         | `item_name: data.item_name` `justification: data.business_justification` `quantity: data.quantity`                         |
+       | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                                                       |
+       | **Output Key**                              | `submitted_pr_result`                                                                                                      |
+       | **Confirmation Policy**                     | *Check the "Require consent from the user" box*                                                                            |
+
+       <Note>
+         Even though `is_purchase_for_organization_acknowledgement` is not technically needed to invoke the submit pr action, marking it as a required Slot for this Activity ensures that the AI Agent will ensure it fills the Slot before executing this Activity.
+       </Note>
+  </Step>
+  <Step title="Create CapEx Content Activity">
+    Create the Content Activity that will execute under the *second* Decision Policy Case (`pr_classification` is `capex`).
+
+    1. Click on the "+" icon below the *second* Case entry under the Decision Policy.
+
+    2. Select "Content Activity" this time.
+
+       ![](/images/docs/d49b0d9da342e99e38b4e09207f808adf307fbee690d3e6a9b5bbd9d14417a9c-Screenshot_2025-04-12_at_18.54.18.png)
+
+    3. Keep the "Content Type" set to "Text".
+
+    4. Paste the following text content (which will share text instructions with the user on how to submit purchase requests that fall under CapEx).
+
+       <CodeGroup>
+         ```bash bash
+         This request falls under CapEx. Please visit <a href="https://www.google.com">CapEx Submission Portal</a> to submit your request.
+         ```
+       </CodeGroup>
+  </Step>
+  <Step title="Create Default Content Activity">
+    Create the Content Activity that will execute under the `default` branch (when `pr_classification` somehow is neither `opex` nor `capex`).
+
+    1. Click on the "+" icon below the *second* Case entry under the Decision Policy.
+    2. Select "Content Activity" again.
+    3. Keep the "Content Type" set to "Text".
+    4. Paste the following text content (which will share text instructions with the user on how to submit purchase requests that fall under CapEx).
+       <CodeGroup>
+         ```bash bash
+         Unfortunately, this purchase request could not get categorized, so it was not submitted. Please feel free to try submitting another request.
+         ```
+       </CodeGroup>
+  </Step>
+  <Step title="Validate Process">
+    Click "Validate". If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
+
+    <Tip>
+      You can also use the following hotkeys to validate without pressing the button:
+
+      | On a MacOS machine | On a Windows machine |
+      | ------------------ | -------------------- |
+      | Cmd + Shift + V    | Ctrl + Shift + V     |
+    </Tip>
+  </Step>
+  <Step title="Publish Process">
+    Click "Publish", review details, and Click "Publish" once again.
+  </Step>
+</Steps>
 
 <Check>
   ### Congratulations! You've just built the main part of this Plugin: the Conversational Process.
@@ -507,49 +577,60 @@ Let's build it!
 
 It's finally time to add your Conversational Process to a **Plugin**, where you can control the Triggering scenarios of your Plugin and specify which end users are allowed to use your Plugin.
 
-1. Navigate to a new Plugin (navigate to the library and click "Create"). ![](/images/docs/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+<Steps>
+  <Step title="Create Plugin">
+    Navigate to a new Plugin (navigate to the library and click "Create"). 
+    
+    ![](/images/docs/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info)                                                                                                                                                                                                                                                                                                                       |
+    | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_support_procurement_purchases`                                                                                                                                                                                                                                                                                                                                     |
+    | **Description** | `This will help users submit a Procurement purchase request (PR). This first compares the name of the PR that the user wants to submit against a list of historical PRs to determine whether the request is classified as "OpEx" or "CapEx". Depending on the classification, it will either submit the PR directly for the user or give the user more information on how to proceed.` |
+  </Step>
+  <Step title="Define Conversational Trigger">
+    Define a Conversational Trigger. 📖 *[Learn more about Natural Language Triggers](/docs/natural-language-triggers).*
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info)                                                                                                                                                                                                                                                                                                                       |
-   | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_support_procurement_purchases`                                                                                                                                                                                                                                                                                                                                     |
-   | **Description** | `This will help users submit a Procurement purchase request (PR). This first compares the name of the PR that the user wants to submit against a list of historical PRs to determine whether the request is classified as "OpEx" or "CapEx". Depending on the classification, it will either submit the PR directly for the user or give the user more information on how to proceed.` |
+    1. Click on "Define a trigger".
 
-3. Define a Conversational Trigger. 📖 *[Learn more about Natural Language Triggers](/docs/natural-language-triggers).*
+    2. In the panel that appears on the right, either:
 
-   1. Click on "Define a trigger".
+       1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
 
-   2. In the panel that appears on the right, either:
+       2. Add the following recommended utterances:
 
-      1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
+          | Utterances to add                         |
+          | ----------------------------------------- |
+          | `submit purchase request`                 |
+          | `how can i submit a PR to procurement?`   |
+          | `I need to order 100 pens for the office` |
+          | `I need to submit a PR for a laptop`      |
+          | `Can I submit a purchase order?`          |
+  </Step>
+  <Step title="Choose Conversational Process">
+    Choose your Conversational Process (the one you built in Phase 2).
 
-      2. Add the following recommended utterances:
+    1. Click on "Set a process".
+    2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_support_procurement_purchases_process`)
+  </Step>
+  <Step title="Define Launch Configuration">
+    Define your Launch Configuration.
 
-         | Utterances to add                         |
-         | ----------------------------------------- |
-         | `submit purchase request`                 |
-         | `how can i submit a PR to procurement?`   |
-         | `I need to order 100 pens for the office` |
-         | `I need to submit a PR for a laptop`      |
-         | `Can I submit a purchase order?`          |
+    1. Navigate to the "Launch Configuration" tab.
 
-4. Choose your Conversational Process (the one you built in Phase 2).
+       ![](/images/docs/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png)
 
-   1. Click on "Set a process".
-   2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_support_procurement_purchases_process`)
+    2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
 
-5. Define your Launch Configuration.
-
-   1. Navigate to the "Launch Configuration" tab.
-
-      ![](/images/docs/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png)
-
-   2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
-
-      ![](/images/docs/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png)
-
-6. Click "Publish" to launch your Plugin.
+       ![](/images/docs/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png)
+  </Step>
+  <Step title="Publish Plugin">
+    Click "Publish" to launch your Plugin.
+  </Step>
+</Steps>
 
 <Check>
   ### Woohoo! You've finished building your Plugin — time to try it out!

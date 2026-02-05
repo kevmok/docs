@@ -12,8 +12,14 @@ In this Quickstart guide, you'll build on the core concepts covered in [Quicksta
 
 # Prerequisites
 
-1. Access to the "Agent Studio" App.
-2. Completed [Quickstart #1: Basic Task Agent](/docs/intro-to-agent-studio-build-your-first-task-agent).
+<CardGroup cols={2}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to the "Agent Studio" App.
+  </Card>
+  <Card title="Quickstart #1 Complete" icon="check">
+    Completed [Quickstart #1: Basic Task Agent](/docs/intro-to-agent-studio-build-your-first-task-agent).
+  </Card>
+</CardGroup>
 
 # What You'll Build
 
@@ -33,10 +39,20 @@ To get to this experience, you can set up a **Data Type** to represent a "featur
 
 You'll build an end-to-end working Plugin via these phases:
 
-1. Set up **2 (HTTP)[Actions](/docs/actions)**: one to fetch available feature requests, and another to update a feature request.
-2. Set up a **"feature request"[Data Type](/docs/data-types)**, and attach a **default[Resolver Strategy](/docs/resolver-strategies) to power a feature request object** (using the "fetch" Action you created in the previous phase).
-3. Build the **Conversational Process**, containing the 1 Activity (using your other "update" Action) and the 2 Slots, as illustrated above.
-4. Add the Conversational Process to your AI Agent by launching a Plugin.
+<Steps>
+  <Step title="Set up HTTP Actions">
+    Set up **2 [HTTP Actions](/docs/actions)**: one to fetch available feature requests, and another to update a feature request.
+  </Step>
+  <Step title="Create Data Type & Resolver Strategy">
+    Set up a **"feature request" [Data Type](/docs/data-types)**, and attach a **default [Resolver Strategy](/docs/resolver-strategies) to power a feature request object** (using the "fetch" Action you created in the previous phase).
+  </Step>
+  <Step title="Build the Conversational Process">
+    Build the **Conversational Process**, containing the 1 Activity (using your other "update" Action) and the 2 Slots, as illustrated above.
+  </Step>
+  <Step title="Launch a Plugin">
+    Add the Conversational Process to your AI Agent by launching a Plugin.
+  </Step>
+</Steps>
 
 *Let's get started!*
 
@@ -61,30 +77,46 @@ You'll build an end-to-end working Plugin via these phases:
   This section will walk you through how to set up your own connector to the Moveworks Purple API (which powers the Actions used in the Quickstart guides), so no need to repeat this step if you've done it before.
 </Info>
 
-In this guide, you'll build a Plugin that will actually fetch from and take action on a store of feature requests that's **set up just for you**. In preparation for this, follow these steps
+In this guide, you'll build a Plugin that will actually fetch from and take action on a store of feature requests that's **set up just for you**. In preparation for this, follow these steps:
 
-1. Go to the [Moveworks Purple API Tool](purple-api-tool).
-2. Click "Create New Session ID". You should see sample feature requests populate below.
-3. Copy your **Session ID** to your own notes. You'll to have this on hand in the following phase when we set up your Actions.
+<Steps>
+  <Step title="Create Session ID">
+    Go to the [Moveworks Purple API Tool](purple-api-tool).
+  </Step>
+  <Step title="Generate Session">
+    Click "Create New Session ID". You should see sample feature requests populate below.
+  </Step>
+  <Step title="Save Session ID">
+    Copy your **Session ID** to your own notes. You'll to have this on hand in the following phase when we set up your Actions.
+  </Step>
+</Steps>
 
 Now, you just need to set up a (reusable) connector that will allow you to seamlessly hit the necessary Actions that your Plugin will use.
 
-1. Navigate to the App Picker in the top right corner of Agent Studio.
+<Steps>
+  <Step title="Open App Picker">
+    Navigate to the App Picker in the top right corner of Agent Studio.
+  </Step>
+  <Step title="Navigate to HTTP Connectors">
+    Click on "HTTP Connectors", which will take you to another browser tab.
+  </Step>
+  <Step title="Create New Connector">
+    Click "Create" in the top right corner.
+  </Step>
+  <Step title="Configure Connector">
+    Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Click on "HTTP Connectors", which will take you to another browser tab.
-
-3. Click "Create" in the top right corner.
-
-4. Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
-
-   | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
-   | ------------------- | ---------------------------------------------------------------- |
-   | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
-   | **Description**     | `Moveworks Purple APIs Connector`                                |
-   | **Base Url**        | `https://marketplace.moveworks.com`                              |
-   | **Auth Config**     | `No Auth`                                                        |
-
-5. Click "Save" on the bottom right corner.
+    | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
+    | ------------------- | ---------------------------------------------------------------- |
+    | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
+    | **Description**     | `Moveworks Purple APIs Connector`                                |
+    | **Base Url**        | `https://marketplace.moveworks.com`                              |
+    | **Auth Config**     | `No Auth`                                                        |
+  </Step>
+  <Step title="Save Connector">
+    Click "Save" on the bottom right corner.
+  </Step>
+</Steps>
 
 <Check>
   ### You're now fully ready to start building. On to Phase 1 to set up your Actions!
@@ -104,64 +136,74 @@ Now, you just need to set up a (reusable) connector that will allow you to seaml
 
 Let's first set up an [HTTP Action](/docs/http-actions) that will fetch available feature requests. This Action doesn't require any dynamic inputs, and will just query an external system for a list of feature requests.
 
-1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+<Steps>
+  <Step title="Open Agent Studio">
+    Navigate to the App Picker in the top right corner. Click on "Agent Studio".
 
-   ![](/images/docs/bf83b7327d9d40a4a4c6efc7962781bfbed0af5a0c7a1bd66eaa6a4c75136d48-image.png)
+    ![](/images/docs/bf83b7327d9d40a4a4c6efc7962781bfbed0af5a0c7a1bd66eaa6a4c75136d48-image.png)
+  </Step>
+  <Step title="Create HTTP Action">
+    Navigate to a new HTTP Action.
 
-2. Navigate to a new HTTP Action.
+    ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-   ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+    ![](/images/docs/b5c578f6ce86df1f77b7c0e8ac27a91f7926cdb4102367e0f53196c71bcb5f16-image.png)
 
-3. Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_fetch_feature_requests`                      |
+    | **Description** | `Fetches a list of existing feature requests`                    |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-   ![](/images/docs/b5c578f6ce86df1f77b7c0e8ac27a91f7926cdb4102367e0f53196c71bcb5f16-image.png)
+    1. Click on the "Import" icon to the right of the "TEST" button.
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_fetch_feature_requests`                      |
-   | **Description** | `Fetches a list of existing feature requests`                    |
+       ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
 
-4. Enter the details of your API:
+    2. Find the **Session ID** that you created & copied from Phase 0 — you'll use it in the next step.
 
-   1. Click on the "Import" icon to the right of the "TEST" button.
+    3. Paste (don't click "Import" yet) the following almost-ready cURL command:
 
-      ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+       <CodeGroup>
+         ```bash bash
+         curl "https://marketplace.moveworks.com/api/purple-suite/community/feature-requests?sessionId=YOUR_SESSION_ID"
+         ```
+       </CodeGroup>
 
-   2. Find the **Session ID** that you created & copied from Phase 0 — you'll use it in the next step.
+    4. Replace `YOUR_SESSION_ID` (at the very end) in the pasted command with your actual Session ID.
 
-   3. Paste (don't click "Import" yet) the following almost-ready cURL command:
+    5. Click "Import" (your Action should now be auto-populated with details).
+  </Step>
+  <Step title="Add Connector">
+    Add your Connector:
 
-      <CodeGroup>
-        ```bash bash
-        curl "https://marketplace.moveworks.com/api/purple-suite/community/feature-requests?sessionId=YOUR_SESSION_ID"
-        ```
-      </CodeGroup>
+    1. Navigate to the "Connector" tab.
 
-   4. Replace `YOUR_SESSION_ID` (at the very end) in the pasted command with your actual Session ID.
+    2. Select "Inherit from existing connector".
 
-   5. Click "Import" (your Action should now be auto-populated with details).
+    3. Select the Connector you created in Phase 0 (e.g. `firstname_lastname_moveworks_purple`).
 
-5. Add your Connector:
+       ![](/images/docs/9ac343a79e74bbc4202e15f740aaaa3ff4779b43d05e6bcc41fae5f9960a6001-image.png)
+  </Step>
+  <Step title="Test Action">
+    Test your Action:
 
-   1. Navigate to the "Connector" tab.
+    1. Click on the "TEST" icon (to the right of the endpoint URL definition).
 
-   2. Select "Inherit from existing connector".
+    2. Inspect the Console to verify that you receive a successful response:
 
-   3. Select the Connector you created in Phase 0 (e.g. `firstname_lastname_moveworks_purple`).
-
-      ![](/images/docs/9ac343a79e74bbc4202e15f740aaaa3ff4779b43d05e6bcc41fae5f9960a6001-image.png)
-
-6. Test your Action:
-
-   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
-
-   2. Inspect the Console to verify that you receive a successful response:
-
-      <Frame caption="You should see: Status Code 200, a list of Feature Request objects, and a response schema of the list.">
-        <img src="/images/docs/d5a3fa3510a76f1a6021c0d2f553951f969b7d23377d8b88bd7bab93a74f1344-Screenshot_2025-04-12_at_02.58.40.png" />
-      </Frame>
-
-7. Hit "Publish".
+       <Frame caption="You should see: Status Code 200, a list of Feature Request objects, and a response schema of the list.">
+         <img src="/images/docs/d5a3fa3510a76f1a6021c0d2f553951f969b7d23377d8b88bd7bab93a74f1344-Screenshot_2025-04-12_at_02.58.40.png" />
+       </Frame>
+  </Step>
+  <Step title="Publish Action">
+    Hit "Publish".
+  </Step>
+</Steps>
 
 <Check>
   ### Nice! You've just set up 1 Action to fetch feature requests — 1 more Action to go.
@@ -181,98 +223,109 @@ Let's first set up an [HTTP Action](/docs/http-actions) that will fetch availabl
 
 Now, we'll build an Action that can apply a status update to a single feature request. This Action will require two dynamic inputs (`feature_request_id` and `new_status`), and should update the feature request record in your session's database.
 
-1. Navigate to a new HTTP Action.
+<Steps>
+  <Step title="Create HTTP Action">
+    Navigate to a new HTTP Action.
+  </Step>
+  <Step title="Click Create">
+    Click "Create".
 
-2. Click "Create".
+    ![](/images/docs/1230fe3b8195128efd0add39af815e8394c98b7db70b2da97e2569a41fb24161-image.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-   ![](/images/docs/1230fe3b8195128efd0add39af815e8394c98b7db70b2da97e2569a41fb24161-image.png)
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_update_feature_request_action`               |
+    | **Description** | `Updates the status of an existing feature request`              |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-3. Set the following title and description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+    1. Click on the "Import" icon to the right of the "TEST" button.
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_update_feature_request_action`               |
-   | **Description** | `Updates the status of an existing feature request`              |
+       ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
 
-4. Enter the details of your API:
+    2. Find the same **Session ID** that you created & copied from Phase 0 — you'll use it in the next step.
 
-   1. Click on the "Import" icon to the right of the "TEST" button.
+    3. Paste (don't click "Import" yet) the following almost-ready cURL command:
 
-      ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+       <CodeGroup>
+         ```bash bash
+         curl -X PATCH "https://marketplace.moveworks.com/api/purple-suite/community/feature-requests/{{feature_request_id}}?sessionId=YOUR_SESSION_ID" \
+         -H "Content-Type: application/json" \
+         -d '{"newStatusNumber": "{{new_status}}"}'
+         ```
+       </CodeGroup>
 
-   2. Find the same **Session ID** that you created & copied from Phase 0 — you'll use it in the next step.
+    4. Replace `YOUR_SESSION_ID` (at the very end) in the pasted command with your actual Session ID.
 
-   3. Paste (don't click "Import" yet) the following almost-ready cURL command:
+    5. Click "Import" (your Action should now be auto-populated with details).
+  </Step>
+  <Step title="Add Connector">
+    Add your Connector:
 
-      <CodeGroup>
-        ```bash bash
-        curl -X PATCH "https://marketplace.moveworks.com/api/purple-suite/community/feature-requests/{{feature_request_id}}?sessionId=YOUR_SESSION_ID" \
-        -H "Content-Type: application/json" \
-        -d '{"newStatusNumber": "{{new_status}}"}'
-        ```
-      </CodeGroup>
+    1. Navigate to the "Connector" tab.
 
-   4. Replace `YOUR_SESSION_ID` (at the very end) in the pasted command with your actual Session ID.
+    2. Select "Inherit from existing connector".
 
-   5. Click "Import" (your Action should now be auto-populated with details).
+    3. Select the Connector you created in Phase 0 (e.g. `firstname_lastname_moveworks_purple`)
 
-5. Add your Connector:
+       ![](/images/docs/9d54b5301480fa3ec5a05df9c25e8d38a4fd4d14b72065605436c7a203d98e31-image.png)
+  </Step>
+  <Step title="Define Input Arguments">
+    Define 2 formal input arguments to represent the "feature request id" and "new status" inputs that this Action requires:
 
-   1. Navigate to the "Connector" tab.
+    1. Click on the "Input Args" button near the top right corner.
 
-   2. Select "Inherit from existing connector".
+       ![](/images/docs/48ab271f5548f5180cdea038d957a96861e90351cda698bf43fd7c5572df7f65-CleanShot_2025-04-14_at_11.47.312x.png)
 
-   3. Select the Connector you created in Phase 0 (e.g. `firstname_lastname_moveworks_purple`)
+    2. Click "Create New" in the "Input Arguments" pop up.
 
-      ![](/images/docs/9d54b5301480fa3ec5a05df9c25e8d38a4fd4d14b72065605436c7a203d98e31-image.png)
+    3. Fill out the following details for your `feature_request_id` argument:
 
-6. Define 2 formal input arguments to represent the "feature request id" and "new status" inputs that this Action requires:
+       | Field label       | Value to enter/select                                                                                                                                           |
+       | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+       | **Argument Name** | `feature_request_id`                                                                                                                                            |
+       | **Data Type**     | *Select "string"*                                                                                                                                               |
+       | **Example Value** | *Copy/Paste an existing**FR-#####** ID from your [Moveworks Purple API](https://app.superblocks.com/applications/a23f55f2-4149-4c18-ac98-9dec93c15ff8) session* |
+       | **Description**   | `The ID of the feature request to update`                                                                                                                       |
+       | **Required**      | *Check the box*                                                                                                                                                 |
 
-   1. Click on the "Input Args" button near the top right corner.
+    4. Hit "Save".
 
-      ![](/images/docs/48ab271f5548f5180cdea038d957a96861e90351cda698bf43fd7c5572df7f65-CleanShot_2025-04-14_at_11.47.312x.png)
+    5. Click "Create New" again in the "Input Arguments" pop up.
 
-   2. Click "Create New" in the "Input Arguments" pop up.
+    6. Fill out the following details for your `new_status` argument:
 
-   3. Fill out the following details for your `feature_request_id` argument:
+       | Field label       | Value to enter/select                               |
+       | ----------------- | --------------------------------------------------- |
+       | **Argument Name** | `new_status`                                        |
+       | **Data Type**     | *Select "string"*                                   |
+       | **Example Value** | `7`                                                 |
+       | **Description**   | `The status to update the given feature request to` |
+       | **Required**      | *Check the box*                                     |
 
-      | Field label       | Value to enter/select                                                                                                                                           |
-      | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-      | **Argument Name** | `feature_request_id`                                                                                                                                            |
-      | **Data Type**     | *Select "string"*                                                                                                                                               |
-      | **Example Value** | *Copy/Paste an existing**FR-#####** ID from your [Moveworks Purple API](https://app.superblocks.com/applications/a23f55f2-4149-4c18-ac98-9dec93c15ff8) session* |
-      | **Description**   | `The ID of the feature request to update`                                                                                                                       |
-      | **Required**      | *Check the box*                                                                                                                                                 |
+    7. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+  </Step>
+  <Step title="Test Action">
+    Test your Action:
 
-   4. Hit "Save".
+    1. Click on the "TEST" icon (to the right of the endpoint URL definition).
 
-   5. Click "Create New" again in the "Input Arguments" pop up.
+    2. Inspect the Console to verify that you receive a successful response:
 
-   6. Fill out the following details for your `new_status` argument:
+       <Frame caption="You can also go to , fetch your session by Session ID, and see that your status for the feature request you updated is now &#x22;On Roadmap&#x22; (which is what status 7 represents).">
+         <img src="/images/docs/2462b5657403d1c345877197599b35d19a6e2d2c312003334a6552dd7905ab80-Screenshot_2025-04-12_at_03.19.21.png" />
 
-      | Field label       | Value to enter/select                               |
-      | ----------------- | --------------------------------------------------- |
-      | **Argument Name** | `new_status`                                        |
-      | **Data Type**     | *Select "string"*                                   |
-      | **Example Value** | `7`                                                 |
-      | **Description**   | `The status to update the given feature request to` |
-      | **Required**      | *Check the box*                                     |
-
-   7. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
-
-7. Test your Action:
-
-   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
-
-   2. Inspect the Console to verify that you receive a successful response:
-
-      <Frame caption="You can also go to , fetch your session by Session ID, and see that your status for the feature request you updated is now &#x22;On Roadmap&#x22; (which is what status 7 represents).">
-        <img src="/images/docs/2462b5657403d1c345877197599b35d19a6e2d2c312003334a6552dd7905ab80-Screenshot_2025-04-12_at_03.19.21.png" />
-
-        [Moveworks Purple API](https://app.superblocks.com/applications/a23f55f2-4149-4c18-ac98-9dec93c15ff8)
-      </Frame>
-
-8. Click "Publish". Review details, and click "Publish" once again.
+         [Moveworks Purple API](https://app.superblocks.com/applications/a23f55f2-4149-4c18-ac98-9dec93c15ff8)
+       </Frame>
+  </Step>
+  <Step title="Publish Action">
+    Click "Publish". Review details, and click "Publish" once again.
+  </Step>
+</Steps>
 
 <Check>
   ### All done with Actions!
@@ -294,58 +347,66 @@ To power the process of updating a feature request, creating a formal **[Data Ty
 
 We'll build the "feature request" Data Type with its Resolver Strategy in this phase:
 
-1. Navigate to a new Data Type.
+<Steps>
+  <Step title="Create Data Type">
+    Navigate to a new Data Type.
 
-   ![](/images/docs/40d2acb46048d22b5048835ae02cfead819cc1e2c12cc63d3803610c1f98d582-Screenshot_2025-04-12_at_03.44.31.png)
+    ![](/images/docs/40d2acb46048d22b5048835ae02cfead819cc1e2c12cc63d3803610c1f98d582-Screenshot_2025-04-12_at_03.44.31.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Data Type (be sure to replace "firstname" and "lastname" with your corresponding information). Note that the title will autofix itself to the appropriate formal type name (in `u_` prefixed format).
 
-2. Set the following title and description for your Data Type (be sure to replace "firstname" and "lastname" with your corresponding information). Note that the title will autofix itself to the appropriate formal type name (in `u_` prefixed format).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_feature_request`                             |
+    | **Description** | `A feature request object`                                       |
+  </Step>
+  <Step title="Provide Schema">
+    Provide the schema for an object of this type:
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_feature_request`                             |
-   | **Description** | `A feature request object`                                       |
+    1. Click "Import JSON" near the top right corner of the editor.
 
-3. Provide the schema for an object of this type:
+       ![](/images/docs/9bd3f4272eab018191125fd5aba5c5c7b0fdc41f9d203198053125bdeac4d00c-Screenshot_2025-04-12_at_03.54.05.png)
 
-   1. Click "Import JSON" near the top right corner of the editor.
+    2. Paste the following JSON sample object into the popup (this will allow you to auto-generate the schema):
 
-      ![](/images/docs/9bd3f4272eab018191125fd5aba5c5c7b0fdc41f9d203198053125bdeac4d00c-Screenshot_2025-04-12_at_03.54.05.png)
+       <CodeGroup>
+         ```bash bash
+         {
+           "id": "FR-12345",
+           "name": "Add Dark Mode",
+           "current_status": "New",
+           "created_by": "[email protected]",
+           "moderator": "[email protected]",
+           "product_area": "UI/UX"
+         }
+         ```
+       </CodeGroup>
 
-   2. Paste the following JSON sample object into the popup (this will allow you to auto-generate the schema):
+    3. Click "Generate", and verify that the auto-populated schema looks correct (matches the structure of the sample object).
+  </Step>
+  <Step title="Configure Resolver Strategy">
+    Configure your [Resolver Strategy](/docs/resolver-strategies). This strategy will contain one [Dynamic Resolver Method](/docs/resolver-strategies#configuring-a-dynamic-resolver), which is essentially a resolver that fetches candidate options from a dynamic source (in this case, from the "fetch feature requests" HTTP Action you configured in Phase 1A).
 
-      <CodeGroup>
-        ```bash bash
-        {
-          "id": "FR-12345",
-          "name": "Add Dark Mode",
-          "current_status": "New",
-          "created_by": "[email protected]",
-          "moderator": "[email protected]",
-          "product_area": "UI/UX"
-        }
-        ```
-      </CodeGroup>
+    1. Navigate to the "Resolver Strategy" tab.
 
-   3. Click "Generate", and verify that the auto-populated schema looks correct (matches the structure of the sample object).
+       ![](/images/docs/ea6c3d65b459957436016a2926df666cf03f28c04ac54edd80c7304b429b55eb-Screenshot_2025-04-12_at_04.00.19.png)
 
-4. Configure your [Resolver Strategy](/docs/resolver-strategies). This strategy will contain one [Dynamic Resolver Method](/docs/resolver-strategies#configuring-a-dynamic-resolver), which is essentially a resolver that fetches candidate options from a dynamic source (in this case, from the "fetch feature requests" HTTP Action you configured in Phase 1A).
+    2. Fill out the following details for your Resolver Strategy Method:
 
-   1. Navigate to the "Resolver Strategy" tab.
-
-      ![](/images/docs/ea6c3d65b459957436016a2926df666cf03f28c04ac54edd80c7304b429b55eb-Screenshot_2025-04-12_at_04.00.19.png)
-
-      1. Fill out the following details for your Resolver Strategy Method:
-
-         | Field label                                 | Value to enter/select                                                                     |
-         | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
-         | **Method Name**                             | `choose_from_existing_feature_requests`                                                   |
-         | **Method Type**                             | *Select`Dynamic`*                                                                         |
-         | **Action**                                  | *Select the`firstname_lastname_fetch_feature_requests` Action that you built in Phase 1A* |
-         | **Input mapping**                           | *\{}*                                                                                     |
-         | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                      |
-         | **Output Cardinality**                      | *Select`Interpret output as a list of candidate values`*                                  |
-
-5. Click "Publish". Review details, and click "Publish" once again.
+       | Field label                                 | Value to enter/select                                                                     |
+       | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+       | **Method Name**                             | `choose_from_existing_feature_requests`                                                   |
+       | **Method Type**                             | *Select`Dynamic`*                                                                         |
+       | **Action**                                  | *Select the`firstname_lastname_fetch_feature_requests` Action that you built in Phase 1A* |
+       | **Input mapping**                           | *\{}*                                                                                     |
+       | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                      |
+       | **Output Cardinality**                      | *Select`Interpret output as a list of candidate values`*                                  |
+  </Step>
+  <Step title="Publish Data Type">
+    Click "Publish". Review details, and click "Publish" once again.
+  </Step>
+</Steps>
 
 <Check>
   ### And just like that... you've created a fully-fledged Data Type!
@@ -371,107 +432,120 @@ Here's a reminder of the bird's eye view for our Process (2 [Slots](/docs/slots)
 
 To build this Conversational Process:
 
-1. Navigate to a new Conversational Process (navigate to the library and click "Create"). ![](/images/docs/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+<Steps>
+  <Step title="Create Conversational Process">
+    Navigate to a new Conversational Process (navigate to the library and click "Create"). 
+    
+    ![](/images/docs/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info)         |
+    | --------------- | ------------------------------------------------------------------------ |
+    | **Title**       | `firstname_lastname_update_feature_request_process`                      |
+    | **Description** | `This will help users update the status of an existing feature request.` |
+  </Step>
+  <Step title="Add Slots">
+    Add TWO new **Slots** for the Process to interact with. One will represent the `feature_request` to update, and the other will be the `target_status` to set on the feature request. *📖*[Learn more about Slots](/docs/slots).
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info)         |
-   | --------------- | ------------------------------------------------------------------------ |
-   | **Title**       | `firstname_lastname_update_feature_request_process`                      |
-   | **Description** | `This will help users update the status of an existing feature request.` |
+    1. Click on the "Slots" button near the top right corner of the editor.
 
-3. Add TWO new **Slots** for the Process to interact with. One will represent the `feature_request` to update, and the other will be the `target_status` to set on the feature request. *📖*[Learn more about Slots](/docs/slots).
+       ![](/images/docs/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png)
 
-   1. Click on the "Slots" button near the top right corner of the editor.
+    2. Click "Create New" in the "Slots" pop up.
 
-      ![](/images/docs/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png)
+    3. Fill out the following details for your first `feature_request` Slot:
 
-   2. Click "Create New" in the "Slots" pop up.
+       | Field label                     | Value to enter/select                                                               |
+       | ------------------------------- | ----------------------------------------------------------------------------------- |
+       | **Name**                        | `feature_request`                                                                   |
+       | **Data Type**                   | *Select the`u_FirstnameLastnameFeatureRequest` Data Type that you built in Phase 2* |
+       | **Slot Description**            | `The feature request that the user wants to update.`                                |
+       | **Slot Validation Policy**      | *Leave blank*                                                                       |
+       | **Slot Validation Description** | *Leave blank*                                                                       |
+       | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                                       |
 
-   3. Fill out the following details for your first `feature_request` Slot:
+    4. Hit "Save" (scroll to the bottom of the popup).
 
-      | Field label                     | Value to enter/select                                                               |
-      | ------------------------------- | ----------------------------------------------------------------------------------- |
-      | **Name**                        | `feature_request`                                                                   |
-      | **Data Type**                   | *Select the`u_FirstnameLastnameFeatureRequest` Data Type that you built in Phase 2* |
-      | **Slot Description**            | `The feature request that the user wants to update.`                                |
-      | **Slot Validation Policy**      | *Leave blank*                                                                       |
-      | **Slot Validation Description** | *Leave blank*                                                                       |
-      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                                       |
+    5. Click "Create New" again in the "Slots" pop up to build your second Slot.
 
-   4. Hit "Save" (scroll to the bottom of the popup).
+    6. Fill out the following details for your second `target_status` Slot:
 
-   5. Click "Create New" again in the "Slots" pop up to build your second Slot.
+       | Field label                     | Value to enter/select                                                     |
+       | ------------------------------- | ------------------------------------------------------------------------- |
+       | **Name**                        | `target_status`                                                           |
+       | **Data Type**                   | *Select "string"*                                                         |
+       | **Slot Description**            | `The target status that the user wants to update the feature request to.` |
+       | **Slot Validation Policy**      | *Leave blank*                                                             |
+       | **Slot Validation Description** | *Leave blank*                                                             |
+       | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                             |
 
-   6. Fill out the following details for your second `target_status` Slot:
+    7. Before saving this slot, you'll add an Inline Resolver Strategy to this `target_status` Slot. We want to power this Slot with a **[Static Resolver](/docs/resolver-strategies#configuring-a-static-resolver)** (aka a resolver which is backed by static multiple choice options).
 
-      | Field label                     | Value to enter/select                                                     |
-      | ------------------------------- | ------------------------------------------------------------------------- |
-      | **Name**                        | `target_status`                                                           |
-      | **Data Type**                   | *Select "string"*                                                         |
-      | **Slot Description**            | `The target status that the user wants to update the feature request to.` |
-      | **Slot Validation Policy**      | *Leave blank*                                                             |
-      | **Slot Validation Description** | *Leave blank*                                                             |
-      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*                             |
+       1. Scroll to the very bottom of this Slot creation popup and click "Add Inline Resolver Strategy".
 
-   7. Before saving this slot, you'll add an Inline Resolver Strategy to this `target_status` Slot. We want to power this Slot with a \*\*[Static Resolver\*\*](/docs/resolver-strategies#configuring-a-static-resolver)(aka a resolver which is backed by static multiple choice options).
+       2. Click "+ Add Method".
 
-      1. Scroll to the very bottom of this Slot creation popup and click "Add Inline Resolver Strategy".
+       3. Fill out the following initial details for your Method.
 
-      2. Click "+ Add Method".
+          | Field label     | Value to enter/select                   |
+          | --------------- | --------------------------------------- |
+          | **Method Name** | `choose_from_existing_feature_requests` |
+          | **Method Type** | *Select`Static`*                        |
 
-      3. Fill out the following initial details for your Method.
+       4. Add the following Static Options for your Static Resolver Method. (Note: the "Raw Value" column contains the actual values that your "update feature request" HTTP Action expects in order to successfully update the status on the feature request).
 
-         | Field label     | Value to enter/select                   |
-         | --------------- | --------------------------------------- |
-         | **Method Name** | `choose_from_existing_feature_requests` |
-         | **Method Type** | *Select`Static`*                        |
+          | Display Value                         | Raw Value |
+          | ------------------------------------- | --------- |
+          | `Existing Functionality/Native Skill` | `2`       |
+          | `Limited Preview`                     | `11`      |
+          | `Future Consideration`                | `3`       |
+          | `Not Enough Info to Make Decision`    | `6`       |
+          | `Delivered`                           | `8`       |
+          | `Duplicate`                           | `9`       |
+          | `New`                                 | `1`       |
+          | `On Roadmap`                          | `7`       |
 
-      4. Add the following Static Options for your Static Resolver Method. (Note: the "Raw Value" column contains the actual values that your "update feature request" HTTP Action expects in order to successfully update the status on the feature request).
+       5. Click the "X" in the top right corner of the "Strategy Definition" pop up.
 
-         | Display Value                         | Raw Value |
-         | ------------------------------------- | --------- |
-         | `Existing Functionality/Native Skill` | `2`       |
-         | `Limited Preview`                     | `11`      |
-         | `Future Consideration`                | `3`       |
-         | `Not Enough Info to Make Decision`    | `6`       |
-         | `Delivered`                           | `8`       |
-         | `Duplicate`                           | `9`       |
-         | `New`                                 | `1`       |
-         | `On Roadmap`                          | `7`       |
+    8. Hit "Save" (scroll to the bottom of the popup) and hit the "X" icon to close this "Slots" pop up.
+  </Step>
+  <Step title="Build Action Activity">
+    Build an **Action Activity** that will post the status update to the feature request. 📖 *[Learn more about Activities](/docs/activities).*
 
-      5. Click the "X" in the top right corner of the "Strategy Definition" pop up.
+    1. Click on the "+ Add a block to your process" button in the main section of the editor.
 
-   8. Hit "Save" (scroll to the bottom of the popup) and hit the "X" icon to close this "Slots" pop up.
+    2. Click on "Action Activity".
 
-4. Build an **Action Activity** that will post the status update to the feature request. 📖 *[Learn more about Activities](/docs/activities).*
+       ![](/images/docs/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png)
 
-   1. Click on the "+ Add a block to your process" button in the main section of the editor.
+    3. Fill out the following details for your Action Activity, which mostly involves connecting your Slot to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process):
 
-   2. Click on "Action Activity".
+       | Field label                                 | Value to enter/select                                                                               |
+       | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+       | **Action**                                  | \*Select the`firstname_lastname_update_feature_request_action` Action that you built in Phase 1B \* |
+       | **Required Slots**                          | *Select 2 slots:`feature_request` and `target_status`*                                              |
+       | **Input mapping**                           | `feature_request_id: data.feature_request.id` `new_status: data.target_status.value`                |
+       | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                                |
+       | **Output Key**                              | `feature_request_update_result`                                                                     |
+       | **Confirmation Policy**                     | *Leave unchecked*                                                                                   |
+  </Step>
+  <Step title="Validate Process">
+    Click "Validate" (Located in the top right corner. Click on the caret icon next to the Publish button). If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
 
-      ![](/images/docs/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png)
-
-   3. Fill out the following details for your Action Activity, which mostly involves connecting your Slot to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process):
-
-      | Field label                                 | Value to enter/select                                                                               |
-      | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-      | **Action**                                  | \*Select the`firstname_lastname_update_feature_request_action` Action that you built in Phase 1B \* |
-      | **Required Slots**                          | *Select 2 slots:`feature_request` and `target_status`*                                              |
-      | **Input mapping**                           | `feature_request_id: data.feature_request.id` `new_status: data.target_status.value`                |
-      | **Output Mapping** (".dot\_walk\_here" box) | *Leave blank (output is fine as is)*                                                                |
-      | **Output Key**                              | `feature_request_update_result`                                                                     |
-      | **Confirmation Policy**                     | *Leave unchecked*                                                                                   |
-
-5. Click "Validate" (Located in the top right corner. Click on the caret icon next to the Publish button). If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
-
-   1. 💡Pro-tip: You can also use the following hotkeys to validate without pressing the button:
+    <Tip>
+      You can also use the following hotkeys to validate without pressing the button:
 
       | On a MacOS machine | On a Windows machine |
       | ------------------ | -------------------- |
       | Cmd + Shift + V    | Ctrl + Shift + V     |
-
-6. Click "Publish", review details, and Click "Publish" once again.
+    </Tip>
+  </Step>
+  <Step title="Publish Process">
+    Click "Publish", review details, and Click "Publish" once again.
+  </Step>
+</Steps>
 
 <Check>
   ### Awesome! You've just built the main part of this Plugin: the Conversational Process.
@@ -491,49 +565,60 @@ To build this Conversational Process:
 
 In our final section, you’ll learn how to add your Conversational Process to a **Plugin**, and control the Triggering scenarios of your Plugin, and specify which end users are allowed to use your Plugin.
 
-1. Navigate to a new Plugin (navigate to the library and click "Create"). ![](/images/docs/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+<Steps>
+  <Step title="Create Plugin">
+    Navigate to a new Plugin (navigate to the library and click "Create"). 
+    
+    ![](/images/docs/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info)         |
+    | --------------- | ------------------------------------------------------------------------ |
+    | **Title**       | `firstname_lastname_update_feature_request`                              |
+    | **Description** | `This will help users update the status of an existing feature request.` |
+  </Step>
+  <Step title="Define Conversational Trigger">
+    Define a Conversational Trigger. 📖 *[Learn more about Natural Language Triggers](/docs/natural-language-triggers).*
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info)         |
-   | --------------- | ------------------------------------------------------------------------ |
-   | **Title**       | `firstname_lastname_update_feature_request`                              |
-   | **Description** | `This will help users update the status of an existing feature request.` |
+    1. Click on "Define a trigger".
 
-3. Define a Conversational Trigger. 📖 *[Learn more about Natural Language Triggers](/docs/natural-language-triggers).*
+    2. In the panel that appears on the right, either:
 
-   1. Click on "Define a trigger".
+       1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
 
-   2. In the panel that appears on the right, either:
+       2. Add the following recommended utterances:
 
-      1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
+          | Utterances to add                                |
+          | ------------------------------------------------ |
+          | `How do I update a feature request?`             |
+          | `Can you update a feature request?`              |
+          | `Change status of FR-12345 to "Limited Preview"` |
+          | `update feature request`                         |
+          | `Change feature request status`                  |
+  </Step>
+  <Step title="Choose Conversational Process">
+    Choose your Conversational Process (the one you built in Phase 2).
 
-      2. Add the following recommended utterances:
+    1. Click on "Set a process".
+    2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_update_feature_request_process`)
+  </Step>
+  <Step title="Define Launch Configuration">
+    Define your Launch Configuration.
 
-         | Utterances to add                                |
-         | ------------------------------------------------ |
-         | `How do I update a feature request?`             |
-         | `Can you update a feature request?`              |
-         | `Change status of FR-12345 to "Limited Preview"` |
-         | `update feature request`                         |
-         | `Change feature request status`                  |
+    1. Navigate to the "Launch Configuration" tab.
 
-4. Choose your Conversational Process (the one you built in Phase 2).
+       ![](/images/docs/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png)
 
-   1. Click on "Set a process".
-   2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_update_feature_request_process`)
+    2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
 
-5. Define your Launch Configuration.
-
-   1. Navigate to the "Launch Configuration" tab.
-
-      ![](/images/docs/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png)
-
-   2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
-
-      ![](/images/docs/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png)
-
-6. Click "Publish" to launch your Plugin.
+       ![](/images/docs/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png)
+  </Step>
+  <Step title="Publish Plugin">
+    Click "Publish" to launch your Plugin.
+  </Step>
+</Steps>
 
 <Check>
   ### And just like that — you've finished building your Plugin, and now it's ready to use!

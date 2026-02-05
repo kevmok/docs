@@ -20,8 +20,14 @@ This guide will walk you through creating an Ambient Agent that intelligently ha
 
 # Prerequisites
 
-1. Access to the "Agent Studio" App
-2. Completed [Quickstart #5: Notification Ambient Agent](/docs/webhook-triggers-quickstart-guide#/)
+<CardGroup cols={2}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to the "Agent Studio" App
+  </Card>
+  <Card title="Quickstart #5 Complete" icon="check">
+    Completed [Quickstart #5: Notification Ambient Agent](/docs/webhook-triggers-quickstart-guide#/)
+  </Card>
+</CardGroup>
 
 # What You'll Build
 
@@ -39,10 +45,20 @@ To achieve this, you will construct the workflow shown below. The agent's logic 
 
 You'll build an end-to-end working Ambient Agent Plugin via these phases:
 
-1. Set up a **Listener**
-2. Build the **Compound Action**
-3. Add the Listener and Compound Action to your AI Agent by launching a **Plugin**
-4. Test the approval workflow using the Purple Suite testing tool.
+<Steps>
+  <Step title="Set up a Listener">
+    Configure a webhook listener to receive expense approval requests.
+  </Step>
+  <Step title="Build the Compound Action">
+    Create the logic to handle approvals with conditional routing.
+  </Step>
+  <Step title="Launch a Plugin">
+    Add the Listener and Compound Action to your AI Agent by launching a **Plugin**.
+  </Step>
+  <Step title="Test the Workflow">
+    Test the approval workflow using the Purple Suite testing tool.
+  </Step>
+</Steps>
 
 *Let's get started!*
 
@@ -59,31 +75,47 @@ You'll build an end-to-end working Ambient Agent Plugin via these phases:
   This section will walk you through how to set up your own connector to the Moveworks Purple API (which powers the Actions used in the Quickstart guides), so no need to repeat this step if you've done it before.
 </Info>
 
-In this guide, you'll build a Plugin that will actually fetch from and take action on a store of feature requests that's **set up just for you**. In preparation for this, follow these steps
+In this guide, you'll build a Plugin that will actually fetch from and take action on a store of feature requests that's **set up just for you**. In preparation for this, follow these steps:
 
-1. Go to the [Moveworks Purple API Tool](purple-api-tool).
-2. Click "Create New Session ID". You should see sample feature requests populate below.
-3. Do not close the Purple API Tool
+<Steps>
+  <Step title="Open Purple API Tool">
+    Go to the [Moveworks Purple API Tool](purple-api-tool).
+  </Step>
+  <Step title="Create Session">
+    Click "Create New Session ID". You should see sample feature requests populate below.
+  </Step>
+  <Step title="Keep Tool Open">
+    Do not close the Purple API Tool
+  </Step>
+</Steps>
 
 Now, you just need to set up a (reusable) connector that will allow you to seamlessly hit the necessary Actions that your Plugin will use.
 
-1. Navigate to the App Picker in the top right corner of Agent Studio.
+<Steps>
+  <Step title="Open App Picker">
+    Navigate to the App Picker in the top right corner of Agent Studio.
+  </Step>
+  <Step title="Navigate to HTTP Connectors">
+    Click on "HTTP Connectors", which will take you to another browser tab.
+  </Step>
+  <Step title="Create Connector">
+    Click "Create" in the top right corner.
+  </Step>
+  <Step title="Configure Connector">
+    Fill out the following information for your Connector (be sure to replace "first" and "last" with your corresponding information).
 
-2. Click on "HTTP Connectors", which will take you to another browser tab.
-
-3. Click "Create" in the top right corner.
-
-4. Fill out the following information for your Connector (be sure to replace "first" and "last" with your corresponding information).
-
-   | Field                              | Value to enter (replace "firstname" & "lastname" with your info) |
-   | ---------------------------------- | ---------------------------------------------------------------- |
-   | **Connection Name**                | `first_last_moveworks_purple`                                    |
-   | **Description**                    | `Moveworks Purple APIs Connector`                                |
-   | **Display Description (Optional)** | *leave blank*                                                    |
-   | **Base Url**                       | `https://marketplace.moveworks.com`                              |
-   | **Auth Config**                    | `No Auth`                                                        |
-
-5. Click "Save" on the bottom right corner.
+    | Field                              | Value to enter (replace "firstname" & "lastname" with your info) |
+    | ---------------------------------- | ---------------------------------------------------------------- |
+    | **Connection Name**                | `first_last_moveworks_purple`                                    |
+    | **Description**                    | `Moveworks Purple APIs Connector`                                |
+    | **Display Description (Optional)** | *leave blank*                                                    |
+    | **Base Url**                       | `https://marketplace.moveworks.com`                              |
+    | **Auth Config**                    | `No Auth`                                                        |
+  </Step>
+  <Step title="Save Connector">
+    Click "Save" on the bottom right corner.
+  </Step>
+</Steps>
 
 <Check>
   ### You're now fully ready to start building. On to Phase 1 to set up your Actions!
@@ -91,32 +123,42 @@ Now, you just need to set up a (reusable) connector that will allow you to seaml
 
 # Phase 1: Set Up Your Webhook Listener
 
-1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+<Steps>
+  <Step title="Open Agent Studio">
+    Navigate to the App Picker in the top right corner. Click on "Agent Studio".
 
-   ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+    ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+  </Step>
+  <Step title="Navigate to Listener">
+    Navigate to a new Listener.
+  </Step>
+  <Step title="Create Listener">
+    Click "Create".
 
-2. Navigate to a new Listener.
+    ![](/images/docs/f1eff0f6fc8a1f38bffdf50da8b303e581a930be2c7d3bbf9f61cb1149946292-CleanShot_2025-08-29_at_14.25.47.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following Title and Description for your listener (be sure to replace **firstname** and **lastname** with your corresponding information).
 
-3. Click "Create".
+    ![](/images/docs/5c216d03884b09e266e752cacb202843f83fed83cfed94edf73f988ba4865960-CleanShot_2025-08-29_at_14.41.47.png)
 
-   ![](/images/docs/f1eff0f6fc8a1f38bffdf50da8b303e581a930be2c7d3bbf9f61cb1149946292-CleanShot_2025-08-29_at_14.25.47.png)
+    | Field           | Value to enter (replace "first" & "last" with your info) |
+    | --------------- | -------------------------------------------------------- |
+    | **Title**       | `quickstart_first_last_expense_approval_listener`        |
+    | **Description** | `Listens for expense approvals`                          |
+  </Step>
+  <Step title="Copy Webhook URL">
+    Click "Copy URL" and paste the webhook URL somewhere you can get back to it quick, we will need it in future steps.
+  </Step>
+  <Step title="Publish Listener">
+    Click "Publish" to save your listener.
+  </Step>
+  <Step title="Confirm Security">
+    When prompted with a confirmation message about security, click "Publish Anyway" to proceed.
 
-4. Set the following Title and Description for your listener (be sure to replace **firstname**and **lastname** with your corresponding information).
-
-   ![](/images/docs/5c216d03884b09e266e752cacb202843f83fed83cfed94edf73f988ba4865960-CleanShot_2025-08-29_at_14.41.47.png)
-
-   | Field           | Value to enter (replace "first" & "last" with your info) |
-   | --------------- | -------------------------------------------------------- |
-   | **Title**       | `quickstart_first_last_expense_approval_listener`        |
-   | **Description** | `Listens for expense approvals`                          |
-
-5. Click "Copy URL" and paste the webhook URL somewhere you can get back to it quick, we will need it in future steps.
-
-6. Click "Publish" to save your listener.
-
-7. When prompted with a confirmation message about security, click "Publish Anyway" to proceed.
-
-![](/images/docs/3b599dcd469e3439bd346df2a28d0ea48cef481e82aba04d3ac79230f1cc0705-CleanShot_2025-10-05_at_22.07.56.png)
+    ![](/images/docs/3b599dcd469e3439bd346df2a28d0ea48cef481e82aba04d3ac79230f1cc0705-CleanShot_2025-10-05_at_22.07.56.png)
+  </Step>
+</Steps>
 
 <Info>
   **Note:** Unsecured listeners are intended for testing only. For production environments, always enable signature verification to secure your webhook listener.
@@ -126,87 +168,96 @@ Now, you just need to set up a (reusable) connector that will allow you to seaml
 
 Let's set up an Action to update the status of the approval that is being provided by the source system. This action will require three dynamic inputs: `approval_id`, `status`, and `session_id`.
 
-1. Navigate to a new HTTP Action.
+<Steps>
+  <Step title="Create HTTP Action">
+    Navigate to a new HTTP Action.
 
-   1. ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+    ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Action (be sure to replace "first" and "last" with your corresponding information).
 
-2. Set the following title and description for your Action (be sure to replace "first" and "last" with your corresponding information).
+    | Field           | Value to enter (replace "first" & "last" with your info) |
+    | --------------- | -------------------------------------------------------- |
+    | **Title**       | `quickstart_first_last_update_approval_request`          |
+    | **Description** | `Updates an approval request's status`                   |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-   | Field           | Value to enter (replace "first" & "last" with your info) |
-   | --------------- | -------------------------------------------------------- |
-   | **Title**       | `quickstart_first_last_update_approval_request`          |
-   | **Description** | `Updates an approval request's status`                   |
+    1. Click on the "Import" icon to the right of the "TEST" button.
 
-3. Enter the details of your API:
+       ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
 
-   1. Click on the "Import" icon to the right of the "TEST" button.
+    2. Paste the following cURL command:
 
-      ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+       <CodeGroup>
+         ```bash bash
+         curl -X PATCH \
+           -H "Content-Type: application/json" \
+           -d '{"status": "{{status}}"}' \
+           "https://marketplace.moveworks.com/api/purple-suite/erp/approvals/{{approval_id}}?sessionId={{session_id}}"
+         ```
+       </CodeGroup>
 
-   2. Paste the following cURL command:
+    3. Click "Import" (your Action should now be auto-populated with details).
+  </Step>
+  <Step title="Add Connector">
+    Navigate to the "Connector" tab, and select your existing Moveworks Purple Connector (set up in Phase 0)
 
-      <CodeGroup>
-        ```bash bash
-        curl -X PATCH \
-          -H "Content-Type: application/json" \
-          -d '{"status": "{{status}}"}' \
-          "https://marketplace.moveworks.com/api/purple-suite/erp/approvals/{{approval_id}}?sessionId={{session_id}}"
-        ```
-      </CodeGroup>
+    ![](/images/docs/577d1124c1b8d3917418a3802e6df0c71f271221567f603cd8ff4d36d9dd0bd2-CleanShot_2025-09-05_at_10.06.47.png)
+  </Step>
+  <Step title="Define Input Arguments">
+    Define 3 formal input arguments to represent the "approval ID", and "status", and "session ID" inputs that this Action requires:
 
-   3. Click "Import" (your Action should now be auto-populated with details).
+    1. Click on the "Input Args" button near the top right corner.
 
-4. Navigate to the "Connector" tab, and select your existing Moveworks Purple Connector (set up in Phase 0)
+    2. Click "Create New" in the "Input Arguments" pop up.
 
-   ![](/images/docs/577d1124c1b8d3917418a3802e6df0c71f271221567f603cd8ff4d36d9dd0bd2-CleanShot_2025-09-05_at_10.06.47.png)
+    3. Fill out the following details for your `approval_id` argument:
 
-5. Define 3 formal input arguments to represent the "approval ID", and "status", and "session ID" inputs that this Action requires:
+       | Field label       | Value to enter/select                          |
+       | ----------------- | ---------------------------------------------- |
+       | **Argument Name** | `approval_id`                                  |
+       | **Data Type**     | *Select "string"*                              |
+       | **Example Value** | `APV-965`                                      |
+       | **Description**   | `The ID of the approval request being updated` |
+       | **Required**      | *Check the box*                                |
 
-   1. Click on the "Input Args" button near the top right corner.
+    4. Hit "Save".
 
-   2. Click "Create New" in the "Input Arguments" pop up.
+    5. Click "Create New" again in the "Input Arguments" pop up.
 
-   3. Fill out the following details for your `approval_id` argument:
+    6. Fill out the following details for your `status` argument:
 
-      | Field label       | Value to enter/select                          |
-      | ----------------- | ---------------------------------------------- |
-      | **Argument Name** | `approval_id`                                  |
-      | **Data Type**     | *Select "string"*                              |
-      | **Example Value** | `APV-965`                                      |
-      | **Description**   | `The ID of the approval request being updated` |
-      | **Required**      | *Check the box*                                |
+       | Field label       | Value to enter/select                                 |
+       | ----------------- | ----------------------------------------------------- |
+       | **Argument Name** | `status`                                              |
+       | **Data Type**     | *Select "string"*                                     |
+       | **Example Value** | `approved`                                            |
+       | **Description**   | `The status the approval request is being updated to` |
+       | **Required**      | *Check the box*                                       |
 
-   4. Hit "Save".
+    7. Hit "Save".
 
-   5. Click "Create New" again in the "Input Arguments" pop up.
+    8. Click "Create New" again in the "Input Arguments" pop up.
 
-   6. Fill out the following details for your `status` argument:
+    9. Fill out the following details for your `session_id` argument:
 
-      | Field label       | Value to enter/select                                 |
-      | ----------------- | ----------------------------------------------------- |
-      | **Argument Name** | `status`                                              |
-      | **Data Type**     | *Select "string"*                                     |
-      | **Example Value** | `approved`                                            |
-      | **Description**   | `The status the approval request is being updated to` |
-      | **Required**      | *Check the box*                                       |
+       | Field label       | Value to enter/select                                                 |
+       | ----------------- | --------------------------------------------------------------------- |
+       | **Argument Name** | `session_id`                                                          |
+       | **Data Type**     | *Select "string"*                                                     |
+       | **Example Value** | `Enter your own` (Enter the session ID you created earlier)           |
+       | **Description**   | `The session of the user that keeps track of their approval requests` |
+       | **Required**      | *Check the box*                                                       |
 
-   7. Hit "Save".
-
-   8. Click "Create New" again in the "Input Arguments" pop up.
-
-   9. Fill out the following details for your `session_id` argument:
-
-      | Field label       | Value to enter/select                                                 |
-      | ----------------- | --------------------------------------------------------------------- |
-      | **Argument Name** | `session_id`                                                          |
-      | **Data Type**     | *Select "string"*                                                     |
-      | **Example Value** | `Enter your own` (Enter the session ID you created earlier)           |
-      | **Description**   | `The session of the user that keeps track of their approval requests` |
-      | **Required**      | *Check the box*                                                       |
-
-   10. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
-
-6. Hit "Publish"
+    10. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+  </Step>
+  <Step title="Publish Action">
+    Hit "Publish"
+  </Step>
+</Steps>
 
 <Check>
   ### Nice, your Action is all set up and ready to update approval requests!
@@ -222,18 +273,22 @@ In this phase you will build a compound action with 1) `approver`, `business_jus
 
 ![](/images/docs/000a9c724d6f7d9cb8227d295d5840b84210ee805e9cdcb20696372b0c0f93ad-image.png)
 
-1. Navigate to a new “Compound Action” in the left nav and then click “Create”.
+<Steps>
+  <Step title="Create Compound Action">
+    Navigate to a new "Compound Action" in the left nav and then click "Create".
 
-   ![](/images/docs/8bd159bb6868ab120b655909f5250a9d0063f70b4f2b5a958c70ca44ca58b574-CleanShot_2025-09-02_at_08.45.53.png)
+    ![](/images/docs/8bd159bb6868ab120b655909f5250a9d0063f70b4f2b5a958c70ca44ca58b574-CleanShot_2025-09-02_at_08.45.53.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Compound Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Compound Action (be sure to replace "firstname" and "lastname" with your corresponding information).
-
-   | Field           | Value                                          |
-   | --------------- | ---------------------------------------------- |
-   | **Title**       | `quickstart_first_last_expense_approval_ca`    |
-   | **Description** | `Handles an incoming expense approval request` |
-
-3. Copy the following expression into the Compound Action Editor
+    | Field           | Value                                          |
+    | --------------- | ---------------------------------------------- |
+    | **Title**       | `quickstart_first_last_expense_approval_ca`    |
+    | **Description** | `Handles an incoming expense approval request` |
+  </Step>
+  <Step title="Add Compound Action Expression">
+    Copy the following expression into the Compound Action Editor
 
    <Warning>
      Make sure to replace the action name's with your action name!
@@ -361,78 +416,82 @@ In this phase you will build a compound action with 1) `approver`, `business_jus
               2. `status: 'approved' | 'denied'`,
               3. `session_id: data.session_id` (used for request scoping/traceability).
    </Info>
+  </Step>
+  <Step title="Define Input Arguments">
+    Define 5 formal input arguments to represent the `approver`, `requested_by`, `payload`, `business_justification`, and `session_id` inputs that this Compound Action requires.
 
-5. Define 5 formal input arguments to represent the `approver`, `requested_by`, `payload`, `business_justification`, and `session_id` inputs that this Compound Action requires.
+    1. Click on the "Input Args" button near the top right corner
 
-   1. Click on the "Input Args" button near the top right corner
+       ![](/images/docs/1e37264a377e14044304d7960ed5828968c7bd6476884383a9c04e485ca5c1f7-CleanShot_2025-09-02_at_08.56.34.png)
 
-      ![](/images/docs/1e37264a377e14044304d7960ed5828968c7bd6476884383a9c04e485ca5c1f7-CleanShot_2025-09-02_at_08.56.34.png)
+    2. Click "Create New" in the "Input Arguments" pop up.
 
-   2. Click "Create New" in the "Input Arguments" pop up.
+    3. Fill out the following details for your `approver` argument:
 
-   3. Fill out the following details for your `approver` argument:
+       | Field label       | Value to enter/select                           |
+       | ----------------- | ----------------------------------------------- |
+       | **Argument Name** | `approver`                                      |
+       | **Data Type**     | *Select "string"*                               |
+       | **Example Value** | `[email protected]`                             |
+       | **Description**   | `The expense approval request's approver email` |
+       | **Required**      | *Check the box*                                 |
 
-      | Field label       | Value to enter/select                           |
-      | ----------------- | ----------------------------------------------- |
-      | **Argument Name** | `approver`                                      |
-      | **Data Type**     | *Select "string"*                               |
-      | **Example Value** | `[email protected]`                             |
-      | **Description**   | `The expense approval request's approver email` |
-      | **Required**      | *Check the box*                                 |
+    4. Hit "Save"
 
-   4. Hit "Save"
+    5. Click "Create New" again to the "Input Arguments" pop up.
 
-   5. Click "Create New" again to the "Input Arguments" pop up.
+    6. Fill out the following details for your `requested_by` argument:
 
-   6. Fill out the following details for your `requested_by` argument:
+       | Field label       | Value to enter/select                         |
+       | ----------------- | --------------------------------------------- |
+       | **Argument Name** | `requested_by`                                |
+       | **Data Type**     | *Select "string"*                             |
+       | **Example Value** | `john`                                        |
+       | **Description**   | `The user who requested the expense approval` |
+       | **Required**      | *Check the box*                               |
 
-      | Field label       | Value to enter/select                         |
-      | ----------------- | --------------------------------------------- |
-      | **Argument Name** | `requested_by`                                |
-      | **Data Type**     | *Select "string"*                             |
-      | **Example Value** | `john`                                        |
-      | **Description**   | `The user who requested the expense approval` |
-      | **Required**      | *Check the box*                               |
+    7. Click "Create New" again to the "Input Arguments" pop up.
 
-   7. Click "Create New" again to the "Input Arguments" pop up.
+    8. Fill out the following details for your `payload` argument:
 
-   8. Fill out the following details for your `payload` argument:
+       | Field label       | Value to enter/select                      |
+       | ----------------- | ------------------------------------------ |
+       | **Argument Name** | `payload`                                  |
+       | **Data Type**     | *Select "object"*                          |
+       | **Example Value** | `{"approval_id":"appr_demo","amount":100}` |
+       | **Description**   | `The payload data in the expense request`  |
+       | **Required**      | *Check the box*                            |
 
-      | Field label       | Value to enter/select                      |
-      | ----------------- | ------------------------------------------ |
-      | **Argument Name** | `payload`                                  |
-      | **Data Type**     | *Select "object"*                          |
-      | **Example Value** | `{"approval_id":"appr_demo","amount":100}` |
-      | **Description**   | `The payload data in the expense request`  |
-      | **Required**      | *Check the box*                            |
+    9. Click "Create New" again to the "Input Arguments" pop up.
 
-   9. Click "Create New" again to the "Input Arguments" pop up.
+    10. Fill out the following details for your `business_justification` argument:
 
-   10. Fill out the following details for your `business_justification` argument:
+        | Field label       | Value to enter/select                          |
+        | ----------------- | ---------------------------------------------- |
+        | **Argument Name** | `business_justification`                       |
+        | **Data Type**     | *Select "string"*                              |
+        | **Example Value** | `team outing`                                  |
+        | **Description**   | `The expense request's business justification` |
+        | **Required**      | *Check the box*                                |
 
-       | Field label       | Value to enter/select                          |
-       | ----------------- | ---------------------------------------------- |
-       | **Argument Name** | `business_justification`                       |
-       | **Data Type**     | *Select "string"*                              |
-       | **Example Value** | `team outing`                                  |
-       | **Description**   | `The expense request's business justification` |
-       | **Required**      | *Check the box*                                |
+    11. Click "Create New" again to the "Input Arguments" pop up.
 
-   11. Click "Create New" again to the "Input Arguments" pop up.
+    12. Fill out the following details for your `session_id` argument:
 
-   12. Fill out the following details for your `session_id` argument:
+        | Field label       | Value to enter/select                                       |
+        | ----------------- | ----------------------------------------------------------- |
+        | **Argument Name** | `session_id`                                                |
+        | **Data Type**     | *Select "string"*                                           |
+        | **Example Value** | `101`                                                       |
+        | **Description**   | `The session were the approval request is being tracked at` |
+        | **Required**      | *Check the box*                                             |
 
-       | Field label       | Value to enter/select                                       |
-       | ----------------- | ----------------------------------------------------------- |
-       | **Argument Name** | `session_id`                                                |
-       | **Data Type**     | *Select "string"*                                           |
-       | **Example Value** | `101`                                                       |
-       | **Description**   | `The session were the approval request is being tracked at` |
-       | **Required**      | *Check the box*                                             |
-
-   13. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
-
-6. Click "Publish"
+    13. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+  </Step>
+  <Step title="Publish Compound Action">
+    Click "Publish"
+  </Step>
+</Steps>
 
 <Check>
   ### All done with Actions!
@@ -444,84 +503,92 @@ In this phase you will build a compound action with 1) `approver`, `business_jus
 
 This section guides you through adding your Listener and Compound Action to a **Plugin**. A key step will be configuring the data flow, where you'll specify exactly which fields from the webhook you want to forward to your action.
 
-1. Navigate to a new Plugin (navigate to the library and click "Create").
+<Steps>
+  <Step title="Create Plugin">
+    Navigate to a new Plugin (navigate to the library and click "Create").
 
-   ![](/images/docs/3dc80b34aa167ed521edb3b70f28538db7528fd1c94ac3b498aa1420d741cf27-image.png)
+    ![](/images/docs/3dc80b34aa167ed521edb3b70f28538db7528fd1c94ac3b498aa1420d741cf27-image.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Plugin (be sure to replace "first" and "last" with your corresponding information).
 
-2. Set the following title and description for your Plugin (be sure to replace "first" and "last" with your corresponding information).
+    | Field           | Value to enter                                  |
+    | --------------- | ----------------------------------------------- |
+    | **Title**       | `quickstart_first_last_expense_approval`        |
+    | **Description** | `Handles an incoming expense approval request.` |
+  </Step>
+  <Step title="Configure System Trigger">
+    In the "Workflow Overview" section click "System" in the Trigger box.
 
-   | Field           | Value to enter                                  |
-   | --------------- | ----------------------------------------------- |
-   | **Title**       | `quickstart_first_last_expense_approval`        |
-   | **Description** | `Handles an incoming expense approval request.` |
+    ![](/images/docs/acda56803fb61470e49986e7c50a9ed4f2187cbccda21f9934ca90ed5c3d9028-CleanShot_2025-09-02_at_09.35.41.png)
 
-3. In the “Workflow Overview” section click “System” in the Trigger box.
+    Configure your system trigger to connect your Listener in the slide-out pop up with:
 
-   ![](/images/docs/acda56803fb61470e49986e7c50a9ed4f2187cbccda21f9934ca90ed5c3d9028-CleanShot_2025-09-02_at_09.35.41.png)
+    | Field Label             | Value to enter/select                                              |
+    | ----------------------- | ------------------------------------------------------------------ |
+    | **Select Trigger Type** | `Webhook`                                                          |
+    | **Select Listener**     | `quickstart_first_last_expense_approval_listener` *(Select yours)* |
+    | **Event Filter**        | *Leave this field empty*                                           |
+  </Step>
+  <Step title="Configure System Body">
+    Click on the "Body" in the "Workflow Overview"
 
-   1. Configure your system trigger to connect your Listener in the slide-out pop up with:
+    ![](/images/docs/7a9616790d77d90664cd93489448cd09620d91b63e681a6936f9e34e126f7bca-CleanShot_2025-09-02_at_09.35.41.png)
 
-      | Field Label             | Value to enter/select                                              |
-      | ----------------------- | ------------------------------------------------------------------ |
-      | **Select Trigger Type** | `Webhook`                                                          |
-      | **Select Listener**     | `quickstart_first_last_expense_approval_listener` *(Select yours)* |
-      | **Event Filter**        | *Leave this field empty*                                           |
+    Configure your system body to connect your compound action to the plugin:
 
-   2. Click on the "Body" in the "Workflow Overview
+    * **Select Type** - System body
 
-      ![](/images/docs/7a9616790d77d90664cd93489448cd09620d91b63e681a6936f9e34e126f7bca-CleanShot_2025-09-02_at_09.35.41.png)
+    * **Select an Action** - quickstart\_first\_last\_expense\_approval\_ca *(Select your Action)*
 
-   3. Configure your system body to connect your compound action to the plugin
+    * **Input Mapping** - Copy the below values
 
-      * **Select Type** - System body
+      * **approver: parsed\_body.approver**
+      * **payload: parsed\_body.data**
+      * **requested\_by: parsed\_body.requested\_by**
+      * **session\_id: parsed\_body.session\_id**
+      * **business\_justification: parsed\_body.details**
 
-      * **Select an Action** - quickstart\_first\_last\_expense\_approval\_ca *(Select your Action)*
+    <Info>
+      **Understanding the Input Mapping**
 
-      * **Input Mapping** - Copy the below values
+      When the listener receives a webhook, we expect a JSON payload structured like this:
 
-        * **approver: parsed\_body.approver**
-        * **payload: parsed\_body.data**
-        * **requested\_by: parsed\_body.requested\_by**
-        * **session\_id: parsed\_body.session\_id**
-        * **business\_justification: parsed\_body.details**
+      JSON
 
-      <Info>
-        **Understanding the Input Mapping**
+      ```
+      {
+        "approver": "[email protected]",
+        "data": {
+          "amount": 300,
+          "approval_id": "APV-965",
+          "category": "Meals & Entertainment",
+          "currency": "USD",
+          "description": "Lunch meeting with a client",
+          "merchant": "The Corner Bistro",
+          "payment_method": "Corporate Credit Card",
+          "transaction_date": "2025-09-05T10:26:00Z"
+        },
+        "details": "Requirement to advance to the next sales pipeline with client",
+        "requested_by": "[email protected]",
+        "session_id": "OW3hEkZwgLCfI2gipNAJ" # this session_id will be based on your session
+      }
+      ```
 
-        When the listener receives a webhook, we expect a JSON payload structured like this:
+      The listener automatically parses this JSON payload into a `parsed_body` object. To access the data you need, you simply use dot notation to reference the keys:
 
-        JSON
+      * `parsed_body.email`
+      * `parsed_body.data`
 
-        ```
-        {
-          "approver": "[email protected]",
-          "data": {
-            "amount": 300,
-            "approval_id": "APV-965",
-            "category": "Meals & Entertainment",
-            "currency": "USD",
-            "description": "Lunch meeting with a client",
-            "merchant": "The Corner Bistro",
-            "payment_method": "Corporate Credit Card",
-            "transaction_date": "2025-09-05T10:26:00Z"
-          },
-          "details": "Requirement to advance to the next sales pipeline with client",
-          "requested_by": "[email protected]",
-          "session_id": "OW3hEkZwgLCfI2gipNAJ" # this session_id will be based on your session
-        }
-        ```
+      This method gives you the flexibility to extract only the specific data your compound action requires, even if the webhook sends a much larger payload.
 
-        The listener automatically parses this JSON payload into a `parsed_body` object. To access the data you need, you simply use dot notation to reference the keys:
-
-        * `parsed_body.email`
-        * `parsed_body.data`
-
-        This method gives you the flexibility to extract only the specific data your compound action requires, even if the webhook sends a much larger payload.
-
-        ***Note**: While this mapping is currently a manual process, we are developing an "Auto Configure" feature to streamline this setup in the future.*
-      </Info>
-
-4. Click "Publish" to launch your Plugin.
+      ***Note**: While this mapping is currently a manual process, we are developing an "Auto Configure" feature to streamline this setup in the future.*
+    </Info>
+  </Step>
+  <Step title="Publish Plugin">
+    Click "Publish" to launch your Plugin.
+  </Step>
+</Steps>
 
 <Check>
   ### And just like that — you've finished building your Plugin, and now it's ready to use!
@@ -533,60 +600,73 @@ This section guides you through adding your Listener and Compound Action to a **
 
 This section guides you through the Moveworks Purple API tool to help you test your plugin by sending webhooks to your listener.
 
-1. Go back to the tab where your [Moveworks Purple API Tool](/docs/purple-api-tool) is open
+<Steps>
+  <Step title="Open Purple API Tool">
+    Go back to the tab where your [Moveworks Purple API Tool](/docs/purple-api-tool) is open
+  </Step>
+  <Step title="Navigate to Webhooks">
+    Click on the **Webhooks** Tab
 
-2. Click on the **Webhooks** Tab
+    ![](/images/docs/c97ce7e4a39d1f05c3cdd9029392751efe7ad1bcaa37abf1562ad9c9caa9457a-CleanShot_2025-09-02_at_10.30.09.png)
+  </Step>
+  <Step title="Configure Webhook">
+    Configure the field values with your listener information
 
-   ![](/images/docs/c97ce7e4a39d1f05c3cdd9029392751efe7ad1bcaa37abf1562ad9c9caa9457a-CleanShot_2025-09-02_at_10.30.09.png)
+    | Field           | Value to enter                                                                                                                   |
+    | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+    | **Webhook URL** | *Enter the Webhook URL you created in [Phase 1](/docs/quickstart-6-ambient-agent-approval#phase-1-set-up-your-webhook-listener)* |
+    | **API Key**     | *Leave empty*                                                                                                                    |
+  </Step>
+  <Step title="Navigate to Approvals">
+    Click on the **Approvals** Tab
+  </Step>
+  <Step title="Fill Approval Form">
+    Fill out the Approval Form with your information (Make sure to edit the approver and requested by fields)
 
-3. Configure the field values with your listener information
+    | Field label                | Value to enter/select                                           |
+    | -------------------------- | --------------------------------------------------------------- |
+    | **Business Justification** | `Requirement to advance to the next sales pipeline with client` |
+    | **Approver Email**         | `[email protected]` *(Type approver email)*                     |
+    | **Requested By Email**     | `[email protected]` *(Type requested by email)*                 |
+    | **Data Template**          | `Expense Approval`                                              |
+  </Step>
+  <Step title="Generate Approval">
+    Click on **Generate Approval**
 
-   | Field           | Value to enter                                                                                                                   |
-   | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-   | **Webhook URL** | *Enter the Webhook URL you created in [Phase 1](/docs/quickstart-6-ambient-agent-approval#phase-1-set-up-your-webhook-listener)* |
-   | **API Key**     | *Leave empty*                                                                                                                    |
+    You will see an approval being generated in the system for your session ID with the details you entered
+  </Step>
+  <Step title="Generate Webhook Payload">
+    Click on **Generate Webhook Payload**
 
-4. Click on the **Approvals** Tab
-
-5. Fill out the Approval Form with your information (Make sure to edit the approver and requested by fields)
-
-   | Field label                | Value to enter/select                                           |
-   | -------------------------- | --------------------------------------------------------------- |
-   | **Business Justification** | `Requirement to advance to the next sales pipeline with client` |
-   | **Approver Email**         | `[email protected]` *(Type approver email)*                     |
-   | **Requested By Email**     | `[email protected]` *(Type requested by email)*                 |
-   | **Data Template**          | `Expense Approval`                                              |
-
-6. Click on **Generate Approval**
-
-   1. You will see an approval being generated in the system for your session ID with the details you entered
-
-7. Click on **Generate Webhook Payload**
-
-   1. A payload will be generated for your upcoming webhook
-      <CodeGroup>
-        ```bash bash
-        {
-          "approver": "[email protected]", // this will your approver make sure to edit
-          "data": {
-            "amount": 300,
-            "approval_id": "APV-965",
-            "category": "Meals & Entertainment",
-            "currency": "USD",
-            "description": "Lunch meeting with a client",
-            "merchant": "The Corner Bistro",
-            "payment_method": "Corporate Credit Card",
-            "transaction_date": "2025-09-05T10:26:00Z"
-          },
-          "details": "Requirement to advance to the next sales pipeline with client",
-          "requested_by": "[email protected]", // this will be your requested by user
-          "session_id": "OW3hEkZwgLCPf2gipNAJ" // this will be based on the session ID you created
-        }
-        ```
-      </CodeGroup>
-   2. Make sure to tinker with the `amount` field to test different flows of your plugin.
-
-8. Click on **Trigger Webhook**
+    A payload will be generated for your upcoming webhook:
+    
+    <CodeGroup>
+      ```bash bash
+      {
+        "approver": "[email protected]", // this will your approver make sure to edit
+        "data": {
+          "amount": 300,
+          "approval_id": "APV-965",
+          "category": "Meals & Entertainment",
+          "currency": "USD",
+          "description": "Lunch meeting with a client",
+          "merchant": "The Corner Bistro",
+          "payment_method": "Corporate Credit Card",
+          "transaction_date": "2025-09-05T10:26:00Z"
+        },
+        "details": "Requirement to advance to the next sales pipeline with client",
+        "requested_by": "[email protected]", // this will be your requested by user
+        "session_id": "OW3hEkZwgLCPf2gipNAJ" // this will be based on the session ID you created
+      }
+      ```
+    </CodeGroup>
+    
+    Make sure to tinker with the `amount` field to test different flows of your plugin.
+  </Step>
+  <Step title="Trigger Webhook">
+    Click on **Trigger Webhook**
+  </Step>
+</Steps>
 
 <Check>
   ### Success! Check the Approvals

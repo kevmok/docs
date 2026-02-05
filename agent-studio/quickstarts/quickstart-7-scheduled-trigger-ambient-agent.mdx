@@ -18,7 +18,11 @@ In this Quickstart, you’ll build an Ambient Agent that is triggered on a sched
 
 # Prerequisites
 
-* Access to the "Agent Studio" app.
+<CardGroup cols={1}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to the "Agent Studio" app.
+  </Card>
+</CardGroup>
 
 # What You'll Build
 
@@ -34,9 +38,17 @@ To get to this experience, the **Ambient Agent** will consist of one *Compound A
 
 You'll build an end-to-end working Ambient Agent Plugin via these phases:
 
-1. Set up an **action**.
-2. Build the **Compound Action**, containing three actions and a notify expression.
-3. Add the Compound Action to your AI Agent by launching a **Plugin**.
+<Steps>
+  <Step title="Set up an Action">
+    Create an HTTP action to fetch purchase requisitions.
+  </Step>
+  <Step title="Build the Compound Action">
+    Build the **Compound Action**, containing three actions and a notify expression.
+  </Step>
+  <Step title="Launch a Plugin">
+    Add the Compound Action to your AI Agent by launching a **Plugin**.
+  </Step>
+</Steps>
 
 *Let's get started!*
 
@@ -50,22 +62,32 @@ You'll build an end-to-end working Ambient Agent Plugin via these phases:
 
 In this guide, the purchase requisition data that your Action will access lives behind the Moveworks Purple API Connector. To access this data via your Action, you need to set up a (reusable) connector:
 
-1. Navigate to the App Picker in the top right corner of Agent Studio.
-2. Click on "HTTP Connectors", which will take you to another browser tab.
+<Steps>
+  <Step title="Open App Picker">
+    Navigate to the App Picker in the top right corner of Agent Studio.
+  </Step>
+  <Step title="Navigate to HTTP Connectors">
+    Click on "HTTP Connectors", which will take you to another browser tab.
 
-![](/images/docs/95668b167382d1a73e1c7d48bd71bb01c8cc106199aca0e533a95d13e48bae60-eac1a5fcfe10b386a1f5cbadfefbfe55b6fafe24491c492b176bcc107a674470-CleanShot_2025-04-12_at_12.06.49.png)
+    ![](/images/docs/95668b167382d1a73e1c7d48bd71bb01c8cc106199aca0e533a95d13e48bae60-eac1a5fcfe10b386a1f5cbadfefbfe55b6fafe24491c492b176bcc107a674470-CleanShot_2025-04-12_at_12.06.49.png)
+  </Step>
+  <Step title="Create Connector">
+    Click "Create" in the top right corner.
+  </Step>
+  <Step title="Configure Connector">
+    Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-3. Click "Create" in the top right corner.
-4. Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
-
-| Field               | Value to enter (replace "firstname" & "lastname" with your info) |
-| ------------------- | ---------------------------------------------------------------- |
-| **Connection Name** | `firstname_lastname_moveworks_purple`                            |
-| **Description**     | `Moveworks Purple APIs Connector`                                |
-| **Base Url**        | `https://marketplace.moveworks.com`                              |
-| **Auth Config**     | `No Auth`                                                        |
-
-5. Click "Save" on the bottom right corner.
+    | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
+    | ------------------- | ---------------------------------------------------------------- |
+    | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
+    | **Description**     | `Moveworks Purple APIs Connector`                                |
+    | **Base Url**        | `https://marketplace.moveworks.com`                              |
+    | **Auth Config**     | `No Auth`                                                        |
+  </Step>
+  <Step title="Save Connector">
+    Click "Save" on the bottom right corner.
+  </Step>
+</Steps>
 
 <Check>
   **You're now fully ready to start building. On to Phase 1!**
@@ -73,56 +95,66 @@ In this guide, the purchase requisition data that your Action will access lives 
 
 # Phase 1: Create the HTTP Action to fetch purchase requisitions
 
-1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+<Steps>
+  <Step title="Open Agent Studio">
+    Navigate to the App Picker in the top right corner. Click on "Agent Studio".
 
-   ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+    ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+  </Step>
+  <Step title="Navigate to HTTP Action">
+    Navigate to a new HTTP Action.
+  </Step>
+  <Step title="Create Action">
+    Click "Create".
 
-2. Navigate to a new HTTP Action.
+    ![](/images/docs/f997ae19e3d47ed058bc124fae82a16b626640983699603a67520b298c290e45-f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following Title and Description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-3. Click "Create".
+    ![](/images/docs/e834002671bd463813d764aa116c135527e2c7d9d0d8a13c918008173e4bb28a-b359101066aa7ca26d1d6178e1c6d5807a1255f1d59c89b0a524a8aa7b598fbf-CleanShot_2025-04-12_at_12.19.00.png)
 
-![](/images/docs/f997ae19e3d47ed058bc124fae82a16b626640983699603a67520b298c290e45-f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+    | Field           | Value to enter (replace "first" & "last" with your info) |
+    | --------------- | -------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_get_purchase_requisitions_action`    |
+    | **Description** | `Retrieves all purchase requistions`                     |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-4. Set the following Title and Description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+    1. Click on the "Import" icon to the right of the "TEST" button.
+    2. Paste the following cURL command (this represents an endpoint which has one dynamic user email query parameter):
 
-![](/images/docs/e834002671bd463813d764aa116c135527e2c7d9d0d8a13c918008173e4bb28a-b359101066aa7ca26d1d6178e1c6d5807a1255f1d59c89b0a524a8aa7b598fbf-CleanShot_2025-04-12_at_12.19.00.png)
+    <CodeGroup>
+      ```bash bash
+      curl -X GET "https://marketplace.moveworks.com/api/purple-suite/erp/purchase-requests/history"
+      ```
+    </CodeGroup>
 
-| Field           | Value to enter (replace "first" & "last" with your info) |
-| --------------- | -------------------------------------------------------- |
-| **Title**       | `firstname_lastname_get_purchase_requisitions_action`    |
-| **Description** | `Retrieves all purchase requistions`                     |
+    3. Click "Import" (your Action should now be auto-populated with details).
 
-5. Enter the details of your API:
+    ![](/images/docs/0c81c6e65a8e60cf62c513c03bc502431122a78f3f3b7da20a5d257232a5ca11-211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+  </Step>
+  <Step title="Add Connector">
+    Add your Connector.
 
-   1. Click on the "Import" icon to the right of the "TEST" button.
-   2. Paste the following cURL command (this represents an endpoint which has one dynamic user email query parameter):
+    1. Navigate to the Connector tab.
+    2. Select the "Inherit from existing connector" radio button.
+    3. Select the Connector you created in Phase 0 from the dropdown (e.g. `firstname_lastname_moveworks_purple`).
 
-   <CodeGroup>
-     ```bash bash
-     curl -X GET "https://marketplace.moveworks.com/api/purple-suite/erp/purchase-requests/history"
-     ```
-   </CodeGroup>
+    ![](/images/docs/9321703e756bc902fc13d73c9a138ee74b1509321423ef0ed62f61e126841745-Screenshot_2025-10-06_at_10.23.17_PM.png)
+  </Step>
+  <Step title="Test Action">
+    Test your Action:
 
-   iii. Click "Import" (your Action should now be auto-populated with details).
+    1. Click on the "TEST" icon (to the right of the endpoint URL definition).
+    2. Inspect the Console to verify that you receive a successful response:
 
-![](/images/docs/0c81c6e65a8e60cf62c513c03bc502431122a78f3f3b7da20a5d257232a5ca11-211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
-
-6. Add your Connector.
-
-   1. Navigate to the Connector tab.
-   2. Select the "Inherit from existing connector" radio button.
-   3. Select the Connector you created in Phase 0 from the dropdown (e.g. `firstname_lastname_moveworks_purple`).
-
-![](/images/docs/9321703e756bc902fc13d73c9a138ee74b1509321423ef0ed62f61e126841745-Screenshot_2025-10-06_at_10.23.17_PM.png)
-
-7. Test your Action:
-
-   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
-   2. Inspect the Console to verify that you receive a successful response:
-
-   <Frame caption="You should see: Status Code 200, a PTO result object, and a response schema of the returned object.">
-     <img src="/images/docs/e1050178ea12b4271bd4b07523e00e610560478c5387a5549af9b3c33e182c78-Screenshot_2025-10-06_at_10.19.43_PM.png" />
-   </Frame>
+    <Frame caption="You should see: Status Code 200, a PTO result object, and a response schema of the returned object.">
+      <img src="/images/docs/e1050178ea12b4271bd4b07523e00e610560478c5387a5549af9b3c33e182c78-Screenshot_2025-10-06_at_10.19.43_PM.png" />
+    </Frame>
+  </Step>
+</Steps>
 
 # Phase 2: Create Your Compound Action
 
@@ -132,21 +164,25 @@ In this phase you will build a compound action with the action you configured to
 
 ![](/images/docs/c1af0b28d3ed3336f8c02c544794fea0ae08daa71b0e241c91ef1b6f98b0301c-flow-.png)
 
-1. Navigate to a new “Compound Action” in the left nav and then click “Create”.
+<Steps>
+  <Step title="Create Compound Action">
+    Navigate to a new "Compound Action" in the left nav and then click "Create".
 
-   ![](/images/docs/8bd159bb6868ab120b655909f5250a9d0063f70b4f2b5a958c70ca44ca58b574-CleanShot_2025-09-02_at_08.45.53.png)
+    ![](/images/docs/8bd159bb6868ab120b655909f5250a9d0063f70b4f2b5a958c70ca44ca58b574-CleanShot_2025-09-02_at_08.45.53.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Compound Action (be sure to replace "first" and "last" with your corresponding information).
 
-2. Set the following title and description for your Compound Action (be sure to replace "first" and "last" with your corresponding information).
+    | Field           | Value                                                                |
+    | --------------- | -------------------------------------------------------------------- |
+    | **Title**       | `quickstart_first_last_purchase_requisition_insights_ca`             |
+    | **Description** | `Sends a message to a user to get insights on purchase requisitions` |
+  </Step>
+  <Step title="Add Compound Action Expression">
+    Copy the following expression into the Compound Action Editor and:
 
-   | Field           | Value                                                                |
-   | --------------- | -------------------------------------------------------------------- |
-   | **Title**       | `quickstart_first_last_purchase_requisition_insights_ca`             |
-   | **Description** | `Sends a message to a user to get insights on purchase requisitions` |
-
-3. Copy the following expression into the Compound Action Editor and
-
-   1. Replace `<your email here>` with your actual email on line 9
-   2. Replace `<your pr action name here>` on line 3 with whatever you named the action`firstname_lastname_get_purchase_requisitions_action` from step 1.
+    1. Replace `<your email here>` with your actual email on line 9
+    2. Replace `<your pr action name here>` on line 3 with whatever you named the action `firstname_lastname_get_purchase_requisitions_action` from step 1.
 
    <CodeGroup>
      ```bash bash
@@ -204,8 +240,11 @@ In this phase you will build a compound action with the action you configured to
            1. **Recipient ID**: It uses the user ID that was retrieved by the `mw.get_user_by_email` action.
            2. **Message**: It uses the formatted text that was generated by the `mw.generate_text_action` action.
    </Info>
-
-4. Click "Publish"
+  </Step>
+  <Step title="Publish Compound Action">
+    Click "Publish"
+  </Step>
+</Steps>
 
 <Check>
   ### All done with Actions!
@@ -217,46 +256,54 @@ In this phase you will build a compound action with the action you configured to
 
 This section guides you through adding your Listener and Compound Action to a **Plugin**. A key step will be configuring the data flow, where you'll specify exactly which fields from the webhook you want to forward to your action.
 
-1. Navigate to a new Plugin (navigate to the library and click "Create").
+<Steps>
+  <Step title="Create Plugin">
+    Navigate to a new Plugin (navigate to the library and click "Create").
 
-   ![](/images/docs/3dc80b34aa167ed521edb3b70f28538db7528fd1c94ac3b498aa1420d741cf27-image.png)
+    ![](/images/docs/3dc80b34aa167ed521edb3b70f28538db7528fd1c94ac3b498aa1420d741cf27-image.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Plugin (be sure to replace "first" and "last" with your corresponding information).
 
-2. Set the following title and description for your Plugin (be sure to replace "first" and "last" with your corresponding information).
+    | Field           | Value to enter                                                                    |
+    | --------------- | --------------------------------------------------------------------------------- |
+    | **Title**       | `quickstart_first_last_purchase_requisition_insights_notification`                |
+    | **Description** | `Sends a message to a user to opt in to recieving purchase requisition insights.` |
+  </Step>
+  <Step title="Configure System Trigger">
+    In the "Workflow Overview" section click "System" in the Trigger box.
 
-   | Field           | Value to enter                                                                    |
-   | --------------- | --------------------------------------------------------------------------------- |
-   | **Title**       | `quickstart_first_last_purchase_requisition_insights_notification`                |
-   | **Description** | `Sends a message to a user to opt in to recieving purchase requisition insights.` |
+    ![](/images/docs/acda56803fb61470e49986e7c50a9ed4f2187cbccda21f9934ca90ed5c3d9028-CleanShot_2025-09-02_at_09.35.41.png)
 
-3. In the “Workflow Overview” section click “System” in the Trigger box.
+    Configure your system trigger to connect your Listener in the slide-out pop up with:
 
-   ![](/images/docs/acda56803fb61470e49986e7c50a9ed4f2187cbccda21f9934ca90ed5c3d9028-CleanShot_2025-09-02_at_09.35.41.png)
+    | Field Label             | Value to enter/select                                             |                                                                                       |
+    | ----------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+    | **Select Trigger Type** | `Schedule`                                                        |                                                                                       |
+    | **Schedule Type**       | `Interval`                                                        |                                                                                       |
+    | **Interval Schedule**   | `5 Minutes` (or whatever you want for testing) Minimum 1 minute\* |                                                                                       |
+    | **Schedule Settings**   | **Start**: `Start Immediately after published`                    | **Stop:** After 1 occurence(s) (recommended to stop so it doesn't keep notifying you) |
 
-   1. Configure your system trigger to connect your Listener in the slide-out pop up with:
+    ![](/images/docs/c0da3f52d304566fd54e062a064a822f8f08db07108a384a70ca6f3ca3727667-Screenshot_2025-10-06_at_10.35.45_PM.png)
+  </Step>
+  <Step title="Configure System Body">
+    Click on the "Body" in the "Workflow Overview".
 
-      | Field Label             | Value to enter/select                                             |                                                                                       |
-      | ----------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-      | **Select Trigger Type** | `Schedule`                                                        |                                                                                       |
-      | **Schedule Type**       | `Interval`                                                        |                                                                                       |
-      | **Interval Schedule**   | `5 Minutes` (or whatever you want for testing) Minimum 1 minute\* |                                                                                       |
-      | **Schedule Settings**   | **Start**: `Start Immediately after published`                    | **Stop:** After 1 occurence(s) (recommended to stop so it doesn't keep notifying you) |
+    ![](/images/docs/7a9616790d77d90664cd93489448cd09620d91b63e681a6936f9e34e126f7bca-CleanShot_2025-09-02_at_09.35.41.png)
 
-   ![](/images/docs/c0da3f52d304566fd54e062a064a822f8f08db07108a384a70ca6f3ca3727667-Screenshot_2025-10-06_at_10.35.45_PM.png)
+    Configure your system body to connect your compound action to the plugin:
 
-   ii. Click on the "Body" in the "Workflow Overview
+    | Field label          | Value to enter/select                                                     |
+    | -------------------- | ------------------------------------------------------------------------- |
+    | **Select Type**      | `System body`                                                             |
+    | **Select an Action** | `quickstart_first_last_purchase_requisition_insights_ca` *(Select yours)* |
 
-   ![](/images/docs/7a9616790d77d90664cd93489448cd09620d91b63e681a6936f9e34e126f7bca-CleanShot_2025-09-02_at_09.35.41.png)
-
-   1. Configure your system body to connect your compound action to the plugin
-
-      | Field label          | Value to enter/select                                                     |
-      | -------------------- | ------------------------------------------------------------------------- |
-      | **Select Type**      | `System body`                                                             |
-      | **Select an Action** | `quickstart_first_last_purchase_requisition_insights_ca` *(Select yours)* |
-
-      ![](/images/docs/eff18206e97ae96ab57fabd4e1e0f44bb2e70009f0688b4e86b343f2f0cb9046-Screenshot_2025-10-06_at_10.40.02_PM.png)
-
-4. Click "Publish" to launch your Plugin.
+    ![](/images/docs/eff18206e97ae96ab57fabd4e1e0f44bb2e70009f0688b4e86b343f2f0cb9046-Screenshot_2025-10-06_at_10.40.02_PM.png)
+  </Step>
+  <Step title="Publish Plugin">
+    Click "Publish" to launch your Plugin.
+  </Step>
+</Steps>
 
 <Check>
   ### And just like that — you've finished building your Plugin, and now it's ready to use!

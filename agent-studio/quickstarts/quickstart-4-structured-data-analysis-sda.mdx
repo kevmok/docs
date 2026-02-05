@@ -17,32 +17,48 @@ At the end, your AI Assistant will be able to handle requests like this
 
 # Prerequisites
 
-* Access to Agent Studio
-* Access to [Structured Data Analysis](https://community.moveworks.com/ideas/structured-data-analysis-2130).
-* No system APIs needed!
+<CardGroup cols={2}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to Agent Studio
+  </Card>
+  <Card title="Structured Data Analysis" icon="chart-bar">
+    Access to [Structured Data Analysis](https://community.moveworks.com/ideas/structured-data-analysis-2130).
+  </Card>
+</CardGroup>
+
+<Note>No system APIs needed!</Note>
 
 # Define your plugin
 
-1. Go to **Agent Studio**. In the **Plugins** tab, select **Create**
+<Steps>
+  <Step title="Open Agent Studio">
+    Go to **Agent Studio**. In the **Plugins** tab, select **Create**
+  </Step>
+  <Step title="Define Your Plugin">
+    Define your plugin.
 
-2. Define your plugin.
+    <Info>
+      ### SDA Tip!
 
-   <Info>
-     ### SDA Tip!
+      It's important to be descriptive about the data that an SDA plugin returns.
+    </Info>
 
-     It's important to be descriptive about the data that an SDA plugin returns.
-   </Info>
-
-   | Attribute          | Value                                                                                                                                                                                                                                                       |
-   | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | Plugin Title       | Fetch Accounts                                                                                                                                                                                                                                              |
-   | Plugin Description | Returns all Accounts with ID, name, industry, territory, created/modified, last contact & renewal, ARR & MRR, employee count, opportunities (total/open/won/lost), avg deal size, churn rate, NPS, tickets, offices, market share %, growth rate & funding. |
+    | Attribute          | Value                                                                                                                                                                                                                                                       |
+    | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | Plugin Title       | Fetch Accounts                                                                                                                                                                                                                                              |
+    | Plugin Description | Returns all Accounts with ID, name, industry, territory, created/modified, last contact & renewal, ARR & MRR, employee count, opportunities (total/open/won/lost), avg deal size, churn rate, NPS, tickets, offices, market share %, growth rate & funding. |
+  </Step>
+</Steps>
 
 # Create a trigger
 
-1. In the Plugin Editor, add a **Conversational Trigger** and fill it out
+<Steps>
+  <Step title="Add Conversational Trigger">
+    In the Plugin Editor, add a **Conversational Trigger** and fill it out
 
-   ![](/images/docs/a8a55337e336f410bd3ef93a36ba3ab5f3d47bb3490f218659235dad5e361a06-CleanShot_2025-06-11_at_19.31.442x.png)
+    ![](/images/docs/a8a55337e336f410bd3ef93a36ba3ab5f3d47bb3490f218659235dad5e361a06-CleanShot_2025-06-11_at_19.31.442x.png)
+  </Step>
+</Steps>
 
 # Build your process
 
@@ -50,74 +66,90 @@ At the end, your AI Assistant will be able to handle requests like this
 
 We need an HTTP action that will fetch the large volume of data from the external system.
 
-1. Click **⊕** in the tab bar and create a new HTTP Action
+<Steps>
+  <Step title="Create HTTP Action">
+    Click **⊕** in the tab bar and create a new HTTP Action
+  </Step>
+  <Step title="Import API">
+    Select the **Import** option (next to the **Test** button)
+  </Step>
+  <Step title="Enter API Call">
+    Import the following API call
 
-2. Select the **Import** option (next to the **Test** button)
+    <CodeGroup>
+      ```bash bash
+      curl --location 'https://marketplace.moveworks.com/api/purple-suite/crm/accounts?count=500'
+      ```
+    </CodeGroup>
+  </Step>
+  <Step title="Test Action">
+    Hit **Test**
+  </Step>
+  <Step title="Name Action">
+    Name your HTTP Action. It should look something like this.
 
-3. Import the following API call
-
-   <CodeGroup>
-     ```bash bash
-     curl --location 'https://marketplace.moveworks.com/api/purple-suite/crm/accounts?count=500'
-     ```
-   </CodeGroup>
-
-4. Hit **Test**
-
-5. Name your HTTP Action. It should look something like this.
-
-   ![](/images/docs/adc9138c37e9a71385cc63b6d2f573a97df0825ac2462258c6414099c4ae478c-image.png)
-
-6. Save your HTTP action
+    ![](/images/docs/adc9138c37e9a71385cc63b6d2f573a97df0825ac2462258c6414099c4ae478c-image.png)
+  </Step>
+  <Step title="Save Action">
+    Save your HTTP action
+  </Step>
+</Steps>
 
 ## Attach a Conversational Process
 
 Now let's connect the HTTP action to your plugin & prepare it for analysis
 
-1. In the Plugin Editor, add a **Conversational Process** & create a new one.
+<Steps>
+  <Step title="Add Conversational Process">
+    In the Plugin Editor, add a **Conversational Process** & create a new one.
+  </Step>
+  <Step title="Add Action Activity">
+    In the **Conversational Process Editor** add an action-based activity.
+  </Step>
+  <Step title="Select HTTP Action">
+    Choose the HTTP Action you just built.
+  </Step>
+  <Step title="Configure Output Mapper">
+    In the activity configuration, under **Output Mapper**, we will rename the fields to make them more friendly for SDA.
 
-2. In the **Conversational Process Editor** add an action-based activity.
+    <Info>
+      ### SDA Tip!
 
-3. Choose the HTTP Action you just built.
+      It's important to name fields succinctly & clearly to maximize the performance of SDA against various queries.
+    </Info>
 
-4. In the activity configuration, under **Output Mapper**, we will rename the fields to make them more friendly for SDA.
-
-   <Info>
-     ### SDA Tip!
-
-     It's important to name fields succinctly & clearly to maximize the performance of SDA against various queries.
-   </Info>
-
-   <CodeGroup>
-     ```bash bash
-     MAP():
-       items: response.accounts
-       converter:
-         AccountID: item.Id
-         AccountName: item.Name
-         AnnualRecurringRevenue: item.ARR__c
-         AverageDealSize: item.AverageDealSize__c
-         ChurnRate: item.ChurnRate__c
-         ClosedLostOpportunities: item.ClosedLostOpportunities__c
-         ClosedWonOpportunities: item.ClosedWonOpportunities__c
-         DateCreated: item.CreatedDate
-         DateLastModified: item.LastModifiedDate
-         Employees: item.NumberOfEmployees
-         FundingAmount: item.FundingAmount__c
-         GrowthRate: item.GrowthRate__c
-         Industry: item.Industry
-         LastContactDate: item.LastContactDate__c
-         MarketShare: item.MarketSharePct__c
-         MonthlyRecurringRevenue: item.MRR__c
-         NetPromoterScore: item.NPS_Score__c
-         NextRenewalDate: item.NextRenewalDate__c
-         OfficeCount: item.OfficesCount__c
-         OpenOpportunities: item.OpenOpportunities__c
-         SupportTickets: item.SupportTickets__c
-         Territory: item.Territory__c
-         TotalOpportunities: item.TotalOpportunities__c
-     ```
-   </CodeGroup>
+    <CodeGroup>
+      ```bash bash
+      MAP():
+        items: response.accounts
+        converter:
+          AccountID: item.Id
+          AccountName: item.Name
+          AnnualRecurringRevenue: item.ARR__c
+          AverageDealSize: item.AverageDealSize__c
+          ChurnRate: item.ChurnRate__c
+          ClosedLostOpportunities: item.ClosedLostOpportunities__c
+          ClosedWonOpportunities: item.ClosedWonOpportunities__c
+          DateCreated: item.CreatedDate
+          DateLastModified: item.LastModifiedDate
+          Employees: item.NumberOfEmployees
+          FundingAmount: item.FundingAmount__c
+          GrowthRate: item.GrowthRate__c
+          Industry: item.Industry
+          LastContactDate: item.LastContactDate__c
+          MarketShare: item.MarketSharePct__c
+          MonthlyRecurringRevenue: item.MRR__c
+          NetPromoterScore: item.NPS_Score__c
+          NextRenewalDate: item.NextRenewalDate__c
+          OfficeCount: item.OfficesCount__c
+          OpenOpportunities: item.OpenOpportunities__c
+          SupportTickets: item.SupportTickets__c
+          Territory: item.Territory__c
+          TotalOpportunities: item.TotalOpportunities__c
+      ```
+    </CodeGroup>
+  </Step>
+</Steps>
 
 # Launch it
 

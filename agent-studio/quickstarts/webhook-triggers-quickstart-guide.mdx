@@ -17,7 +17,11 @@ In this Quickstart guide, you'll build an Ambient Agent that is triggered by a w
 
 # Prerequisites
 
-* Access to the "Agent Studio" app.
+<CardGroup cols={1}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to the "Agent Studio" app.
+  </Card>
+</CardGroup>
 
 # What You'll Build
 
@@ -35,45 +39,65 @@ To get to this experience, the **Ambient Agent** will consist of one *Compound A
 
 You'll build an end-to-end working Ambient Agent Plugin via these phases:
 
-1. Set up a **Listener**.
-2. Build the **Compound Action**, containing two actions and two input arguments.
-3. Add the Listener and Compound Action to your AI Agent by launching a **Plugin**.
-4. Test your webhooks using our Purple Suite tool.
+<Steps>
+  <Step title="Set up a Listener">
+    Set up a **Listener**.
+  </Step>
+  <Step title="Build the Compound Action">
+    Build the **Compound Action**, containing two actions and two input arguments.
+  </Step>
+  <Step title="Launch a Plugin">
+    Add the Listener and Compound Action to your AI Agent by launching a **Plugin**.
+  </Step>
+  <Step title="Test Your Webhooks">
+    Test your webhooks using our Purple Suite tool.
+  </Step>
+</Steps>
 
 *Let's get started!*
 
 # Phase 1: Set Up Your Webhook Listener
 
-1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+<Steps>
+  <Step title="Open Agent Studio">
+    Navigate to the App Picker in the top right corner. Click on "Agent Studio".
 
-   ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+    ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+  </Step>
+  <Step title="Navigate to Listener">
+    Navigate to a new Listener.
+  </Step>
+  <Step title="Create Listener">
+    Click "Create".
 
-2. Navigate to a new Listener.
+    ![](/images/docs/f1eff0f6fc8a1f38bffdf50da8b303e581a930be2c7d3bbf9f61cb1149946292-CleanShot_2025-08-29_at_14.25.47.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following Title and Description for your listener (be sure to replace **first**and **lastn** with your corresponding information).
 
-3. Click "Create".
+    ![](/images/docs/5c216d03884b09e266e752cacb202843f83fed83cfed94edf73f988ba4865960-CleanShot_2025-08-29_at_14.41.47.png)
 
-   ![](/images/docs/f1eff0f6fc8a1f38bffdf50da8b303e581a930be2c7d3bbf9f61cb1149946292-CleanShot_2025-08-29_at_14.25.47.png)
+    | Field           | Value to enter (replace "first" & "last" with your info) |
+    | --------------- | -------------------------------------------------------- |
+    | **Title**       | `quickstart_first_last_notification_listener`            |
+    | **Description** | `Listens for simple notifications`                       |
+  </Step>
+  <Step title="Copy Webhook URL">
+    Click "Copy URL" and paste the webhook URL somewhere you can get back to it quick, we will need it in future steps.
+  </Step>
+  <Step title="Publish Listener">
+    Click "Publish" to save your listener.
+  </Step>
+  <Step title="Confirm Security Warning">
+    When prompted with a confirmation message about security, click "Publish Anyway" to proceed.
 
-4. Set the following Title and Description for your listener (be sure to replace **first**and **lastn** with your corresponding information).
+    ![](/images/docs/3b599dcd469e3439bd346df2a28d0ea48cef481e82aba04d3ac79230f1cc0705-CleanShot_2025-10-05_at_22.07.56.png)
 
-   ![](/images/docs/5c216d03884b09e266e752cacb202843f83fed83cfed94edf73f988ba4865960-CleanShot_2025-08-29_at_14.41.47.png)
-
-   | Field           | Value to enter (replace "first" & "last" with your info) |
-   | --------------- | -------------------------------------------------------- |
-   | **Title**       | `quickstart_first_last_notification_listener`            |
-   | **Description** | `Listens for simple notifications`                       |
-
-5. Click "Copy URL" and paste the webhook URL somewhere you can get back to it quick, we will need it in future steps.
-
-6. Click "Publish" to save your listener.
-
-7. When prompted with a confirmation message about security, click "Publish Anyway" to proceed.
-
-![](/images/docs/3b599dcd469e3439bd346df2a28d0ea48cef481e82aba04d3ac79230f1cc0705-CleanShot_2025-10-05_at_22.07.56.png)
-
-<Info>
-  **Note:** Unsecured listeners are intended for testing only. For production environments, always enable signature verification to secure your webhook listener.
-</Info>
+    <Info>
+      **Note:** Unsecured listeners are intended for testing only. For production environments, always enable signature verification to secure your webhook listener.
+    </Info>
+  </Step>
+</Steps>
 
 # Phase 2: Create Your Compound Action
 
@@ -83,111 +107,119 @@ In this phase you will build a compound action with 1) `user_email` and `payload
 
 ![](/images/docs/2752bfead642faf336230558440ef6b2bd667cef962c48b4487bc09302c107b1-image.png)
 
-1. Navigate to a new “Compound Action” in the left nav and then click “Create”.
+<Steps>
+  <Step title="Create Compound Action">
+    Navigate to a new "Compound Action" in the left nav and then click "Create".
 
-   ![](/images/docs/8bd159bb6868ab120b655909f5250a9d0063f70b4f2b5a958c70ca44ca58b574-CleanShot_2025-09-02_at_08.45.53.png)
+    ![](/images/docs/8bd159bb6868ab120b655909f5250a9d0063f70b4f2b5a958c70ca44ca58b574-CleanShot_2025-09-02_at_08.45.53.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Compound Action (be sure to replace "first" and "last" with your corresponding information).
 
-2. Set the following title and description for your Compound Action (be sure to replace "first" and "last" with your corresponding information).
+    | Field           | Value                                           |
+    | --------------- | ----------------------------------------------- |
+    | **Title**       | `quickstart_first_last_message_notification_ca` |
+    | **Description** | `Sends a message to a user`                     |
+  </Step>
+  <Step title="Add Compound Action Expression">
+    Copy the following expression into the Compound Action Editor
 
-   | Field           | Value                                           |
-   | --------------- | ----------------------------------------------- |
-   | **Title**       | `quickstart_first_last_message_notification_ca` |
-   | **Description** | `Sends a message to a user`                     |
+    <CodeGroup>
+      ```bash bash
+      steps:
+          - action:
+              output_key: target_user
+              action_name: mw.get_user_by_email
+              input_args:
+                user_email: data.user_email
+          - action:
+              output_key: generate_text_action_result
+              action_name: mw.generate_text_action
+              progress_updates:
+                on_complete: ON_COMPLETE_MESSAGE
+                on_pending: ON_PENDING_MESSAGE
+              input_args:
+                system_prompt: '''Based on the provided user message, provide an actionable alert and formatted message for the user'''
+                user_input:
+                  RENDER():
+                    template: "{{webhook_data}}"
+                    args:
+                      webhook_data: $STRINGIFY_JSON(data.payload)
+          - notify:
+              output_key: notification_output
+              recipient_id: data.target_user.user.id
+              message: data.generate_text_action_result.generated_output
+      ```
+    </CodeGroup>
 
-3. Copy the following expression into the Compound Action Editor
+    <Info>
+      **Understanding the Compound Action**
 
-   <CodeGroup>
-     ```bash bash
-     steps:
-         - action:
-             output_key: target_user
-             action_name: mw.get_user_by_email
-             input_args:
-               user_email: data.user_email
-         - action:
-             output_key: generate_text_action_result
-             action_name: mw.generate_text_action
-             progress_updates:
-               on_complete: ON_COMPLETE_MESSAGE
-               on_pending: ON_PENDING_MESSAGE
-             input_args:
-               system_prompt: '''Based on the provided user message, provide an actionable alert and formatted message for the user'''
-               user_input:
-                 RENDER():
-                   template: "{{webhook_data}}"
-                   args:
-                     webhook_data: $STRINGIFY_JSON(data.payload)
-         - notify:
-             output_key: notification_output
-             recipient_id: data.target_user.user.id
-             message: data.generate_text_action_result.generated_output
-     ```
-   </CodeGroup>
+      This Compound Action executes three actions in sequence, with the output of one step feeding into the next:
 
-   <Info>
-     **Understanding the Compound Action**
+      1. `mw.get_user_by_email` **[(Built-in Action)](/docs/built-in-actions#/get_user_by_email)**
 
-     This Compound Action executes three actions in sequence, with the output of one step feeding into the next:
+         1. **Purpose**: To identify the notification recipient.
+         2. **Process**: It takes a user's email address (from the webhook) as its input and retrieves that user's unique Moveworks profile ID.
 
-     1. `mw.get_user_by_email` **[(Built-in Action)](/docs/built-in-actions#/get_user_by_email)**
+      2. `mw.generate_text_action` **[(Built-in Action)](/docs/built-in-actions#/generate_text_action)**
 
-        1. **Purpose**: To identify the notification recipient.
-        2. **Process**: It takes a user's email address (from the webhook) as its input and retrieves that user's unique Moveworks profile ID.
+         1. **Purpose**: To create a polished message for the user.
+         2. **Process**: This action uses an LLM to interpret the raw data in the webhook payload and generate a structured, readable message.
 
-     2. `mw.generate_text_action` **[(Built-in Action)](/docs/built-in-actions#/generate_text_action)**
+      3. `notify` **[(Compound Action Expression)](/docs/compound-action-syntax-reference#/notify)**
 
-        1. **Purpose**: To create a polished message for the user.
-        2. **Process**: This action uses an LLM to interpret the raw data in the webhook payload and generate a structured, readable message.
+         1. **Purpose**: To send the final notification.
 
-     3. `notify` **[(Compound Action Expression)](/docs/compound-action-syntax-reference#/notify)**
+         2. **Process**: This action takes two inputs from the previous steps:
 
-        1. **Purpose**: To send the final notification.
+            1. **Recipient ID**: It uses the user ID that was retrieved by the `mw.get_user_by_email` action.
+            2. **Message**: It uses the formatted text that was generated by the `mw.generate_text_action` action.
+    </Info>
+  </Step>
+  <Step title="Define Input Arguments">
+    Define two formal input arguments to represent the `user_email` and `payload` inputs that this Compound Action Requires
 
-        2. **Process**: This action takes two inputs from the previous steps:
+    1. Click on the "Input Args" button near the top right corner
 
-           1. **Recipient ID**: It uses the user ID that was retrieved by the `mw.get_user_by_email` action.
-           2. **Message**: It uses the formatted text that was generated by the `mw.generate_text_action` action.
-   </Info>
+       ![](/images/docs/cb76619efcd96cb2db0da468ff63bf96b17bea935ffc02b345df7379e99de22d-CleanShot_2025-10-05_at_22.14.55.png)
 
-4. Define two formal input arguments to represent the `user_email` and `payload` inputs that this Compound Action Requires
+    2. Click "Create New" in the "Input Arguments" pop up.
 
-   1. Click on the "Input Args" button near the top right corner
+    3. Fill out the following details for your `user_email` argument:
 
-      ![](/images/docs/cb76619efcd96cb2db0da468ff63bf96b17bea935ffc02b345df7379e99de22d-CleanShot_2025-10-05_at_22.14.55.png)
+       | Field label       | Value to enter/select                         |
+       | ----------------- | --------------------------------------------- |
+       | **Argument Name** | `user_email`                                  |
+       | **Data Type**     | *Select "string"*                             |
+       | **Example Value** | *Leave this field empty*                      |
+       | **Description**   | `The email of the user that will be notified` |
+       | **Required**      | *Check the box*                               |
 
-   2. Click "Create New" in the "Input Arguments" pop up.
+    4. Hit "Save"
 
-   3. Fill out the following details for your `user_email` argument:
+    5. Click "Create New" again to the "Input Arguments" pop up.
 
-      | Field label       | Value to enter/select                         |
-      | ----------------- | --------------------------------------------- |
-      | **Argument Name** | `user_email`                                  |
-      | **Data Type**     | *Select "string"*                             |
-      | **Example Value** | *Leave this field empty*                      |
-      | **Description**   | `The email of the user that will be notified` |
-      | **Required**      | *Check the box*                               |
+    6. Fill out the following details for your `payload` argument:
 
-   4. Hit "Save"
+       | Field label       | Value to enter/select                                     |
+       | ----------------- | --------------------------------------------------------- |
+       | **Argument Name** | `payload`                                                 |
+       | **Data Type**     | *Select "object"*                                         |
+       | **Example Value** | *Leave this field empty*                                  |
+       | **Description**   | `The payload of the webhook sent from an external system` |
+       | **Required**      | *Check the box*                                           |
 
-   5. Click "Create New" again to the "Input Arguments" pop up.
+       <Info>
+         **Known Issue:** The **Example Value** field is optional but currently if left empty, you may see a red validation message ("Must be a valid object") and a warning icon next to the argument name after saving. This is a known issue (currently expected behavior) and will not block publishing — you can safely ignore it.
+       </Info>
 
-   6. Fill out the following details for your `payload` argument:
-
-      | Field label       | Value to enter/select                                     |
-      | ----------------- | --------------------------------------------------------- |
-      | **Argument Name** | `payload`                                                 |
-      | **Data Type**     | *Select "object"*                                         |
-      | **Example Value** | *Leave this field empty*                                  |
-      | **Description**   | `The payload of the webhook sent from an external system` |
-      | **Required**      | *Check the box*                                           |
-
-      <Info>
-        **Known Issue:** The **Example Value** field is optional but currently if left empty, you may see a red validation message (“Must be a valid object”) and a warning icon next to the argument name after saving. This is a known issue (currently expected behavior) and will not block publishing — you can safely ignore it.
-      </Info>
-
-   7. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
-
-5. Click "Publish"
+    7. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+  </Step>
+  <Step title="Publish Compound Action">
+    Click "Publish"
+  </Step>
+</Steps>
 
 <Check>
   ### All done with Actions!
@@ -199,88 +231,96 @@ In this phase you will build a compound action with 1) `user_email` and `payload
 
 This section guides you through adding your Listener and Compound Action to a **Plugin**. A key step will be configuring the data flow, where you'll specify exactly which fields from the webhook you want to forward to your action.
 
-1. Navigate to a new Plugin (navigate to the library and click "Create").
+<Steps>
+  <Step title="Create Plugin">
+    Navigate to a new Plugin (navigate to the library and click "Create").
 
-   ![](/images/docs/3dc80b34aa167ed521edb3b70f28538db7528fd1c94ac3b498aa1420d741cf27-image.png)
+    ![](/images/docs/3dc80b34aa167ed521edb3b70f28538db7528fd1c94ac3b498aa1420d741cf27-image.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Plugin (be sure to replace "first" and "last" with your corresponding information).
 
-2. Set the following title and description for your Plugin (be sure to replace "first" and "last" with your corresponding information).
+    | Field           | Value to enter                                                            |
+    | --------------- | ------------------------------------------------------------------------- |
+    | **Title**       | `quickstart_first_last_message_notification`                              |
+    | **Description** | `Sends a message to a user based on a webhook with an email and payload.` |
+  </Step>
+  <Step title="Configure System Trigger">
+    In the "Workflow Overview" section click "System" in the Trigger box.
 
-   | Field           | Value to enter                                                            |
-   | --------------- | ------------------------------------------------------------------------- |
-   | **Title**       | `quickstart_first_last_message_notification`                              |
-   | **Description** | `Sends a message to a user based on a webhook with an email and payload.` |
+    ![](/images/docs/acda56803fb61470e49986e7c50a9ed4f2187cbccda21f9934ca90ed5c3d9028-CleanShot_2025-09-02_at_09.35.41.png)
 
-3. In the “Workflow Overview” section click “System” in the Trigger box.
+    Configure your system trigger to connect your Listener in the slide-out pop up with:
 
-   ![](/images/docs/acda56803fb61470e49986e7c50a9ed4f2187cbccda21f9934ca90ed5c3d9028-CleanShot_2025-09-02_at_09.35.41.png)
+    | Field Label             | Value to enter/select                                          |
+    | ----------------------- | -------------------------------------------------------------- |
+    | **Select Trigger Type** | `Webhook`                                                      |
+    | **Select Listener**     | `quickstart_first_last_notification_listener` *(Select yours)* |
+    | **Event Filter**        | *Leave this field empty*                                       |
+  </Step>
+  <Step title="Configure System Body">
+    Click on the "Body" in the "Workflow Overview".
 
-   1. Configure your system trigger to connect your Listener in the slide-out pop up with:
+    ![](/images/docs/7a9616790d77d90664cd93489448cd09620d91b63e681a6936f9e34e126f7bca-CleanShot_2025-09-02_at_09.35.41.png)
 
-      | Field Label             | Value to enter/select                                          |
-      | ----------------------- | -------------------------------------------------------------- |
-      | **Select Trigger Type** | `Webhook`                                                      |
-      | **Select Listener**     | `quickstart_first_last_notification_listener` *(Select yours)* |
-      | **Event Filter**        | *Leave this field empty*                                       |
+    Configure your system body to connect your compound action to the plugin:
 
-   2. Click on the "Body" in the "Workflow Overview
+    | Field label          | Value to enter/select                                            |
+    | -------------------- | ---------------------------------------------------------------- |
+    | **Select Type**      | `System body`                                                    |
+    | **Select an Action** | `quickstart_first_last_message_notification_ca` *(Select yours)* |
+    | **Input mapping**    | `user_email: parsed_body.email``payload: parsed_body.data`       |
 
-      ![](/images/docs/7a9616790d77d90664cd93489448cd09620d91b63e681a6936f9e34e126f7bca-CleanShot_2025-09-02_at_09.35.41.png)
+    <Info>
+      **Understanding the Input Mapping**
 
-   3. Configure your system body to connect your compound action to the plugin
+      When the listener receives a webhook, we expect a JSON payload structured like this:
 
-      | Field label          | Value to enter/select                                            |
-      | -------------------- | ---------------------------------------------------------------- |
-      | **Select Type**      | `System body`                                                    |
-      | **Select an Action** | `quickstart_first_last_message_notification_ca` *(Select yours)* |
-      | **Input mapping**    | `user_email: parsed_body.email``payload: parsed_body.data`       |
+      JSON
 
-      <Info>
-        **Understanding the Input Mapping**
-
-        When the listener receives a webhook, we expect a JSON payload structured like this:
-
-        JSON
-
-        ```
-        {
-          "createdAt": "2025-09-02T18:10:28Z",
-          "data": {
-            "actions": [
-              {
-                "text": "View PTO Policy",
-                "url": "https://internal-hr.example.com/policies/pto-2025"
-              }
-            ],
-            "alert_code": "PTO-EXP-WARN-90",
-            "details": {
-              "accrual_policy": "use-it-or-lose-it",
-              "current_balance_hours": 112.5,
-              "hours_at_risk": 72.5,
-              "policy_id": "pol_hr_pto_standard_2025"
-            },
-            "last_date": "Tue Sep 09 2025",
-            "message": "This is a friendly reminder that you have accrued paid time off that is set to expire. To ensure you don't lose these hours, please schedule and take your vacation time.",
-            "object": "alert",
-            "priority": "medium",
-            "title": "Action Required: Use Your PTO Balance Before Year-End"
+      ```
+      {
+        "createdAt": "2025-09-02T18:10:28Z",
+        "data": {
+          "actions": [
+            {
+              "text": "View PTO Policy",
+              "url": "https://internal-hr.example.com/policies/pto-2025"
+            }
+          ],
+          "alert_code": "PTO-EXP-WARN-90",
+          "details": {
+            "accrual_policy": "use-it-or-lose-it",
+            "current_balance_hours": 112.5,
+            "hours_at_risk": 72.5,
+            "policy_id": "pol_hr_pto_standard_2025"
           },
-          "email": "[email protected]",
-          "eventId": "evt_alert_2b3c4d5e6f7G8h9I0jK",
-          "eventType": "alert.pto_expiration_warning"
-        }
-        ```
+          "last_date": "Tue Sep 09 2025",
+          "message": "This is a friendly reminder that you have accrued paid time off that is set to expire. To ensure you don't lose these hours, please schedule and take your vacation time.",
+          "object": "alert",
+          "priority": "medium",
+          "title": "Action Required: Use Your PTO Balance Before Year-End"
+        },
+        "email": "[email protected]",
+        "eventId": "evt_alert_2b3c4d5e6f7G8h9I0jK",
+        "eventType": "alert.pto_expiration_warning"
+      }
+      ```
 
-        The listener automatically parses this JSON payload into a `parsed_body` object. To access the data you need, you simply use dot notation to reference the keys:
+      The listener automatically parses this JSON payload into a `parsed_body` object. To access the data you need, you simply use dot notation to reference the keys:
 
-        * `parsed_body.email`
-        * `parsed_body.data`
+      * `parsed_body.email`
+      * `parsed_body.data`
 
-        This method gives you the flexibility to extract only the specific data your compound action requires, even if the webhook sends a much larger payload.
+      This method gives you the flexibility to extract only the specific data your compound action requires, even if the webhook sends a much larger payload.
 
-        ***Note**: While this mapping is currently a manual process, we are developing an "Auto Configure" feature to streamline this setup in the future.*
-      </Info>
-
-4. Click "Publish" to launch your Plugin.
+      ***Note**: While this mapping is currently a manual process, we are developing an "Auto Configure" feature to streamline this setup in the future.*
+    </Info>
+  </Step>
+  <Step title="Publish Plugin">
+    Click "Publish" to launch your Plugin.
+  </Step>
+</Steps>
 
 <Check>
   ### And just like that — you've finished building your Plugin, and now it's ready to use!
@@ -292,60 +332,69 @@ This section guides you through adding your Listener and Compound Action to a **
 
 This section guides you through the Moveworks Purple API tool to help you test your plugin by sending webhooks to your listener.
 
-1. Go the [Moveworks Purple API Tool](/docs/purple-api-tool)
+<Steps>
+  <Step title="Open Purple API Tool">
+    Go the [Moveworks Purple API Tool](/docs/purple-api-tool)
+  </Step>
+  <Step title="Create Session ID">
+    Click "Create New Session ID"
+  </Step>
+  <Step title="Navigate to Webhooks Tab">
+    Click on the "Webhooks" Tab
 
-2. Click "Create New Session ID"
+    ![](/images/docs/c97ce7e4a39d1f05c3cdd9029392751efe7ad1bcaa37abf1562ad9c9caa9457a-CleanShot_2025-09-02_at_10.30.09.png)
+  </Step>
+  <Step title="Configure Webhook Fields">
+    Configure the field values with your listener information
 
-3. Click on the "Webhooks" Tab
+    | Field           | Value to enter                                                                                                                 |
+    | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+    | **Webhook URL** | *Enter the Webhook URL you created in [Phase 1](/docs/webhook-triggers-quickstart-guide#phase-1-set-up-your-webhook-listener)* |
+    | **API Key**     | *Leave empty*                                                                                                                  |
+  </Step>
+  <Step title="Generate Webhook Payload">
+    Select the "Simple Notification" tab and click on "Generate Webhook Payload"
 
-   ![](/images/docs/c97ce7e4a39d1f05c3cdd9029392751efe7ad1bcaa37abf1562ad9c9caa9457a-CleanShot_2025-09-02_at_10.30.09.png)
+    A payload will be generated for your upcoming webhook:
 
-4. Configure the field values with your listener information
-
-   | Field           | Value to enter                                                                                                                 |
-   | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-   | **Webhook URL** | *Enter the Webhook URL you created in [Phase 1](/docs/webhook-triggers-quickstart-guide#phase-1-set-up-your-webhook-listener)* |
-   | **API Key**     | *Leave empty*                                                                                                                  |
-
-5. Select the "Simple Notification" tab and click on "Generate Webhook Payload"
-
-   1. A payload will be generated for your upcoming webhook
-
-      <CodeGroup>
-        ```bash bash
-        {
-          "createdAt": "2025-09-02T18:10:28Z",
-          "data": {
-            "actions": [
-              {
-                "text": "View PTO Policy",
-                "url": "https://internal-hr.example.com/policies/pto-2025"
-              }
-            ],
-            "alert_code": "PTO-EXP-WARN-90",
-            "details": {
-              "accrual_policy": "use-it-or-lose-it",
-              "current_balance_hours": 112.5,
-              "hours_at_risk": 72.5,
-              "policy_id": "pol_hr_pto_standard_2025"
-            },
-            "last_date": "Tue Sep 09 2025",
-            "message": "This is a friendly reminder that you have accrued paid time off that is set to expire. To ensure you don't lose these hours, please schedule and take your vacation time.",
-            "object": "alert",
-            "priority": "medium",
-            "title": "Action Required: Use Your PTO Balance Before Year-End"
+    <CodeGroup>
+      ```bash bash
+      {
+        "createdAt": "2025-09-02T18:10:28Z",
+        "data": {
+          "actions": [
+            {
+              "text": "View PTO Policy",
+              "url": "https://internal-hr.example.com/policies/pto-2025"
+            }
+          ],
+          "alert_code": "PTO-EXP-WARN-90",
+          "details": {
+            "accrual_policy": "use-it-or-lose-it",
+            "current_balance_hours": 112.5,
+            "hours_at_risk": 72.5,
+            "policy_id": "pol_hr_pto_standard_2025"
           },
-          "email": "[email protected]",
-          "eventId": "evt_alert_2b3c4d5e6f7G8h9I0jK",
-          "eventType": "alert.pto_expiration_warning",
-          "sessionId": "C7KOA5KoumkgsTiXDHa4" // This sessionId will be based on your session
-        }
-        ```
-      </CodeGroup>
+          "last_date": "Tue Sep 09 2025",
+          "message": "This is a friendly reminder that you have accrued paid time off that is set to expire. To ensure you don't lose these hours, please schedule and take your vacation time.",
+          "object": "alert",
+          "priority": "medium",
+          "title": "Action Required: Use Your PTO Balance Before Year-End"
+        },
+        "email": "[email protected]",
+        "eventId": "evt_alert_2b3c4d5e6f7G8h9I0jK",
+        "eventType": "alert.pto_expiration_warning",
+        "sessionId": "C7KOA5KoumkgsTiXDHa4" // This sessionId will be based on your session
+      }
+      ```
+    </CodeGroup>
 
-   2. Change the `data` and `email` fields to the corresponding values you would want.
-
-6. Click on **Trigger Webhook**
+    Change the `data` and `email` fields to the corresponding values you would want.
+  </Step>
+  <Step title="Trigger Webhook">
+    Click on **Trigger Webhook**
+  </Step>
+</Steps>
 
 <Check>
   ### Success! Check Your Notifications
