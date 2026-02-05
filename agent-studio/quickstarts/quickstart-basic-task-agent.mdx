@@ -22,8 +22,14 @@ This Quickstart guide provides a comprehensive walkthrough on how to build a sim
 
 # Prerequisites
 
-1. Access to "Agent Studio" App.
-2. Basic understanding of [Actions](actions).
+<CardGroup cols={2}>
+  <Card title="Agent Studio Access" icon="key">
+    Access to the "Agent Studio" App
+  </Card>
+  <Card title="Actions Knowledge" icon="bolt" href="actions">
+    Basic understanding of Actions
+  </Card>
+</CardGroup>
 
 ***
 
@@ -37,21 +43,20 @@ Agents are AI-powered digital workers who can understand natural language reques
 
 ### Types of Agents
 
-#### Task Agents
-
-Task Agents are designed to handle specific, well-defined tasks that typically involve a single request and response cycle. They excel at executing discrete actions like checking statuses, submitting tickets, or retrieving information. Task Agents are perfect for automating routine operations that previously required manual intervention.
-
-#### Process Agents
-
-Process Agents manage multi-step workflows that span across different systems and may require sequential actions. These agents can coordinate complex business processes that involve decision points, conditional logic, and multiple backend systems. Process Agents are ideal for automating end-to-end workflows like employee onboarding or change management processes.
-
-#### Proactive Agents
-
-Proactive Agents monitor systems and data to initiate actions without explicit user requests. They can detect patterns, anticipate needs, and take preemptive steps to address potential issues before they impact operations. These agents provide value through timely interventions based on predefined triggers and conditions.
-
-#### Ambient Agents
-
-Ambient Agents work continuously in the background, learning from interactions and improving over time. They build a contextual understanding of your organization's operations and can offer insights or assistance based on observed patterns. Ambient Agents enhance the overall intelligence of your automation ecosystem.
+<AccordionGroup>
+  <Accordion title="Task Agents" icon="check-circle">
+    Task Agents are designed to handle specific, well-defined tasks that typically involve a single request and response cycle. They excel at executing discrete actions like checking statuses, submitting tickets, or retrieving information. Task Agents are perfect for automating routine operations that previously required manual intervention.
+  </Accordion>
+  <Accordion title="Process Agents" icon="sitemap">
+    Process Agents manage multi-step workflows that span across different systems and may require sequential actions. These agents can coordinate complex business processes that involve decision points, conditional logic, and multiple backend systems. Process Agents are ideal for automating end-to-end workflows like employee onboarding or change management processes.
+  </Accordion>
+  <Accordion title="Proactive Agents" icon="bell">
+    Proactive Agents monitor systems and data to initiate actions without explicit user requests. They can detect patterns, anticipate needs, and take preemptive steps to address potential issues before they impact operations. These agents provide value through timely interventions based on predefined triggers and conditions.
+  </Accordion>
+  <Accordion title="Ambient Agents" icon="cloud">
+    Ambient Agents work continuously in the background, learning from interactions and improving over time. They build a contextual understanding of your organization's operations and can offer insights or assistance based on observed patterns. Ambient Agents enhance the overall intelligence of your automation ecosystem.
+  </Accordion>
+</AccordionGroup>
 
 ## Agent Studio Overview
 
@@ -105,9 +110,17 @@ To get to this experience, the **Conversational Process** should consist of one 
 
 You'll build an end-to-end working Plugin via these phases:
 
-1. Set up an **Action (HTTP Action)**.
-2. Build the **Conversational Process**, containing the 1 Activity (using the Action set up in the previous phase) and the 1 Slot, as illustrated above.
-3. Add the Conversational Process to your AI Agent by launching a **Plugin**.
+<CardGroup cols={3}>
+  <Card title="Phase 1" icon="bolt">
+    Set up an **Action (HTTP Action)**
+  </Card>
+  <Card title="Phase 2" icon="diagram-project">
+    Build the **Conversational Process** with 1 Activity and 1 Slot
+  </Card>
+  <Card title="Phase 3" icon="rocket">
+    Launch a **Plugin** to add your Process to the AI Agent
+  </Card>
+</CardGroup>
 
 *Let's get started!*
 
@@ -133,24 +146,32 @@ You'll build an end-to-end working Plugin via these phases:
 
 In this guide, the PTO data that your Action will access lives behind the Moveworks Purple API Connector. To access this data via your Action, you need to set up a (reusable) connector:
 
-1. Navigate to the App Picker in the top right corner of Agent Studio.
+<Steps>
+  <Step title="Navigate to App Picker">
+    Navigate to the App Picker in the top right corner of Agent Studio.
+  </Step>
+  <Step title="Open HTTP Connectors">
+    Click on "HTTP Connectors", which will take you to another browser tab.
 
-2. Click on "HTTP Connectors", which will take you to another browser tab.
+    ![](/images/docs/eac1a5fcfe10b386a1f5cbadfefbfe55b6fafe24491c492b176bcc107a674470-CleanShot_2025-04-12_at_12.06.49.png)
+  </Step>
+  <Step title="Create New Connector">
+    Click "Create" in the top right corner.
+  </Step>
+  <Step title="Fill Out Connector Details">
+    Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-   ![](/images/docs/eac1a5fcfe10b386a1f5cbadfefbfe55b6fafe24491c492b176bcc107a674470-CleanShot_2025-04-12_at_12.06.49.png)
-
-3. Click "Create" in the top right corner.
-
-4. Fill out the following information for your Connector (be sure to replace "firstname" and "lastname" with your corresponding information).
-
-   | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
-   | ------------------- | ---------------------------------------------------------------- |
-   | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
-   | **Description**     | `Moveworks Purple APIs Connector`                                |
-   | **Base Url**        | `https://marketplace.moveworks.com`                              |
-   | **Auth Config**     | `No Auth`                                                        |
-
-5. Click "Save" on the bottom right corner.
+    | Field               | Value to enter (replace "firstname" & "lastname" with your info) |
+    | ------------------- | ---------------------------------------------------------------- |
+    | **Connection Name** | `firstname_lastname_moveworks_purple`                            |
+    | **Description**     | `Moveworks Purple APIs Connector`                                |
+    | **Base Url**        | `https://marketplace.moveworks.com`                              |
+    | **Auth Config**     | `No Auth`                                                        |
+  </Step>
+  <Step title="Save Your Connector">
+    Click "Save" on the bottom right corner.
+  </Step>
+</Steps>
 
 <Check>
   ### You're now fully ready to start building. On to Phase 1!
@@ -168,94 +189,106 @@ In this guide, the PTO data that your Action will access lives behind the Movewo
 
 We'll start by creating an [HTTP Action](http-actions) that can query an external system for a user's PTO balance.
 
-1. Navigate to the App Picker in the top right corner. Click on "Agent Studio".
+<Steps>
+  <Step title="Navigate to Agent Studio">
+    Navigate to the App Picker in the top right corner. Click on "Agent Studio".
 
-   ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+    ![](/images/docs/8a1d6d41f2431631dcb80e0736ffd9ec0bb31418100bc79463170fe7840cba2d-CleanShot_2025-04-14_at_08.48.272x.png)
+  </Step>
+  <Step title="Navigate to HTTP Action">
+    Navigate to a new HTTP Action.
+  </Step>
+  <Step title="Create New Action">
+    Click "Create".
 
-2. Navigate to a new HTTP Action.
+    ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following Title and Description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-3. Click "Create".
+    ![](/images/docs/b359101066aa7ca26d1d6178e1c6d5807a1255f1d59c89b0a524a8aa7b598fbf-CleanShot_2025-04-12_at_12.19.00.png)
 
-   ![](/images/docs/f766e3b729ab041efe71fc7f811d7086cab20363a6e32e74738aa10c75965e6f-Screenshot_2025-04-11_at_22.27.04.png)
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_get_mw_pto_balance_action`                   |
+    | **Description** | `Fetches the PTO balance for a given user`                       |
+  </Step>
+  <Step title="Enter API Details">
+    Enter the details of your API:
 
-4. Set the following Title and Description for your Action (be sure to replace "firstname" and "lastname" with your corresponding information).
+    1. Click on the "Import" icon to the right of the "TEST" button.
 
-   ![](/images/docs/b359101066aa7ca26d1d6178e1c6d5807a1255f1d59c89b0a524a8aa7b598fbf-CleanShot_2025-04-12_at_12.19.00.png)
+       ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_get_mw_pto_balance_action`                   |
-   | **Description** | `Fetches the PTO balance for a given user`                       |
+    2. Paste the following cURL command (this represents an endpoint which has one dynamic user email query parameter):
 
-5. Enter the details of your API:
+       <CodeGroup>
+         ```bash bash
+         curl -X GET "https://marketplace.moveworks.com/api/purple-suite/hris/pto-balance?email={{user_email}}&pto_type={{pto_type}}"
+         ```
+       </CodeGroup>
 
-   1. Click on the "Import" icon to the right of the "TEST" button.
+    3. Click "Import" (your Action should now be auto-populated with details).
+  </Step>
+  <Step title="Add Your Connector">
+    Add your Connector:
 
-      ![](/images/docs/211a66734c7e49958b56459da201f7c13d5db1969a9aa20538baef768b0bd03d-Screenshot_2025-04-11_at_15.39.40.png)
+    1. Navigate to the Connector tab.
 
-   2. Paste the following cURL command (this represents an endpoint which has one dynamic user email query parameter):
+    2. Select the "Inherit from existing connector" radio button.
 
-      <CodeGroup>
-        ```bash bash
-        curl -X GET "https://marketplace.moveworks.com/api/purple-suite/hris/pto-balance?email={{user_email}}&pto_type={{pto_type}}"
-        ```
-      </CodeGroup>
+    3. Select the Connector you created in Phase 0 from the dropdown (e.g. `firstname_lastname_moveworks_purple`).
 
-   3. Click "Import" (your Action should now be auto-populated with details).
+       ![](/images/docs/e47f2a6e69b0a5e0377c7f46b7409c80b18aa1b78eb77f3588ca547b0c85e02a-CleanShot_2025-04-28_at_16.17.20.png)
+  </Step>
+  <Step title="Define Input Arguments">
+    Define a formal input argument to represent the "user email" input this Action requires:
 
-6. Add your Connector.
+    1. Click on the "Input Args" button near the top right corner.
 
-   1. Navigate to the Connector tab.
+       ![](/images/docs/0d41f4e1399a260f8d8ca56ba5ddf0d62d316512775e1201258a56436f83a0b1-CleanShot_2025-04-28_at_16.18.55.png)
 
-   2. Select the "Inherit from existing connector" radio button.
+    2. Click "Create New" in the Input Arguments pop up.
 
-   3. Select the Connector you created in Phase 0 from the dropdown (e.g. `firstname_lastname_moveworks_purple`).
+    3. Fill out the following details for your `user_email` argument:
 
-      ![](/images/docs/e47f2a6e69b0a5e0377c7f46b7409c80b18aa1b78eb77f3588ca547b0c85e02a-CleanShot_2025-04-28_at_16.17.20.png)
+       | Field label       | Value to enter/select                                    |
+       | ----------------- | -------------------------------------------------------- |
+       | **Argument Name** | `user_email`                                             |
+       | **Data Type**     | *Select "string"*                                        |
+       | **Example Value** | `[email protected]`                                      |
+       | **Description**   | `The email address of the user to fetch PTO balance for` |
+       | **Required**      | *Check the box*                                          |
 
-7. Define a formal input argument to represent the "user email" input this Action requires:
+    4. Hit "Save" and click on "Create New" to create input argument.
 
-   1. Click on the "Input Args" button near the top right corner.
+    5. Fill out the following details for your `pto_type` argument:
 
-      ![](/images/docs/0d41f4e1399a260f8d8ca56ba5ddf0d62d316512775e1201258a56436f83a0b1-CleanShot_2025-04-28_at_16.18.55.png)
+       | Field label       | Value to enter/select                                   |
+       | ----------------- | ------------------------------------------------------- |
+       | **Argument Name** | `pto_type`                                              |
+       | **Data Type**     | *Select "string"*                                       |
+       | **Example Value** | `vacation`                                              |
+       | **Description**   | `The pto balance type of the user you are fetching for` |
+       | **Required**      | *Check the box*                                         |
 
-   2. Click "Create New" in the Input Arguments pop up.
+    6. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
+  </Step>
+  <Step title="Test Your Action">
+    Test your Action:
 
-   3. Fill out the following details for your `user_email` argument:
+    1. Click on the "TEST" icon (to the right of the endpoint URL definition).
 
-      | Field label       | Value to enter/select                                    |
-      | ----------------- | -------------------------------------------------------- |
-      | **Argument Name** | `user_email`                                             |
-      | **Data Type**     | *Select "string"*                                        |
-      | **Example Value** | `[email protected]`                                      |
-      | **Description**   | `The email address of the user to fetch PTO balance for` |
-      | **Required**      | *Check the box*                                          |
+    2. Inspect the Console to verify that you receive a successful response:
 
-   4. Hit "Save" and click on "Create New" to create input argument.
-
-   5. Fill out the following details for your `pto_type` argument:
-
-      | Field label       | Value to enter/select                                   |
-      | ----------------- | ------------------------------------------------------- |
-      | **Argument Name** | `pto_type`                                              |
-      | **Data Type**     | *Select "string"*                                       |
-      | **Example Value** | `vacation`                                              |
-      | **Description**   | `The pto balance type of the user you are fetching for` |
-      | **Required**      | *Check the box*                                         |
-
-   6. Hit "Save" and hit the "X" icon to close this "Input Arguments" pop up.
-
-8. Test your Action:
-
-   1. Click on the "TEST" icon (to the right of the endpoint URL definition).
-
-   2. Inspect the Console to verify that you receive a successful response:
-
-      <Frame caption="You should see: Status Code 200, a PTO result object, and a response schema of the returned object.">
-        <img src="/images/docs/ee973f700e84f88193f46d2815cc786987272201c30bcd6940507d7b7c1d30c0-CleanShot_2025-04-28_at_16.26.16.png" />
-      </Frame>
-
-9. Click "Publish". Review details, and click "Publish" once again.
+       <Frame caption="You should see: Status Code 200, a PTO result object, and a response schema of the returned object.">
+         <img src="/images/docs/ee973f700e84f88193f46d2815cc786987272201c30bcd6940507d7b7c1d30c0-CleanShot_2025-04-28_at_16.26.16.png" />
+       </Frame>
+  </Step>
+  <Step title="Publish Your Action">
+    Click "Publish". Review details, and click "Publish" once again.
+  </Step>
+</Steps>
 
 <Check>
   ### Congratulations! You've set up your first Action.
@@ -279,86 +312,99 @@ In this phase, you'll 1) build a `user_email` **[Slot](/docs/slots)**, and 2) an
 
 ![](/images/docs/f0d78b166c14e9518feaa191ceb8d2f1ceaa3254b10f563b1a888e18676d5b62-Screenshot_2025-04-12_at_02.09.18.png)
 
-1. Navigate to a new Conversational Process (navigate to the library and click "Create"). ![](/images/docs/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+<Steps>
+  <Step title="Create a New Conversational Process">
+    Navigate to a new Conversational Process (navigate to the library and click "Create").
+    
+    ![](/images/docs/cf672292d3288b63d4346bbc1485e470afb98eefb4dbb74b1f8a410de724a806-Screenshot_2025-04-11_at_22.25.42.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Conversational Process (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_get_mw_pto_balance_process`                  |
+    | **Description** | `Fetches the PTO balance for a given user`                       |
+  </Step>
+  <Step title="Add a New Slot">
+    Add a new **Slot** to represent the user email that this process will need to collect. 📖 *[Learn more about Slots](/docs/slots)*.
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_get_mw_pto_balance_process`                  |
-   | **Description** | `Fetches the PTO balance for a given user`                       |
+    1. Click on the "Slots" button near the top right corner of the editor.
 
-3. Add a new **Slot** to represent the user email that this process will need to collect. 📖 *[Learn more about Slots](/docs/slots)*.
+       ![](/images/docs/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png)
 
-   1. Click on the "Slots" button near the top right corner of the editor.
+    2. Click "Create New" in the Slots pop up.
 
-      ![](/images/docs/66a573184d7a15edd6172d4e958100d15df2d029eb27559f307fcace224f741f-Screenshot_2025-04-11_at_22.34.38.png)
+    3. Fill out the following details for your Slot:
 
-   2. Click "Create New" in the Slots pop up.
+       | Field label                     | Value to enter/select                               |
+       | ------------------------------- | --------------------------------------------------- |
+       | **Name**                        | `pto_type`                                          |
+       | **Data Type**                   | *Select "string"*                                   |
+       | **Slot Description**            | `The type of PTO balance the user is fetching for.` |
+       | **Slot Validation Policy**      | *Leave blank*                                       |
+       | **Slot Validation Description** | *Leave blank*                                       |
+       | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*       |
 
-   3. Fill out the following details for your Slot:
+    4. Before saving this slot you will add an **Resolver strategy**. You want to power this Slot with a **[Static Resolver](/docs/resolver-strategies#configuring-a-static-resolver)**.
 
-      | Field label                     | Value to enter/select                               |
-      | ------------------------------- | --------------------------------------------------- |
-      | **Name**                        | `pto_type`                                          |
-      | **Data Type**                   | *Select "string"*                                   |
-      | **Slot Description**            | `The type of PTO balance the user is fetching for.` |
-      | **Slot Validation Policy**      | *Leave blank*                                       |
-      | **Slot Validation Description** | *Leave blank*                                       |
-      | **Slot Inference Policy**       | *Leave as is (Infer slot value if available)*       |
+       1. At the very bottom of the Slot creation popup, click on "Resolver Strategy" and "Create".
 
-   4. Before saving this slot you will add an **Resolver strategy**. You want to power this Slot with a **[Static Resolver](/docs/resolver-strategies#configuring-a-static-resolver)**.
+       2. Click "+ Add Method".
 
-      1. At the very bottom of the Slot creation popup, click on "Resolver Strategy" and "Create".
+          1. Fill out the following initial details for your Method.
 
-      2. Click "+ Add Method".
+             | Field Label     | Value to enter/select                    |
+             | --------------- | ---------------------------------------- |
+             | **Method Name** | `choose_from_existing_pto_balance_types` |
+             | **Method Type** | *Select`Static`*                         |
 
-         1. Fill out the following initial details for your Method.
+       3. Add the following Static Options for your Static Resolver Method. (Note: the "Raw Value" column contains the actual values that your "get mw pto balance" HTTP Action expects in order to successfully retrieve the type PTO balance).
 
-            | Field Label     | Value to enter/select                    |
-            | --------------- | ---------------------------------------- |
-            | **Method Name** | `choose_from_existing_pto_balance_types` |
-            | **Method Type** | *Select`Static`*                         |
+          | Display Value | Raw Value  |
+          | ------------- | ---------- |
+          | `Vacation`    | `vacation` |
+          | `Sick`        | `sick`     |
 
-      3. Add the following Static Options for your Static Resolver Method. (Note: the "Raw Value" column contains the actual values that your "get mw pto balance" HTTP Action expects in order to successfully retrieve the type PTO balance).
+       4. Click the "X" in the top right corner of the "Strategy Definition" pop up.
 
-      | Display Value | Raw Value  |
-      | ------------- | ---------- |
-      | `Vacation`    | `vacation` |
-      | `Sick`        | `sick`     |
+    5. Hit "Save" (scroll to the bottom of the slot popup) and hit the "X" icon to close this "Slots" pop up.
+  </Step>
+  <Step title="Build an Action Activity">
+    Build an **Action Activity** that will perform the retrieval of a user's PTO balance. 📖 *[Learn more about Activities](/docs/activities).*
 
-      4. Click the "X" in the top right corner of the "Strategy Definition" pop up.
+    1. Click on the "+ Add a block to your process" button in the main section of the editor.
 
-   5. Hit "Save" (scroll to the bottom of the slot popup) and hit the "X" icon to close this "Slots" pop up.
+    2. Click on "Action Activity".
 
-4. Build an **Action Activity** that will perform the retrieval of a user's PTO balance. 📖 *[Learn more about Activities](/docs/activities).*
+       ![](/images/docs/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png)
 
-   1. Click on the "+ Add a block to your process" button in the main section of the editor.
+    3. Fill out the following details for your Action Activity, which mostly involves connecting your Slot to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process):
 
-   2. Click on "Action Activity".
+       | Field label                                 | Value to enter/select                                                                          |
+       | ------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+       | **Action**                                  | \*Select the`firstname_lastname_get_mw_pto_balance_action` Action that you built in Phase 1 \* |
+       | **Required Slots**                          | *Select the`pto_type` Slot that you added*                                                     |
+       | **Input mapping**                           | `pto_type: data.pto_type.value` `user_email: meta_info.user.email_addr`                        |
+       | **Output Mapping** (".dot\_walk\_here" box) | `.pto_details`                                                                                 |
+       | **Output Key**                              | `pto_balance_result`                                                                           |
+       | **Confirmation Policy**                     | *Leave unchecked*                                                                              |
+  </Step>
+  <Step title="Validate Your Process">
+    Click "Validate" (Located in the top right corner. Click on the caret icon next to the Publish button). If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
 
-      ![](/images/docs/9923f68921ed0d545cac8d400cc96f427e97c3d7b97c77f8c9efd5aeb19e8bd8-Screenshot_2025-04-11_at_22.54.07.png)
-
-   3. Fill out the following details for your Action Activity, which mostly involves connecting your Slot to the input(s) of the HTTP Action (and mapping the result of the Action back to the Conversational Process):
-
-      | Field label                                 | Value to enter/select                                                                          |
-      | ------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-      | **Action**                                  | \*Select the`firstname_lastname_get_mw_pto_balance_action` Action that you built in Phase 1 \* |
-      | **Required Slots**                          | *Select the`pto_type` Slot that you added*                                                     |
-      | **Input mapping**                           | `pto_type: data.pto_type.value` `user_email: meta_info.user.email_addr`                        |
-      | **Output Mapping** (".dot\_walk\_here" box) | `.pto_details`                                                                                 |
-      | **Output Key**                              | `pto_balance_result`                                                                           |
-      | **Confirmation Policy**                     | *Leave unchecked*                                                                              |
-
-5. Click "Validate" (Located in the top right corner. Click on the caret icon next to the Publish button). If everything went well so far, the Console (bottom of the editor) will say "Validation successful".
-
-   1. 💡Pro-tip: You can also use the following hotkeys to validate without pressing the button:
+    <Tip>
+      You can also use the following hotkeys to validate without pressing the button:
 
       | On a MacOS machine | On a Windows machine |
       | ------------------ | -------------------- |
       | Cmd + Shift + V    | Ctrl + Shift + V     |
-
-6. Click "Publish". Review details, and click "Publish" once again.
+    </Tip>
+  </Step>
+  <Step title="Publish Your Process">
+    Click "Publish". Review details, and click "Publish" once again.
+  </Step>
+</Steps>
 
 <Check>
   ### Awesome! You've just built the main part of this Plugin: the Conversational Process.
@@ -378,49 +424,60 @@ In this phase, you'll 1) build a `user_email` **[Slot](/docs/slots)**, and 2) an
 
 In our final section, you’ll learn how to add your Conversational Process to a **Plugin**, and control the Triggering scenarios of your Plugin, and specify which end users are allowed to use your Plugin.
 
-1. Navigate to a new Plugin (navigate to the library and click "Create"). ![](/images/docs/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+<Steps>
+  <Step title="Create a New Plugin">
+    Navigate to a new Plugin (navigate to the library and click "Create").
+    
+    ![](/images/docs/2538849f05fc57c0680d22e384afc549488573cf9bbb9e2445136573a31d527a-Screenshot_2025-04-11_at_22.23.36.png)
+  </Step>
+  <Step title="Set Title and Description">
+    Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
 
-2. Set the following title and description for your Plugin (be sure to replace "firstname" and "lastname" with your corresponding information).
+    | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
+    | --------------- | ---------------------------------------------------------------- |
+    | **Title**       | `firstname_lastname_get_mw_pto_balance`                          |
+    | **Description** | `Fetches the PTO balance for a given user`                       |
+  </Step>
+  <Step title="Define a Conversational Trigger">
+    Define a Conversational Trigger. 📖 *[Learn more about Natural Language Triggers](/docs/natural-language-triggers).*
 
-   | Field           | Value to enter (replace "firstname" & "lastname" with your info) |
-   | --------------- | ---------------------------------------------------------------- |
-   | **Title**       | `firstname_lastname_get_mw_pto_balance`                          |
-   | **Description** | `Fetches the PTO balance for a given user`                       |
+    1. Click on "Define a trigger".
 
-3. Define a Conversational Trigger. 📖 *[Learn more about Natural Language Triggers](/docs/natural-language-triggers).*
+    2. In the panel that appears on the right, either:
 
-   1. Click on "Define a trigger".
+       1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
 
-   2. In the panel that appears on the right, either:
+       2. Add the following recommended utterances:
 
-      1. Approve (click "Trigger") 5 of the auto-generated suggested positive examples, or
+          | Utterances to add                                   |
+          | --------------------------------------------------- |
+          | `How can I check my current paid time off balance?` |
+          | `Can I take PTO next week?`                         |
+          | `I want to take PTO the first week of May`          |
+          | `Check PTO balance`                                 |
+          | `What is my remaining paid time off balance`        |
+  </Step>
+  <Step title="Choose Your Conversational Process">
+    Choose your Conversational Process (the one you built in Phase 2).
 
-      2. Add the following recommended utterances:
+    1. Click on "Set a process".
+    2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_get_mw_pto_balance_process`)
+  </Step>
+  <Step title="Define Your Launch Configuration">
+    Define your Launch Configuration.
 
-         | Utterances to add                                   |
-         | --------------------------------------------------- |
-         | `How can I check my current paid time off balance?` |
-         | `Can I take PTO next week?`                         |
-         | `I want to take PTO the first week of May`          |
-         | `Check PTO balance`                                 |
-         | `What is my remaining paid time off balance`        |
+    1. Navigate to the "Launch Configuration" tab.
 
-4. Choose your Conversational Process (the one you built in Phase 2).
+       ![](/images/docs/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png)
 
-   1. Click on "Set a process".
-   2. In the panel that appears on the right, search for and select the Conversational Process that you built in Phase 2 (should be named `firstname_lastname_get_mw_pto_balance_process`)
+    2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
 
-5. Define your Launch Configuration.
-
-   1. Navigate to the "Launch Configuration" tab.
-
-      ![](/images/docs/d4019c54aae64f4d69e70c8f759774bb183bfa5cf1d821981394731cfab4f6ca-Screenshot_2025-04-12_at_00.05.14.png)
-
-   2. In the Input field under "Allow selected users", enter your email (or multiple emails using commas to separate the email addresses).
-
-      ![](/images/docs/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png)
-
-6. Click "Publish". Review details, and click "Publish" once again to launch your Plugin.
+       ![](/images/docs/8bf3be36c9cca23420ce9b386d1e9bf3ec64573f5cb43d0504844ad4e5b7a015-Screenshot_2025-04-12_at_00.07.06.png)
+  </Step>
+  <Step title="Publish Your Plugin">
+    Click "Publish". Review details, and click "Publish" once again to launch your Plugin.
+  </Step>
+</Steps>
 
 <Warning>
   ### Don't forget to press "enter" when adding user emails
